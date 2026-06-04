@@ -1,0 +1,29 @@
+---
+import { blogCategoryLabels } from "../../../config/taxonomy";
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllBlogCategories, getPostsByCategory } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const categories = await getAllBlogCategories();
+
+  return categories.map((category) => ({
+    params: { category },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const posts = await getPostsByCategory(category);
+---
+
+<BaseLayout title={`分类：${blogCategoryLabels[category]}`} description={`归档所有 ${blogCategoryLabels[category]} 分类下的文章。`} image="/og/page/blog.svg">
+  <ArchivePageLayout
+    title={`分类：${blogCategoryLabels[category]}`}
+    description="按栏目聚合文章，让内容不只是时间线，也能形成稳定主题入口。"
+    breadcrumbs={[{ label: "博客", href: "/blog" }, { label: `分类：${blogCategoryLabels[category]}` }]}
+  >
+    {posts.map((post) => <ArticleCard post={post} />)}
+  </ArchivePageLayout>
+</BaseLayout>

@@ -1,0 +1,25 @@
+---
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllBlogSeries, getPostsBySeries } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const seriesList = await getAllBlogSeries();
+
+  return seriesList.map((series) => ({ params: { series }, props: { series } }));
+}
+
+const { series } = Astro.props as { series: string };
+const posts = await getPostsBySeries(series);
+---
+
+<BaseLayout title={`系列：${series}`} description={`归档所有属于 ${series} 系列的文章。`} image="/og/page/blog.svg">
+  <ArchivePageLayout
+    title={`系列：${series}`}
+    description="按系列聚合文章，方便把阶段性写作组织成连续主题。"
+    breadcrumbs={[{ label: "博客", href: "/blog" }, { label: `系列：${series}` }]}
+  >
+    {posts.map((post) => <ArticleCard post={post} />)}
+  </ArchivePageLayout>
+</BaseLayout>

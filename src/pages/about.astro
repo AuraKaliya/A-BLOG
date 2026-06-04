@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getAboutPageData } from "../lib/content";
+import { siteConfig } from "../config/site";
+
+const aboutPage = await getAboutPageData();
+const about = aboutPage.data;
+---
+
+<BaseLayout title={about.title} description={about.description} image="/og/page/about.svg">
+  <main class="page-main">
+    <section class="page-hero container">
+      <h1>{about.title}</h1>
+      <p>这里是个人档案页的基础框架，可以继续替换为你的真实经历、方向和联系方式。</p>
+    </section>
+
+    <section class="about-section section-dark">
+      <div class="container about-grid">
+        <article class="about-story">
+          <h3>{about.intro.title}</h3>
+          <p>{about.intro.description}</p>
+        </article>
+        <div class="stats-grid" id="focus">
+          {about.focusAreas.map((item, index) => <article><strong>{String(index + 1).padStart(2, "0")}</strong><span>{item}</span></article>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="support-section section-mid" id="stack">
+      <div class="container support-layout">
+        <div class="support-panel">
+          {
+            about.stackCards.map((card) => (
+              <article class:list={["support-card", { primary: card.featured }]}>
+                {card.label && <span class="eyebrow">{card.label}</span>}
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </article>
+            ))
+          }
+        </div>
+
+        <div class="support-form static-panel" id="contact">
+          <span class="eyebrow">Contact</span>
+          <h3>联系方式</h3>
+          <label>
+            <span>{about.contact.emailLabel}</span>
+            <input type="text" value={siteConfig.author.email} readonly />
+          </label>
+          <label>
+            <span>{about.contact.githubLabel}</span>
+            <input type="text" value={siteConfig.author.github.replace("https://", "")} readonly />
+          </label>
+          <label>
+            <span>{about.contact.socialLabel}</span>
+            <input type="text" value={siteConfig.author.social} readonly />
+          </label>
+          <a class="primary-cta submit" href={`mailto:${siteConfig.author.email}`}>{about.contact.ctaLabel}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,25 @@
+---
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllBlogTags, getPostsByTag } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const tags = await getAllBlogTags();
+
+  return tags.map((tag) => ({ params: { tag }, props: { tag } }));
+}
+
+const { tag } = Astro.props;
+const posts = await getPostsByTag(tag);
+---
+
+<BaseLayout title={`标签：${tag}`} description={`归档所有标记为 ${tag} 的文章。`} image="/og/page/blog.svg">
+  <ArchivePageLayout
+    title={`标签：${tag}`}
+    description="按标签聚合文章，方便之后把长期写作整理成主题索引。"
+    breadcrumbs={[{ label: "博客", href: "/blog" }, { label: `标签：${tag}` }]}
+  >
+    {posts.map((post) => <ArticleCard post={post} />)}
+  </ArchivePageLayout>
+</BaseLayout>

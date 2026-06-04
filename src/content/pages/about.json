@@ -1,0 +1,37 @@
+{
+  "kind": "about",
+  "title": "关于",
+  "description": "个人介绍、关注方向、技术栈和联系方式。",
+  "intro": {
+    "title": "先把自己放进一个清晰的结构里。",
+    "description": "个人网站最有用的地方，是让别人快速理解你长期关注什么、做过什么、正在构建什么，以及为什么这些内容放在一起。"
+  },
+  "focusAreas": [
+    "前端与展示系统",
+    "AI 应用与自动化",
+    "产品与内容结构",
+    "长期写作与复盘"
+  ],
+  "stackCards": [
+    {
+      "label": "Stack",
+      "title": "当前技术栈",
+      "description": "Astro、Markdown、TypeScript、现代 CSS，以及后续可以接入的搜索、评论和数据分析。",
+      "featured": true
+    },
+    {
+      "title": "站点定位",
+      "description": "纯展示为主，优先保证内容组织、视觉质感、SEO 和维护成本。"
+    },
+    {
+      "title": "后续扩展",
+      "description": "可以逐步加入主题索引、系列文章、作品筛选、站内搜索和订阅能力。"
+    }
+  ],
+  "contact": {
+    "ctaLabel": "发送邮件",
+    "emailLabel": "邮箱",
+    "githubLabel": "GitHub",
+    "socialLabel": "社交主页"
+  }
+}

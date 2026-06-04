@@ -1,0 +1,82 @@
+---
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getContentStats, getFeaturedPosts, getFeaturedWorks, getNowPageData } from "../lib/content";
+
+const [nowPage, stats, posts, works] = await Promise.all([getNowPageData(), getContentStats(), getFeaturedPosts(3), getFeaturedWorks(3)]);
+const now = nowPage.data;
+---
+
+<BaseLayout title={now.title} description={now.description} image="/og/page/now.svg">
+  <main class="page-main">
+    <PageHero title={now.title} description="一个轻量的状态页：告诉访问者这个站正在关注什么、已经有什么、下一步准备补什么。" />
+
+    <section class="about-section section-dark">
+      <div class="container archive-list">
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "现在" }]} />
+        <div class="stats-grid expanded">
+          <article>
+            <strong>{stats.postCount}</strong>
+            <span>公开文章</span>
+          </article>
+          <article>
+            <strong>{stats.workCount}</strong>
+            <span>作品条目</span>
+          </article>
+          <article>
+            <strong>{stats.topicCount}</strong>
+            <span>主题方向</span>
+          </article>
+          <article>
+            <strong>{stats.tagCount}</strong>
+            <span>文章标签</span>
+          </article>
+        </div>
+
+        <SectionHeading
+          eyebrow="Focus"
+          title={now.intro.title}
+          description={now.intro.description}
+        />
+        <div class="topic-overview">
+          {now.focusAreas.map((area, index) => <article class="topic-tile"><span>{String(index + 1).padStart(2, "0")}</span><strong>{area.title}</strong><p>{area.description}</p></article>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="support-section section-mid">
+      <div class="container archive-list">
+        <SectionHeading eyebrow="Tracks" title="迭代轨道" description="把当前开发工作拆成可以持续推进的几个轨道。" />
+        <div class="support-panel lab-panel">
+          {
+            now.tracks.map((track, index) => (
+              <article class:list={["support-card", { primary: index === 0 }]}>
+                <h3>{track.title}</h3>
+                <p>{track.description}</p>
+                <ul class="status-list">{track.items.map((item) => <li>{item}</li>)}</ul>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="archive-section section-dark">
+      <div class="container archive-list">
+        <SectionHeading eyebrow="Recent" title="最近可以展示的内容" description="这里复用精选文章和精选作品，后续可替换成真实更新流。" />
+        <div class="now-recents">
+          <div class="resource-column">
+            <h4>精选文章</h4>
+            {posts.map((post) => <a href={`/blog/${post.slug}`}>{post.data.title}</a>)}
+          </div>
+          <div class="resource-column">
+            <h4>精选作品</h4>
+            {works.map((work) => <a href={`/works/${work.slug}`}>{work.data.title}</a>)}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

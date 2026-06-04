@@ -1,0 +1,24 @@
+---
+import type { WorkEntry } from "../lib/content";
+import { workCategoryLabels, workStatusLabels } from "../config/taxonomy";
+
+interface Props {
+  work: WorkEntry;
+}
+
+const { work } = Astro.props;
+---
+
+<article class="work-card">
+  <div class:list={["media-surface", work.data.category]}></div>
+  <span class="eyebrow">{workCategoryLabels[work.data.category]}</span>
+  <h2><a href={`/works/${work.slug}`}>{work.data.title}</a></h2>
+  <p>{work.data.description}</p>
+  <div class="meta-grid">
+    <span>{work.data.year}</span>
+    <span>{work.data.role}</span>
+    <span>{workStatusLabels[work.data.status]}</span>
+  </div>
+  <div class="tag-row">{work.data.techStack.slice(0, 3).map((item) => <span>{item}</span>)}</div>
+  <a class="text-link" href={`/works/${work.slug}`}>查看详情</a>
+</article>

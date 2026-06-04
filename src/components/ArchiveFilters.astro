@@ -1,0 +1,36 @@
+---
+interface FilterItem {
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+interface FilterGroup {
+  title: string;
+  items: FilterItem[];
+}
+
+interface Props {
+  groups: FilterGroup[];
+}
+
+const { groups } = Astro.props;
+const visibleGroups = groups.filter((group) => group.items.length > 0);
+---
+
+{
+  visibleGroups.length > 0 && (
+    <div class="archive-filters">
+      {
+        visibleGroups.map((group) => (
+          <div>
+            <span class="eyebrow">{group.title}</span>
+            <div class="tag-row">
+              {group.items.map((item) => <a class:list={{ active: item.active }} href={item.href}>{item.label}</a>)}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  )
+}

@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="搜索" description="搜索文章、作品、标签和技术栈。" image="/og/page/search.svg">
+  <main class="page-main">
+    <section class="page-hero container">
+      <h1>搜索</h1>
+      <p>搜索文章、作品、标签、分类和技术栈。当前使用静态索引，后续可以平滑替换为 Pagefind。</p>
+    </section>
+
+    <section class="archive-section section-dark">
+      <div class="container search-shell" data-search-root>
+        <label class="search-box">
+          <span>搜索内容</span>
+          <input type="search" placeholder="输入关键词，例如 Astro、作品、AI" data-search-input />
+        </label>
+        <div class="search-filter-row" role="group" aria-label="搜索类型">
+          <button class="filter-chip active" type="button" data-search-filter="all">全部</button>
+          <button class="filter-chip" type="button" data-search-filter="blog">文章</button>
+          <button class="filter-chip" type="button" data-search-filter="work">作品</button>
+          <button class="filter-chip" type="button" data-search-filter="topic">主题</button>
+        </div>
+        <div class="search-summary" data-search-summary>输入关键词开始搜索。</div>
+        <div class="search-results archive-list" data-search-results></div>
+      </div>
+    </section>
+  </main>
+  <script is:inline src="/search.js"></script>
+</BaseLayout>

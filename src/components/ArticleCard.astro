@@ -1,0 +1,25 @@
+---
+import type { BlogPost } from "../lib/content";
+import { blogCategoryLabels } from "../config/taxonomy";
+import { formatDate, getReadingTime } from "../lib/format";
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+---
+
+<article class="archive-item">
+  <div>
+    <div class="meta-grid">
+      <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+      <a href={`/blog/categories/${post.data.category}`}>{blogCategoryLabels[post.data.category]}</a>
+      <span>{getReadingTime(post)}</span>
+      {post.data.featured && <span>精选</span>}
+    </div>
+    <h2><a href={`/blog/${post.slug}`}>{post.data.title}</a></h2>
+    <p>{post.data.description}</p>
+  </div>
+  <div class="tag-row">{post.data.tags.map((tag) => <a href={`/blog/tags/${tag}`}>{tag}</a>)}</div>
+</article>

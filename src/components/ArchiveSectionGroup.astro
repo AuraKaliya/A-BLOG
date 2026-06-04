@@ -1,0 +1,16 @@
+---
+import SectionHeading from "./SectionHeading.astro";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+---
+
+<section class="work-category-section">
+  <SectionHeading eyebrow={eyebrow} title={title} description={description} />
+  <slot />
+</section>

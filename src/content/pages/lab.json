@@ -1,0 +1,27 @@
+{
+  "kind": "lab",
+  "title": "实验室",
+  "description": "AI 原型、交互 Demo、小工具和想法验证的归档入口。",
+  "intro": {
+    "title": "实验不是作品的附属品",
+    "description": "实验页负责展示过程、假设和原型。它可以比作品集更早记录方向，也更适合承接快速迭代。"
+  },
+  "cards": [
+    {
+      "label": "Prototype",
+      "title": "AI 与自动化原型",
+      "description": "放置提示词实验、Agent 流程、小脚本和能展示方法论的 Demo。",
+      "href": "/lab",
+      "actionLabel": "查看实验条目",
+      "featured": true
+    },
+    {
+      "title": "交互与可视化",
+      "description": "适合放一些前端动效、数据图表、Canvas/SVG 练习和交互草图。"
+    },
+    {
+      "title": "想法仓库",
+      "description": "并不是所有想法都需要成熟后再出现，公开记录过程本身也有价值。"
+    }
+  ]
+}

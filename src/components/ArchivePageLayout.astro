@@ -1,0 +1,46 @@
+---
+import Breadcrumbs from "./Breadcrumbs.astro";
+import PageHero from "./PageHero.astro";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  sectionTone?: "section-dark" | "section-mid";
+  breadcrumbs?: BreadcrumbItem[];
+  backLinkHref?: string;
+  backLinkLabel?: string;
+}
+
+const {
+  title,
+  description,
+  sectionTone = "section-dark",
+  breadcrumbs = [],
+  backLinkHref,
+  backLinkLabel,
+} = Astro.props;
+---
+
+<main class="page-main">
+  <PageHero title={title} description={description} />
+
+  <section class:list={["archive-section", sectionTone]}>
+    <div class="container archive-list">
+      {
+        breadcrumbs.length > 0 ? (
+          <Breadcrumbs items={breadcrumbs} />
+        ) : (
+          backLinkHref && backLinkLabel && <a class="text-link back-link" href={backLinkHref}>{backLinkLabel}</a>
+        )
+      }
+      <slot name="before" />
+      <slot />
+      <slot name="after" />
+    </div>
+  </section>
+</main>

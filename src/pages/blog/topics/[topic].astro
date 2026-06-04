@@ -1,0 +1,55 @@
+---
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import EmptyState from "../../../components/EmptyState.astro";
+import { getPostsByTopic, getTopicDefinitions, type TopicEntry } from "../../../lib/content";
+import { buildBreadcrumbStructuredData, buildCollectionPageStructuredData } from "../../../lib/seo";
+
+export async function getStaticPaths() {
+  const topics = await getTopicDefinitions();
+
+  return topics.map((topic) => ({
+    params: { topic: topic.id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props as { topic: TopicEntry };
+const posts = await getPostsByTopic(topic.id);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "博客", path: "/blog" },
+    { name: topic.data.title, path: `/blog/topics/${topic.id}` },
+  ]),
+  buildCollectionPageStructuredData({
+    title: `主题：${topic.data.title}`,
+    description: topic.data.description,
+    path: `/blog/topics/${topic.id}`,
+    itemCount: posts.length,
+  }),
+];
+---
+
+<BaseLayout
+  title={`主题：${topic.data.title}`}
+  description={`归档所有属于 ${topic.data.title} 主题的文章。`}
+  image={`/og/topics/${topic.id}.svg`}
+  keywords={topic.data.keywords}
+  structuredData={structuredData}
+>
+  <ArchivePageLayout
+    title={`主题：${topic.data.title}`}
+    description={topic.data.description}
+    breadcrumbs={[{ label: "博客", href: "/blog" }, { label: `主题：${topic.data.title}` }]}
+  >
+    {
+      posts.length > 0 ? (
+        posts.map((post) => <ArticleCard post={post} />)
+      ) : (
+        <EmptyState title="这个主题下还没有文章" description="后续为文章补充主题后，这里会自动聚合对应内容。" />
+      )
+    }
+  </ArchivePageLayout>
+</BaseLayout>

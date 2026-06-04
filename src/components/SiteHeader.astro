@@ -1,0 +1,174 @@
+---
+import { aboutMenuLinks, mainNav, portfolioMenuGroups } from "../config/navigation";
+import { getTopicDefinitions } from "../lib/content";
+import { siteConfig } from "../config/site";
+import IconSymbol from "./IconSymbol.astro";
+
+const pathname = Astro.url.pathname;
+const topics = await getTopicDefinitions();
+const quickTopicLinks = topics.map((topic) => ({
+  label: topic.data.title,
+  href: `/topics#${topic.id}`,
+}));
+const isActivePath = (path: string) => {
+  if (path === "/") return pathname === "/";
+  return pathname === path || pathname.startsWith(`${path}/`);
+};
+---
+
+<header class="site-header" id="top">
+  <div class="nav-shell">
+    <a class="brand" href="/" aria-label="返回门户首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" role="img">
+          <path d="M12 44 28 12h12l-9 18h17L28 58l7-24H18z"></path>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <strong>{siteConfig.name}</strong>
+        <span>{siteConfig.tagline}</span>
+      </span>
+    </a>
+
+    <button class="mobile-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="切换导航">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-group" id="site-nav">
+      <nav class="site-nav" aria-label="主导航">
+        {
+          mainNav.map((item) =>
+            "menu" in item && item.menu === "works" ? (
+              <div class="nav-item has-menu" data-menu-root>
+                <button
+                  class:list={["nav-trigger", { active: isActivePath(item.match) }]}
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="menu-works"
+                  data-menu-trigger="works"
+                >
+                  {item.label}
+                  <span class="nav-chevron" aria-hidden="true"></span>
+                </button>
+
+                <div class="mega-menu mega-menu-products" id="menu-works" data-menu="works">
+                  <div class="mega-shell">
+                    <div class="menu-kicker">
+                      <span class="eyebrow">Works</span>
+                      <h3>用作品、写作和实验构成你的公开档案</h3>
+                      <p>左侧按展示类型分组，右侧展示可以继续扩展的作品卡片。</p>
+                    </div>
+
+                    <div class="product-menu-layout" data-portfolio-menu>
+                      <div class="product-pillar-list" role="tablist" aria-label="作品分类">
+                        {
+                          portfolioMenuGroups.map((group, index) => (
+                            <button
+                              class:list={["pillar-tab", { "is-active": index === 0 }]}
+                              type="button"
+                              role="tab"
+                              aria-selected={index === 0 ? "true" : "false"}
+                              aria-controls={`portfolio-panel-${group.id}`}
+                              id={`portfolio-tab-${group.id}`}
+                              data-group-id={group.id}
+                            >
+                              <strong>{group.label}</strong>
+                              <span>{group.description}</span>
+                            </button>
+                          ))
+                        }
+                      </div>
+
+                      <div class="portfolio-panels">
+                        {
+                          portfolioMenuGroups.map((group, index) => (
+                            <div
+                              class="product-detail-panel"
+                              role="tabpanel"
+                              id={`portfolio-panel-${group.id}`}
+                              aria-labelledby={`portfolio-tab-${group.id}`}
+                              data-portfolio-panel={group.id}
+                              hidden={index !== 0}
+                            >
+                              {group.cards.map((card) => (
+                                <article class="product-detail-card">
+                                  <h4>{card.title}</h4>
+                                  <p>{card.text}</p>
+                                  <ul>{card.items.map((item) => <li>{item}</li>)}</ul>
+                                </article>
+                              ))}
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a class:list={["nav-link", { active: isActivePath(item.match) }]} href={item.href} aria-current={isActivePath(item.match) ? "page" : undefined}>
+                {item.label}
+              </a>
+            ),
+          )
+        }
+
+        <div class="nav-item has-menu" data-menu-root>
+          <button
+            class:list={["nav-trigger", { active: isActivePath("/about") }]}
+            type="button"
+            aria-expanded="false"
+            aria-controls="menu-about"
+            data-menu-trigger="about"
+          >
+            关于
+            <span class="nav-chevron" aria-hidden="true"></span>
+          </button>
+
+          <div class="mega-menu" id="menu-about" data-menu="about">
+            <div class="mega-shell">
+              <div class="menu-kicker">
+                <span class="eyebrow">About</span>
+                <h3>把个人介绍做成可以快速理解的入口</h3>
+                <p>适合放你的身份、能力边界、联系方式和当前关注方向。</p>
+              </div>
+
+              <div class="menu-columns three-up">
+                {
+                  aboutMenuLinks.map((column) => (
+                    <div class="menu-column">
+                      <h4>{column.title}</h4>
+                      {column.links.map((link) => <a href={link.href}>{link.label}</a>)}
+                    </div>
+                  ))
+                }
+                <article class="featured-menu-card">
+                  <span class="eyebrow">Now</span>
+                  <h4>当前主题</h4>
+                  <p>搭建一个长期可维护的个人展示系统，让内容、项目和想法有统一的归宿。</p>
+                  <div class="mini-link-list">
+                    {quickTopicLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+                  </div>
+                  <a href="/now" class="text-link">查看当前状态</a>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="utility-button" href="/rss.xml" aria-label="RSS">
+          <IconSymbol name="rss" />
+        </a>
+        <a class:list={["utility-chip", { active: isActivePath("/search") }]} href="/search" aria-label="站内搜索">
+          <IconSymbol name="nodes" />
+          <span>Search</span>
+        </a>
+        <a class="contact-link" href="/about#contact">联系我</a>
+      </div>
+    </div>
+  </div>
+</header>

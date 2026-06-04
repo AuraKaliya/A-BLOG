@@ -1,0 +1,117 @@
+---
+import SiteHeader from "../components/SiteHeader.astro";
+import { mainNav } from "../config/navigation";
+import { siteConfig } from "../config/site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  image?: string;
+  keywords?: string[];
+  robots?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  ogType = "website",
+  image,
+  keywords = [],
+  robots = "index,follow",
+  publishedTime,
+  modifiedTime,
+  structuredData: customStructuredData,
+} = Astro.props;
+const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
+const imageUrl = image ? new URL(image, siteConfig.url).toString() : undefined;
+const defaultStructuredData = {
+  "@context": "https://schema.org",
+  "@type": ogType === "article" ? "Article" : "WebPage",
+  name: pageTitle,
+  headline: pageTitle,
+  description,
+  url: canonicalUrl,
+  author: {
+    "@type": "Person",
+    name: siteConfig.author.name,
+  },
+  publisher: {
+    "@type": "Person",
+    name: siteConfig.author.name,
+  },
+};
+const extraStructuredData = customStructuredData ? (Array.isArray(customStructuredData) ? customStructuredData : [customStructuredData]) : [];
+const structuredDataItems: Record<string, unknown>[] = [defaultStructuredData as Record<string, unknown>, ...extraStructuredData];
+---
+
+<!doctype html>
+<html lang={siteConfig.locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    {keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteConfig.title} />
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    <meta name="twitter:card" content={imageUrl ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {
+      structuredDataItems.map((item) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
+      ))
+    }
+  </head>
+  <body>
+    <div class="site-bg"></div>
+    <SiteHeader />
+    <slot />
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path d="M12 44 28 12h12l-9 18h17L28 58l7-24H18z"></path>
+            </svg>
+          </span>
+          <p>{siteConfig.description}</p>
+        </div>
+
+        <div class="footer-column">
+          <h4>导航</h4>
+          {mainNav.map((item) => <a href={item.href}>{item.label}</a>)}
+          <a href="/search">搜索</a>
+          <a href="/about">关于</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>站点能力</h4>
+          {siteConfig.footerCapabilities.map((item) => <span>{item}</span>)}
+        </div>
+      </div>
+    </footer>
+    <script is:inline src="/site.js"></script>
+  </body>
+</html>

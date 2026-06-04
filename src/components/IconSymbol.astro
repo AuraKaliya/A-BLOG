@@ -1,0 +1,60 @@
+---
+interface Props {
+  name: "article" | "grid" | "lab" | "nodes" | "rss" | "mail";
+}
+
+const { name } = Astro.props;
+---
+
+{
+  name === "article" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 5h14v14H5z"></path>
+      <path d="M8 9h8M8 13h5"></path>
+    </svg>
+  )
+}
+{
+  name === "grid" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="5" width="7" height="7"></rect>
+      <rect x="13" y="5" width="7" height="7"></rect>
+      <rect x="4" y="14" width="16" height="5"></rect>
+    </svg>
+  )
+}
+{
+  name === "lab" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 3v5l-5 9a4 4 0 0 0 3.5 6h9a4 4 0 0 0 3.5-6l-5-9V3"></path>
+      <path d="M8 3h8M7 17h10"></path>
+    </svg>
+  )
+}
+{
+  name === "nodes" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="6" cy="7" r="3"></circle>
+      <circle cx="18" cy="7" r="3"></circle>
+      <circle cx="12" cy="18" r="3"></circle>
+      <path d="m8.5 9.2 2 5M15.5 9.2l-2 5M9 7h6"></path>
+    </svg>
+  )
+}
+{
+  name === "rss" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 5c9 0 14 5 14 14"></path>
+      <path d="M5 11c5.2 0 8 2.8 8 8"></path>
+      <circle cx="6" cy="18" r="1.5"></circle>
+    </svg>
+  )
+}
+{
+  name === "mail" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="6" width="16" height="12" rx="1.5"></rect>
+      <path d="m5 7 7 6 7-6"></path>
+    </svg>
+  )
+}

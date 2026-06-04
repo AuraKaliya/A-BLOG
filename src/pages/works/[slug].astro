@@ -1,0 +1,85 @@
+---
+import { render } from "astro:content";
+import ArticleCard from "../../components/ArticleCard.astro";
+import WorkCard from "../../components/WorkCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPostsBySlugs, getPublishedWorks, getTopicDefinitionMap, getWorksBySlugs } from "../../lib/content";
+import { buildBreadcrumbStructuredData, buildCreativeWorkStructuredData } from "../../lib/seo";
+import { workCategoryLabels, workStatusLabels } from "../../config/taxonomy";
+
+export async function getStaticPaths() {
+  const works = await getPublishedWorks();
+  return works.map((work) => ({ params: { slug: work.slug }, props: { work } }));
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+const [relatedPosts, relatedWorks, topicMap] = await Promise.all([
+  getPostsBySlugs(work.data.relatedPosts),
+  getWorksBySlugs(work.data.relatedWorks),
+  getTopicDefinitionMap(),
+]);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "作品", path: "/works" },
+    { name: work.data.title, path: `/works/${work.slug}` },
+  ]),
+  buildCreativeWorkStructuredData(work),
+];
+---
+
+<BaseLayout
+  title={work.data.title}
+  description={work.data.description}
+  ogType="article"
+  image={work.data.cover ?? `/og/works/${work.slug}.svg`}
+  keywords={[workCategoryLabels[work.data.category], ...work.data.techStack, ...work.data.topics]}
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <article class="article-shell container">
+      <a class="text-link back-link" href="/works">返回作品</a>
+      <header class="article-header">
+        <a class="eyebrow" href={`/works/categories/${work.data.category}`}>{workCategoryLabels[work.data.category]}</a>
+        <h1>{work.data.title}</h1>
+        <p>{work.data.description}</p>
+        <div class="meta-grid">
+          <span>{work.data.year}</span>
+          <span>{work.data.role}</span>
+          <span>{workStatusLabels[work.data.status]}</span>
+          <span>优先级 {work.data.priority}</span>
+        </div>
+        <div class="tag-row">{work.data.techStack.map((item) => <span>{item}</span>)}</div>
+        {
+          work.data.topics.length > 0 && (
+            <div class="tag-row">
+              {work.data.topics.map((topic) => <a href={`/works/topics/${topic}`}>{topicMap.get(topic)?.data.title ?? topic}</a>)}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+      {
+        work.data.links.length > 0 && (
+          <div class="article-links">
+            {work.data.links.map((link) => (
+              <a class="secondary-cta" href={link.href}>{link.label}</a>
+            ))}
+          </div>
+        )
+      }
+      {
+        (relatedPosts.length > 0 || relatedWorks.length > 0) && (
+          <section class="related-section">
+            <h2>关联内容</h2>
+            {relatedPosts.length > 0 && <div class="archive-list compact-list">{relatedPosts.map((post) => <ArticleCard post={post} />)}</div>}
+            {relatedWorks.length > 0 && <div class="work-grid">{relatedWorks.map((relatedWork) => <WorkCard work={relatedWork} />)}</div>}
+          </section>
+        )
+      }
+    </article>
+  </main>
+</BaseLayout>

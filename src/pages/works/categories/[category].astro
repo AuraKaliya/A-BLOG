@@ -1,0 +1,30 @@
+---
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import WorkCard from "../../../components/WorkCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllWorkCategories, getWorksByCategory, type WorkEntry } from "../../../lib/content";
+import { workCategoryLabels } from "../../../config/taxonomy";
+
+export async function getStaticPaths() {
+  const categories = await getAllWorkCategories();
+
+  return categories.map((category) => ({
+    params: { category },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props as { category: WorkEntry["data"]["category"] };
+const works = await getWorksByCategory(category);
+---
+
+<BaseLayout title={`作品分类：${workCategoryLabels[category]}`} description={`归档所有 ${workCategoryLabels[category]} 类型的作品。`} image="/og/page/works.svg">
+  <ArchivePageLayout
+    title={workCategoryLabels[category]}
+    description="按作品类型聚合项目，方便把案例、工具、研究和实验分开浏览。"
+    sectionTone="section-mid"
+    breadcrumbs={[{ label: "作品", href: "/works" }, { label: workCategoryLabels[category] }]}
+  >
+    <div class="work-grid">{works.map((work) => <WorkCard work={work} />)}</div>
+  </ArchivePageLayout>
+</BaseLayout>

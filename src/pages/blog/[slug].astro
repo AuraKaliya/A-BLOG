@@ -1,0 +1,98 @@
+---
+import { render } from "astro:content";
+import { blogCategoryLabels } from "../../config/taxonomy";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import WorkCard from "../../components/WorkCard.astro";
+import { getAdjacentPosts, getPublishedPosts, getTopicDefinitionMap, getWorksBySlugs } from "../../lib/content";
+import { buildBlogPostingStructuredData, buildBreadcrumbStructuredData } from "../../lib/seo";
+import { formatDate, getReadingTime } from "../../lib/format";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post, adjacent: getAdjacentPosts(posts, post.slug) },
+  }));
+}
+
+const { post, adjacent } = Astro.props;
+const { Content } = await render(post);
+const [relatedWorks, topicMap] = await Promise.all([getWorksBySlugs(post.data.relatedWorks), getTopicDefinitionMap()]);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "博客", path: "/blog" },
+    { name: post.data.title, path: `/blog/${post.slug}` },
+  ]),
+  buildBlogPostingStructuredData(post),
+];
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  image={post.data.cover ?? `/og/blog/${post.slug}.svg`}
+  keywords={[blogCategoryLabels[post.data.category], ...post.data.tags, ...post.data.topics]}
+  publishedTime={post.data.pubDate.toISOString()}
+  modifiedTime={(post.data.updatedDate ?? post.data.pubDate).toISOString()}
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <article class="article-shell container">
+      <a class="text-link back-link" href="/blog">返回博客</a>
+      <header class="article-header">
+        <div class="meta-grid">
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          {post.data.updatedDate && <span>更新于 {formatDate(post.data.updatedDate)}</span>}
+          <a href={`/blog/categories/${post.data.category}`}>{blogCategoryLabels[post.data.category]}</a>
+          <span>{getReadingTime(post)}</span>
+          {post.data.series && <span>{post.data.series}</span>}
+        </div>
+        <h1>{post.data.title}</h1>
+        <p>{post.data.description}</p>
+        <div class="tag-row">{post.data.tags.map((tag) => <a href={`/blog/tags/${tag}`}>{tag}</a>)}</div>
+        {
+          post.data.topics.length > 0 && (
+            <div class="tag-row">
+              {post.data.topics.map((topic) => <a href={`/blog/topics/${topic}`}>{topicMap.get(topic)?.data.title ?? topic}</a>)}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+      {
+        relatedWorks.length > 0 && (
+          <section class="related-section">
+            <h2>关联作品</h2>
+            <div class="work-grid">{relatedWorks.map((work) => <WorkCard work={work} />)}</div>
+          </section>
+        )
+      }
+      <nav class="article-nav" aria-label="文章导航">
+        {
+          adjacent.previous ? (
+            <a href={`/blog/${adjacent.previous.slug}`}>
+              <span>上一篇</span>
+              <strong>{adjacent.previous.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+        {
+          adjacent.next ? (
+            <a href={`/blog/${adjacent.next.slug}`}>
+              <span>下一篇</span>
+              <strong>{adjacent.next.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+      </nav>
+    </article>
+  </main>
+</BaseLayout>

@@ -1,0 +1,82 @@
+---
+import ArticleCard from "../components/ArticleCard.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import WorkCard from "../components/WorkCard.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getAllBlogCategories, getAllBlogTags, getTopicSummaries } from "../lib/content";
+import { buildBreadcrumbStructuredData, buildTopicSummaryStructuredData } from "../lib/seo";
+
+const [topics, categories, tags] = await Promise.all([getTopicSummaries(), getAllBlogCategories(), getAllBlogTags()]);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "主题地图", path: "/topics" },
+  ]),
+  buildTopicSummaryStructuredData(topics),
+];
+---
+
+<BaseLayout
+  title="主题地图"
+  description="把博客、作品和实验按照长期关注方向重新组织。"
+  image="/og/page/topics.svg"
+  keywords={topics.flatMap((topic) => topic.keywords)}
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <PageHero title="主题地图" description="不按发布时间浏览，而是按长期主题重新看见文章、作品和实验之间的关系。" />
+
+    <section class="archive-section section-dark">
+      <div class="container archive-list">
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "主题地图" }]} />
+
+        <div class="topic-overview">
+          {
+            topics.map((topic) => (
+              <a class:list={["topic-tile", `accent-${topic.accent}`]} href={`#${topic.id}`}>
+                <span>{topic.posts.length + topic.works.length}</span>
+                <strong>{topic.title}</strong>
+                <p>{topic.description}</p>
+              </a>
+            ))
+          }
+        </div>
+
+        <section class="topic-taxonomy-panel">
+          <SectionHeading
+            eyebrow="Taxonomy"
+            title="现有分类和标签"
+            description="这里展示当前内容层已经识别出的栏目与标签，后续可以继续沉淀成稳定主题。"
+          />
+          <div class="taxonomy-columns">
+            <div>
+              <h3>文章栏目</h3>
+              <div class="tag-row">{categories.map((category) => <a href={`/blog/categories/${category}`}>{category}</a>)}</div>
+            </div>
+            <div>
+              <h3>文章标签</h3>
+              <div class="tag-row">{tags.map((tag) => <a href={`/blog/tags/${tag}`}>{tag}</a>)}</div>
+            </div>
+          </div>
+        </section>
+
+        {
+          topics.map((topic) => (
+            <section class="topic-section" id={topic.id}>
+              <SectionHeading
+                eyebrow={topic.title}
+                title={`${topic.title}主题`}
+                description={`${topic.description} 当前关联 ${topic.posts.length} 篇文章、${topic.works.length} 个作品。`}
+              />
+              <div class="topic-keywords tag-row">{topic.keywords.map((keyword) => <span>{keyword}</span>)}</div>
+              {topic.posts.length > 0 && <div class="archive-list compact-list">{topic.posts.map((post) => <ArticleCard post={post} />)}</div>}
+              {topic.works.length > 0 && <div class="work-grid">{topic.works.map((work) => <WorkCard work={work} />)}</div>}
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>

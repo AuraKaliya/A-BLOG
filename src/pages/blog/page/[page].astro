@@ -1,0 +1,36 @@
+---
+import ArchivePageLayout from "../../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import Pagination from "../../../components/Pagination.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getPublishedPosts } from "../../../lib/content";
+import { paginate } from "../../../lib/pagination";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const totalPages = Math.max(1, Math.ceil(posts.length / 6));
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props;
+const posts = await getPublishedPosts();
+const paginated = paginate(posts, page, 6, "/blog");
+---
+
+<BaseLayout title={`博客 第 ${paginated.page.currentPage} 页`} description="博客归档分页。" image="/og/page/blog.svg">
+  <ArchivePageLayout
+    title="博客"
+    description={`第 ${paginated.page.currentPage} 页，共 ${paginated.page.totalPages} 页。`}
+    breadcrumbs={[{ label: "博客", href: "/blog" }, { label: `第 ${paginated.page.currentPage} 页` }]}
+  >
+    {paginated.items.map((post) => <ArticleCard post={post} />)}
+    <Pagination slot="after" page={paginated.page} />
+  </ArchivePageLayout>
+</BaseLayout>

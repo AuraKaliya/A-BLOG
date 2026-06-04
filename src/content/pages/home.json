@@ -1,0 +1,103 @@
+{
+  "kind": "home",
+  "title": "个人门户",
+  "description": "一个用于展示博客、作品、实验和个人档案的 Astro 个人网站。",
+  "hero": {
+    "title": "博客之外\n也是你的\n作品入口",
+    "description": "一个简易但可扩展的个人网页框架：用门户首页分发博客、作品、实验和个人档案，让长期输出有统一的展示秩序。",
+    "actions": [
+      {
+        "label": "进入门户",
+        "href": "#portal",
+        "variant": "primary"
+      },
+      {
+        "label": "查看作品",
+        "href": "/works",
+        "variant": "secondary"
+      }
+    ],
+    "metrics": [
+      {
+        "eyebrow": "Content System",
+        "value": "04",
+        "description": "Blog / Works / Lab / About"
+      },
+      {
+        "eyebrow": "Static First",
+        "value": "MD",
+        "description": "文章和作品都从 Markdown 内容集合生成。"
+      }
+    ]
+  },
+  "portalCards": [
+    {
+      "title": "博客",
+      "description": "用于发布技术笔记、产品观察、读书整理和阶段性复盘。",
+      "href": "/blog",
+      "icon": "article"
+    },
+    {
+      "title": "作品",
+      "description": "展示项目、工具、设计稿、研究成果和可以被复用的产出。",
+      "href": "/works",
+      "icon": "grid"
+    },
+    {
+      "title": "主题",
+      "description": "把文章、作品和实验按照长期关注方向重新组织。",
+      "href": "/topics",
+      "icon": "nodes"
+    },
+    {
+      "title": "实验",
+      "description": "容纳还在探索中的 AI 原型、交互 Demo、小工具和想法验证。",
+      "href": "/lab",
+      "icon": "lab"
+    }
+  ],
+  "suggestedPostColumns": [
+    "技术笔记",
+    "产品观察",
+    "读书整理",
+    "阶段复盘"
+  ],
+  "labCards": [
+    {
+      "label": "Prototype",
+      "title": "AI 与自动化原型",
+      "description": "放置提示词实验、Agent 流程、小脚本和能展示方法论的 Demo。",
+      "href": "/lab",
+      "actionLabel": "查看实验索引",
+      "featured": true
+    },
+    {
+      "title": "交互与可视化",
+      "description": "适合放一些前端动效、数据图表、Canvas/SVG 练习和交互草图。"
+    },
+    {
+      "title": "想法仓库",
+      "description": "并不是所有想法都需要成熟后再出现，公开记录过程本身也有价值。"
+    }
+  ],
+  "roadmapItems": [
+    {
+      "label": "站内搜索",
+      "value": "静态索引 / Pagefind 预留"
+    },
+    {
+      "label": "主题地图",
+      "value": "Topics / Series / Tags"
+    },
+    {
+      "label": "内容订阅",
+      "value": "RSS / 邮件列表"
+    }
+  ],
+  "aboutStory": {
+    "title": "一个个人站，不只是简历，也是长期输出的索引。",
+    "description": "首版先把骨架搭好：以后你每增加一篇文章、一个作品或一次实验，都能自然归档到这个系统里。",
+    "href": "/about",
+    "actionLabel": "完善关于页"
+  }
+}
