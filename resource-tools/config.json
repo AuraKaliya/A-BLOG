@@ -1,0 +1,17 @@
+{
+  "paths": {
+    "test_resource": "test-resource",
+    "resource": "resource"
+  },
+  "resource": {
+    "public_prefix": "/resource",
+    "folders": ["images", "covers", "avatars", "files", "downloads"],
+    "lowercase_names": true
+  },
+  "remote": {
+    "host": "49.232.167.68",
+    "user": "ubuntu",
+    "ssh_key": "~/.ssh/AuraKey.pem",
+    "app_root": "/root/A-BLOG"
+  }
+}

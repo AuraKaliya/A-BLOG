@@ -6,6 +6,16 @@ const linkSchema = z.object({
   href: z.string(),
 });
 
+const coverSchema = z.string().refine(
+  (value) =>
+    value.startsWith("/resource/") ||
+    value.startsWith("/og/") ||
+    /^https?:\/\//.test(value),
+  {
+    message: "Cover paths should use /resource/..., /og/..., or an absolute http(s) URL.",
+  },
+);
+
 const heroActionSchema = z.object({
   label: z.string(),
   href: z.string(),
@@ -117,7 +127,7 @@ const blog = defineCollection({
     updatedDate: z.coerce.date().optional(),
     category: z.enum(blogCategoryKeys).default("engineering"),
     series: z.string().optional(),
-    cover: z.string().optional(),
+    cover: coverSchema.optional(),
     featured: z.boolean().default(false),
     relatedWorks: z.array(z.string()).default([]),
     topics: z.array(z.string()).default([]),
@@ -137,7 +147,7 @@ const works = defineCollection({
     status: z.enum(["concept", "building", "shipped", "archived"]).default("building"),
     priority: z.number().default(0),
     techStack: z.array(z.string()).default([]),
-    cover: z.string().optional(),
+    cover: coverSchema.optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
     topics: z.array(z.string()).default([]),

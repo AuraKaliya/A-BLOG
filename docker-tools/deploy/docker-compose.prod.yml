@@ -1,0 +1,9 @@
+services:
+  a-blog:
+    image: ${A_BLOG_IMAGE:-aura-blog:latest}
+    container_name: ${A_BLOG_CONTAINER:-aura-blog}
+    restart: unless-stopped
+    ports:
+      - "${A_BLOG_BIND:-127.0.0.1}:${A_BLOG_PORT:-8080}:80"
+    volumes:
+      - "${A_BLOG_RESOURCE_DIR:-/opt/a-blog/resource}:/usr/share/nginx/html/resource:ro"

@@ -7,3 +7,15 @@ output/
 .env
 .env.*
 !.env.example
+
+resource/*
+!resource/.gitkeep
+test-resource/*
+!test-resource/.gitkeep
+
+resource-tools/resource-manifest.json
+resource-tools/.tmp/
+resource-tools/*.log
+
+__pycache__/
+*.pyc

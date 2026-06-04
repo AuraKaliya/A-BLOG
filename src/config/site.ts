@@ -3,7 +3,7 @@ export const siteConfig = {
   title: "个人门户",
   tagline: "Personal archive",
   description: "一个用于展示博客、作品、实验和个人档案的 Astro 个人网站。",
-  url: "https://example.com",
+  url: "https://aurakaliye.com",
   locale: "zh-CN",
   author: {
     name: "Your Name",

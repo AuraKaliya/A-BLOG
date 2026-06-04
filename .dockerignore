@@ -1,0 +1,12 @@
+node_modules
+dist
+.astro
+output
+.git
+*.log
+.env
+.env.*
+resource
+test-resource
+resource-tools
+doc

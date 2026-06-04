@@ -1,0 +1,12 @@
+services:
+  a-blog:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: aura-blog:local
+    container_name: aura-blog-local
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - "../test-resource:/usr/share/nginx/html/resource:ro"
