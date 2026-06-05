@@ -39,6 +39,11 @@ export async function getPostsByCategory(category: string) {
   return posts.filter((post) => post.data.category === category);
 }
 
+export async function getPostsBySection(section: BlogPost["data"]["section"]) {
+  const posts = await getPublishedPosts();
+  return posts.filter((post) => post.data.section === section);
+}
+
 export async function getPostsByTag(tag: string) {
   const posts = await getPublishedPosts();
   return posts.filter((post) => post.data.tags.includes(tag));

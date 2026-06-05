@@ -1,0 +1,25 @@
+---
+import ArchivePageLayout from "../../components/ArchivePageLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import EmptyState from "../../components/EmptyState.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPostsBySection } from "../../lib/content";
+
+const posts = await getPostsBySection("tech");
+---
+
+<BaseLayout title="技术" description="开发笔记、工具链、教程、踩坑与实现记录。" image="/og/page/tech.svg">
+  <ArchivePageLayout
+    title="技术"
+    description="面向实现过程的长期记录：开发笔记、工具链、教程、踩坑与可复用的方法。"
+    breadcrumbs={[{ label: "门户", href: "/" }, { label: "技术" }]}
+  >
+    {
+      posts.length > 0 ? (
+        posts.map((post) => <ArticleCard post={post} />)
+      ) : (
+        <EmptyState title="还没有技术文章" description="为文章设置 section: tech 后，它会出现在这里。" />
+      )
+    }
+  </ArchivePageLayout>
+</BaseLayout>

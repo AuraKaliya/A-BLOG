@@ -1,0 +1,83 @@
+---
+import { render } from "astro:content";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import WorldCard from "../../components/WorldCard.astro";
+import { worldKindLabels, worldStatusLabels } from "../../config/taxonomy";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublishedWorldEntries, getTopicDefinitionMap, getWorldEntriesBySlugs } from "../../lib/content";
+import { formatDate } from "../../lib/format";
+import { buildBreadcrumbStructuredData, buildWorldEntryStructuredData } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const entries = await getPublishedWorldEntries();
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const [relatedEntries, topicMap] = await Promise.all([
+  getWorldEntriesBySlugs(entry.data.relatedEntries),
+  getTopicDefinitionMap(),
+]);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "世界档案", path: "/world" },
+    { name: entry.data.title, path: `/world/${entry.slug}` },
+  ]),
+  buildWorldEntryStructuredData(entry),
+];
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  ogType="article"
+  image={entry.data.cover ?? `/og/world/${entry.slug}.svg`}
+  keywords={[worldKindLabels[entry.data.kind], ...entry.data.tags, ...entry.data.topics]}
+  modifiedTime={entry.data.updatedDate.toISOString()}
+  structuredData={structuredData}
+>
+  <main class="page-main world-detail-main">
+    <article class="article-shell container">
+      <Breadcrumbs
+        items={[
+          { label: "门户", href: "/" },
+          { label: "世界档案", href: "/world" },
+          { label: entry.data.title },
+        ]}
+      />
+      <header class="article-header world-entry-header">
+        <span class="eyebrow">Archive / {entry.data.kind}</span>
+        <h1>{entry.data.title}</h1>
+        <p>{entry.data.description}</p>
+        <div class="meta-grid">
+          <span>{worldKindLabels[entry.data.kind]}</span>
+          <span>{worldStatusLabels[entry.data.status]}</span>
+          {entry.data.era && <span>{entry.data.era}</span>}
+          {entry.data.eventDate && <span>{entry.data.eventDate}</span>}
+          <span>更新于 {formatDate(entry.data.updatedDate)}</span>
+        </div>
+        <div class="tag-row">{entry.data.tags.map((tag) => <span>{tag}</span>)}</div>
+        {
+          entry.data.topics.length > 0 && (
+            <div class="tag-row">
+              {entry.data.topics.map((topic) => <a href={`/topics#${topic}`}>{topicMap.get(topic)?.data.title ?? topic}</a>)}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose world-prose">
+        <Content />
+      </div>
+      {
+        relatedEntries.length > 0 && (
+          <section class="related-section">
+            <h2>关联档案</h2>
+            <div class="world-grid">{relatedEntries.map((relatedEntry) => <WorldCard entry={relatedEntry} />)}</div>
+          </section>
+        )
+      }
+    </article>
+  </main>
+</BaseLayout>

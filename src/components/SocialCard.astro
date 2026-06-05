@@ -1,0 +1,25 @@
+---
+interface Props {
+  platform: string;
+  handle: string;
+  description: string;
+  href: string;
+  accent: "cyan" | "orange" | "green";
+}
+
+const { platform, handle, description, href, accent } = Astro.props;
+const isExternal = /^https?:\/\//.test(href);
+---
+
+<a
+  class:list={["social-card", `accent-${accent}`]}
+  href={href}
+  target={isExternal ? "_blank" : undefined}
+  rel={isExternal ? "me noopener noreferrer" : undefined}
+>
+  <span class="social-card-mark" aria-hidden="true">{platform.slice(0, 1).toUpperCase()}</span>
+  <span class="eyebrow">{platform}</span>
+  <strong>{handle}</strong>
+  <p>{description}</p>
+  <span class="social-card-action">{isExternal ? "前往平台" : "打开入口"} →</span>
+</a>

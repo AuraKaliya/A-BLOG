@@ -76,6 +76,26 @@ CONTENT_TYPES = {
         "directory": "src/content/works",
         "extension": ".md",
     },
+    "world": {
+        "label": "世界档案",
+        "directory": "src/content/world",
+        "extension": ".md",
+    },
+    "notes": {
+        "label": "短动态",
+        "directory": "src/content/notes",
+        "extension": ".md",
+    },
+    "links": {
+        "label": "站外信号",
+        "directory": "src/content/links",
+        "extension": ".md",
+    },
+    "changelog": {
+        "label": "更新记录",
+        "directory": "src/content/changelog",
+        "extension": ".md",
+    },
     "pages": {
         "label": "页面配置",
         "directory": "src/content/pages",
@@ -263,6 +283,7 @@ def md_template(kind: str, title: str) -> str:
 title: {yaml_scalar(title)}
 description: "请填写作品描述。"
 year: {datetime.now().year}
+updatedDate: {today}
 role: "请填写角色"
 category: "project"
 status: "building"
@@ -277,11 +298,76 @@ links: []
 
 请填写作品正文。
 """
+    if kind == "world":
+        return f"""---
+title: {yaml_scalar(title)}
+description: "请填写世界条目摘要。"
+kind: "term"
+status: "organizing"
+era: "当前纪年"
+sortOrder: 0
+updatedDate: {today}
+featured: false
+topics: []
+tags: []
+relatedEntries: []
+draft: false
+---
+
+请填写世界条目正文。
+"""
+    if kind == "notes":
+        return f"""---
+title: {yaml_scalar(title)}
+description: "请填写短动态摘要。"
+pubDate: {today}
+updatedDate: {today}
+kind: "thought"
+mood: ""
+featured: false
+topics: []
+tags: []
+draft: false
+---
+
+请填写短动态正文。
+"""
+    if kind == "links":
+        return f"""---
+title: {yaml_scalar(title)}
+description: "请填写站外链接描述。"
+note: "请填写推荐理由。"
+url: "https://example.com/"
+kind: "reading"
+language: "中文"
+addedDate: {today}
+featured: false
+topics: []
+tags: []
+draft: false
+---
+
+请填写补充说明。
+"""
+    if kind == "changelog":
+        return f"""---
+version: {yaml_scalar(title)}
+date: {today}
+summary: "请填写更新摘要。"
+type: "content"
+featured: false
+changes: []
+draft: false
+---
+
+请填写更新说明。
+"""
     return f"""---
 title: {yaml_scalar(title)}
 description: "请填写文章摘要。"
 pubDate: {today}
 updatedDate: {today}
+section: "tech"
 category: "engineering"
 featured: false
 relatedWorks: []
@@ -523,8 +609,12 @@ class ContentService:
                     description = str(payload.get("description", ""))
                 else:
                     data, _body, _lines = split_frontmatter(text)
-                    title = str(data.get("title", title))
-                    description = str(data.get("description", ""))
+                    if kind == "changelog":
+                        title = str(data.get("version", title))
+                        description = str(data.get("summary", ""))
+                    else:
+                        title = str(data.get("title", title))
+                        description = str(data.get("description", ""))
             except Exception:
                 description = "读取失败"
             updated = datetime.fromtimestamp(path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
@@ -591,10 +681,11 @@ class ContentService:
             text = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
         else:
             if title:
-                text = set_frontmatter_field(text, "title", title)
+                text = set_frontmatter_field(text, "version" if kind == "changelog" else "title", title)
             if description:
-                text = set_frontmatter_field(text, "description", description)
-            text = set_frontmatter_field(text, "cover", cover)
+                text = set_frontmatter_field(text, "summary" if kind == "changelog" else "description", description)
+            if kind not in {"changelog", "notes", "links"}:
+                text = set_frontmatter_field(text, "cover", cover)
 
         if new_path != old_path and new_path.exists():
             raise RuntimeError(f"目标 slug 已存在：{new_path.name}")
@@ -898,8 +989,12 @@ class ResourceManagerApp(tk.Tk):
                 pass
         else:
             data, _body, _lines = split_frontmatter(text)
-            title = str(data.get("title", title))
-            description = str(data.get("description", description))
+            if kind == "changelog":
+                title = str(data.get("version", title))
+                description = str(data.get("summary", description))
+            else:
+                title = str(data.get("title", title))
+                description = str(data.get("description", description))
             cover = str(data.get("cover", ""))
         self.content_title_var.set(title)
         self.content_description_var.set(description)

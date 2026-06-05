@@ -1,0 +1,61 @@
+---
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import EmptyState from "../../components/EmptyState.astro";
+import NoteCard from "../../components/NoteCard.astro";
+import PageHero from "../../components/PageHero.astro";
+import { noteKindLabels } from "../../config/taxonomy";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublishedNotes } from "../../lib/content";
+import { buildBreadcrumbStructuredData, buildCollectionPageStructuredData } from "../../lib/seo";
+
+const notes = await getPublishedNotes();
+const kinds = Object.entries(noteKindLabels).filter(([kind]) => notes.some((note) => note.data.kind === kind));
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "短动态", path: "/notes" },
+  ]),
+  buildCollectionPageStructuredData({
+    title: "短动态",
+    description: "比文章更轻的状态、随想、分享与碎片记录。",
+    path: "/notes",
+    itemCount: notes.length,
+  }),
+];
+---
+
+<BaseLayout
+  title="短动态"
+  description="比文章更轻的状态、随想、分享与碎片记录。"
+  image="/og/page/notes.svg"
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <PageHero title="短动态" description="不必等到想法长成文章。这里保留状态、随想、链接和仍在发光的碎片。" />
+
+    <section class="archive-section section-dark">
+      <div class="container archive-list" data-note-filter-root>
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "短动态" }]} />
+
+        <div class="note-command-panel">
+          <div>
+            <span class="eyebrow">Signal Stream</span>
+            <strong data-note-filter-summary>正在显示全部 {notes.length} 条动态</strong>
+          </div>
+          <div class="search-filter-row" role="group" aria-label="短动态类型筛选">
+            <button class="filter-chip active" type="button" data-note-filter="all" aria-pressed="true">全部 {notes.length}</button>
+            {
+              kinds.map(([kind, label]) => (
+                <button class="filter-chip" type="button" data-note-filter={kind} aria-pressed="false">
+                  {label} {notes.filter((note) => note.data.kind === kind).length}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        {notes.length > 0 ? <div class="notes-grid">{notes.map((note) => <NoteCard note={note} />)}</div> : <EmptyState title="还没有公开动态" description="新增 notes 内容后，这里会形成轻量更新流。" />}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

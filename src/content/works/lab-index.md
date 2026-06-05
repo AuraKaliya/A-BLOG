@@ -2,6 +2,7 @@
 title: "实验室索引"
 description: "展示小工具、交互原型、AI 实验和还没完全产品化的想法。"
 year: 2026
+updatedDate: 2026-06-01
 role: "原型探索"
 category: "experiment"
 status: "concept"

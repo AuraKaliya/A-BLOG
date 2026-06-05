@@ -1,0 +1,84 @@
+---
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import ContentMap from "../components/ContentMap.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { contentGraphKindLabels } from "../config/taxonomy";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getContentGraphData, getTopicSummaries } from "../lib/content";
+import { buildBreadcrumbStructuredData, buildCollectionPageStructuredData } from "../lib/seo";
+
+const [graph, topics] = await Promise.all([getContentGraphData(), getTopicSummaries()]);
+const graphKinds = Object.entries(contentGraphKindLabels);
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "内容星图", path: "/map" },
+  ]),
+  buildCollectionPageStructuredData({
+    title: "内容星图",
+    description: "把主题关联和跨内容引用展开成一张可以探索的关系图。",
+    path: "/map",
+    itemCount: graph.nodes.length,
+  }),
+];
+---
+
+<BaseLayout
+  title="内容星图"
+  description="把主题关联和跨内容引用展开成一张可以探索的关系图。"
+  image="/og/page/map.svg"
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <PageHero title="内容星图" description="有些内容靠时间相邻，有些内容则因为共享主题、彼此引用而发生连接。这里展示后一种关系。" />
+
+    <section class="archive-section content-map-section">
+      <div class="container archive-list" data-content-map-root>
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "内容星图" }]} />
+
+        <div class="content-map-command-panel">
+          <div>
+            <span class="eyebrow">Constellation</span>
+            <strong data-content-map-summary>{graph.nodes.length} 个节点 / {graph.edges.length} 条关系</strong>
+            <p>悬停或聚焦一个节点可以看见它的直接连接；点击节点会进入对应内容。</p>
+          </div>
+          <div class="search-filter-row" role="group" aria-label="内容星图类型筛选">
+            <button class="filter-chip active" type="button" data-graph-filter="all" aria-pressed="true">全部 {graph.nodes.length}</button>
+            {
+              graphKinds.map(([kind, label]) => (
+                <button class="filter-chip" type="button" data-graph-filter={kind} aria-pressed="false">
+                  {label} {graph.counts[kind as keyof typeof graph.counts]}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <ContentMap graph={graph} />
+
+        <div class="content-map-actions">
+          <a class="secondary-cta" href="/topics">切换到主题地图</a>
+          <a class="secondary-cta" href="/links">查看站外信号</a>
+          <a class="secondary-cta" href="/graph.json">查看图数据 JSON</a>
+          <button class="primary-cta random-entry-button" type="button" data-random-entry>沿随机节点离开</button>
+        </div>
+
+        <section class="content-map-topic-index">
+          <SectionHeading eyebrow="Topic Cores" title="主题核心索引" description="每个主题核心连接不同类型的内容；这里提供不依赖图形的浏览入口。" />
+          <div class="topic-overview">
+            {
+              topics.map((topic) => (
+                <a class:list={["topic-tile", `accent-${topic.accent}`]} href={`/topics#${topic.id}`}>
+                  <span>{topic.posts.length + topic.works.length + topic.worlds.length + topic.notes.length + topic.links.length}</span>
+                  <strong>{topic.title}</strong>
+                  <p>{topic.description}</p>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

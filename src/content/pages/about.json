@@ -28,6 +28,29 @@
       "description": "可以逐步加入主题索引、系列文章、作品筛选、站内搜索和订阅能力。"
     }
   ],
+  "socialCards": [
+    {
+      "platform": "GitHub",
+      "handle": "your-name",
+      "description": "查看公开代码、实验项目与持续维护中的仓库。",
+      "href": "https://github.com/your-name",
+      "accent": "cyan"
+    },
+    {
+      "platform": "RSS",
+      "handle": "站点订阅",
+      "description": "通过阅读器接收新文章，不依赖任何社交平台算法。",
+      "href": "/rss.xml",
+      "accent": "orange"
+    },
+    {
+      "platform": "Email",
+      "handle": "your-name@example.com",
+      "description": "适合较完整的交流、合作或反馈。",
+      "href": "mailto:your-name@example.com",
+      "accent": "green"
+    }
+  ],
   "contact": {
     "ctaLabel": "发送邮件",
     "emailLabel": "邮箱",

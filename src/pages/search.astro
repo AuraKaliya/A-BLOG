@@ -2,11 +2,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="搜索" description="搜索文章、作品、标签和技术栈。" image="/og/page/search.svg">
+<BaseLayout title="搜索" description="搜索文章、作品、世界档案、短动态、推荐链接、标签和技术栈。" image="/og/page/search.svg">
   <main class="page-main">
     <section class="page-hero container">
       <h1>搜索</h1>
-      <p>搜索文章、作品、标签、分类和技术栈。当前使用静态索引，后续可以平滑替换为 Pagefind。</p>
+      <p>搜索文章、作品、世界档案、短动态、推荐链接、标签、分类和技术栈。当前使用静态索引，后续可以平滑替换为 Pagefind。</p>
     </section>
 
     <section class="archive-section section-dark">
@@ -19,6 +19,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <button class="filter-chip active" type="button" data-search-filter="all">全部</button>
           <button class="filter-chip" type="button" data-search-filter="blog">文章</button>
           <button class="filter-chip" type="button" data-search-filter="work">作品</button>
+          <button class="filter-chip" type="button" data-search-filter="world">世界</button>
+          <button class="filter-chip" type="button" data-search-filter="note">短动态</button>
+          <button class="filter-chip" type="button" data-search-filter="link">推荐链接</button>
+          <button class="filter-chip" type="button" data-search-filter="changelog">更新记录</button>
           <button class="filter-chip" type="button" data-search-filter="topic">主题</button>
         </div>
         <div class="search-summary" data-search-summary>输入关键词开始搜索。</div>

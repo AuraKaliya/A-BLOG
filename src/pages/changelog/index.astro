@@ -1,0 +1,41 @@
+---
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PageHero from "../../components/PageHero.astro";
+import { changelogTypeLabels } from "../../config/taxonomy";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublishedChangelogEntries } from "../../lib/content";
+import { formatDate } from "../../lib/format";
+
+const entries = await getPublishedChangelogEntries();
+---
+
+<BaseLayout title="更新记录" description="记录网站版本、内容更新、设计调整与维护动作。" image="/og/page/changelog.svg">
+  <main class="page-main">
+    <PageHero title="更新记录" description="这里保留站点活着的痕迹：新增了什么、调整了什么，以及下一次回看时值得记住什么。" />
+    <section class="archive-section section-dark">
+      <div class="container archive-list">
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "更新记录" }]} />
+        <div class="timeline changelog-timeline">
+          {
+            entries.map((entry) => (
+              <article class="timeline-entry" id={entry.slug}>
+                <div class="timeline-date">
+                  <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+                </div>
+                <div>
+                  <div class="meta-grid">
+                    <span>{changelogTypeLabels[entry.data.type]}</span>
+                    {entry.data.featured && <span>重要更新</span>}
+                  </div>
+                  <h2>{entry.data.version}</h2>
+                  <p>{entry.data.summary}</p>
+                  <ul class="status-list">{entry.data.changes.map((change) => <li>{change}</li>)}</ul>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

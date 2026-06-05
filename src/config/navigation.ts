@@ -1,10 +1,9 @@
 export const mainNav = [
-  { label: "门户", href: "/#portal", match: "/" },
-  { label: "博客", href: "/blog", match: "/blog" },
+  { label: "入口", href: "/", match: "/" },
+  { label: "文字", href: "/writings", match: "/writings" },
+  { label: "技术", href: "/tech", match: "/tech" },
   { label: "作品", href: "/works", match: "/works", menu: "works" },
-  { label: "主题", href: "/topics", match: "/topics" },
-  { label: "实验", href: "/lab", match: "/lab" },
-  { label: "现在", href: "/now", match: "/now" },
+  { label: "世界", href: "/world", match: "/world" },
 ] as const;
 
 export const portfolioMenuGroups = [
@@ -51,15 +50,21 @@ export const aboutMenuLinks = [
       { label: "关注方向", href: "/about#focus" },
       { label: "技术栈", href: "/about#stack" },
       { label: "联系方式", href: "/about#contact" },
+      { label: "社交入口", href: "/about#socials" },
     ],
   },
   {
-    title: "内容索引",
+    title: "次级入口",
     links: [
-      { label: "最新文章", href: "/blog" },
-      { label: "精选作品", href: "/works" },
       { label: "主题地图", href: "/topics" },
+      { label: "内容星图", href: "/map" },
       { label: "实验室", href: "/lab" },
+      { label: "当前状态", href: "/now" },
+      { label: "短动态", href: "/notes" },
+      { label: "站外信号", href: "/links" },
+      { label: "更新记录", href: "/changelog" },
+      { label: "全站归档", href: "/archive" },
+      { label: "全部文章", href: "/blog" },
       { label: "RSS 订阅", href: "/rss.xml" },
     ],
   },

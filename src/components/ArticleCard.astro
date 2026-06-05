@@ -1,6 +1,7 @@
 ---
 import type { BlogPost } from "../lib/content";
 import { blogCategoryLabels } from "../config/taxonomy";
+import { blogSectionLabels } from "../config/taxonomy";
 import { formatDate, getReadingTime } from "../lib/format";
 
 interface Props {
@@ -14,6 +15,7 @@ const { post } = Astro.props;
   <div>
     <div class="meta-grid">
       <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+      <a href={post.data.section === "writings" ? "/writings" : "/tech"}>{blogSectionLabels[post.data.section]}</a>
       <a href={`/blog/categories/${post.data.category}`}>{blogCategoryLabels[post.data.category]}</a>
       <span>{getReadingTime(post)}</span>
       {post.data.featured && <span>精选</span>}

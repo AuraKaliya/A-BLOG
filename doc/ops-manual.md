@@ -342,11 +342,26 @@ GUI 还包含“内容编辑”标签页，可编辑：
 ```text
 博客文章：src/content/blog/*.md
 作品：src/content/works/*.md
+世界档案：src/content/world/*.md
+短动态：src/content/notes/*.md
+站外信号：src/content/links/*.md
+更新记录：src/content/changelog/*.md
 页面配置：src/content/pages/*.json
 主题配置：src/content/topics/*.json
 ```
 
+作品链接支持 `demo / source / article / external` 四种类型；世界档案支持类型、状态、关联条目和虚构事件日期；短动态支持随想、状态、分享和碎片四种类型；站外信号支持友链、阅读、工具、灵感和资料五种类型。
+
 编辑内容后，先在 GUI 中点击“构建校验”，通过后再执行 Docker 发布流程。
+
+站点会根据主题和内容引用自动生成：
+
+```text
+/map：可视化内容星图
+/graph.json：机器可读关系图数据
+/links：可筛选的友链与推荐目录
+/links.json：机器可读站外信号数据
+```
 
 ## 回滚
 

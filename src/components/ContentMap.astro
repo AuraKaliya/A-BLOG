@@ -1,0 +1,83 @@
+---
+import type { ContentGraphData } from "../lib/content";
+
+interface Props {
+  graph: ContentGraphData;
+}
+
+const { graph } = Astro.props;
+const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
+const shortLabel = (value: string) => (value.length > 10 ? `${value.slice(0, 9)}…` : value);
+---
+
+<div class="content-map-shell">
+  <div class="content-map-viewport" tabindex="0" aria-label="可横向滚动的内容关系图">
+    <svg class="content-map" viewBox="0 0 1120 760" role="img" aria-labelledby="content-map-title content-map-description">
+      <title id="content-map-title">Aura 内容星图</title>
+      <desc id="content-map-description">主题位于中心，文章、作品、世界档案、短动态与站外链接围绕外圈，通过主题和直接引用相连。</desc>
+      <defs>
+        <radialGradient id="map-core-glow">
+          <stop offset="0" stop-color="#03ffff" stop-opacity="0.11"></stop>
+          <stop offset="1" stop-color="#03ffff" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle class="content-map-core-glow" cx="560" cy="380" r="255"></circle>
+      <circle class="content-map-orbit inner" cx="560" cy="380" r="190"></circle>
+      <ellipse class="content-map-orbit outer" cx="560" cy="380" rx="485" ry="325"></ellipse>
+
+      <g class="content-map-edges">
+        {
+          graph.edges.map((edge) => {
+            const source = nodesById.get(edge.source);
+            const target = nodesById.get(edge.target);
+            if (!source || !target) return null;
+            return (
+              <line
+                class:list={["content-map-edge", `edge-${edge.kind}`]}
+                x1={source.x}
+                y1={source.y}
+                x2={target.x}
+                y2={target.y}
+                data-graph-edge
+                data-source={edge.source}
+                data-target={edge.target}
+                data-edge-kind={edge.kind}
+              />
+            );
+          })
+        }
+      </g>
+
+      <g class="content-map-nodes">
+        {
+          graph.nodes.map((node) => (
+            <a
+              class:list={["content-map-node", `node-${node.kind}`, { featured: node.featured }]}
+              href={node.href}
+              aria-label={`${node.title}，${node.description}`}
+              data-graph-node
+              data-graph-node-id={node.id}
+              data-graph-node-kind={node.kind}
+            >
+              <g transform={`translate(${node.x} ${node.y})`}>
+                <circle class="content-map-node-halo" r={node.radius + 9}></circle>
+                <circle class="content-map-node-core" r={node.radius}></circle>
+                <text class="content-map-node-label" y={node.radius + 22} text-anchor="middle">{shortLabel(node.title)}</text>
+              </g>
+            </a>
+          ))
+        }
+      </g>
+    </svg>
+  </div>
+
+  <div class="content-map-legend" aria-label="内容星图图例">
+    <span><i class="legend-dot topic"></i>主题核心</span>
+    <span><i class="legend-dot blog"></i>文章</span>
+    <span><i class="legend-dot work"></i>作品</span>
+    <span><i class="legend-dot world"></i>世界档案</span>
+    <span><i class="legend-dot note"></i>短动态</span>
+    <span><i class="legend-dot link"></i>站外链接</span>
+    <span><i class="legend-line related"></i>直接引用</span>
+  </div>
+</div>

@@ -37,7 +37,7 @@ GUI includes two tabs:
 
 ```text
 资源管理：import -> test-resource, promote -> resource, sync server
-内容编辑：edit blog, works, pages, and topics under src/content
+内容编辑：edit blog, works, world, notes, links, changelog, pages, and topics under src/content
 ```
 
 The content editor supports:
@@ -45,8 +45,24 @@ The content editor supports:
 ```text
 博客文章：src/content/blog/*.md
 作品：src/content/works/*.md
+世界档案：src/content/world/*.md
+短动态：src/content/notes/*.md
+站外信号：src/content/links/*.md
+更新记录：src/content/changelog/*.md
 页面配置：src/content/pages/*.json
 主题配置：src/content/topics/*.json
+```
+
+作品链接可以在 frontmatter 的 `links` 中使用以下类型：
+
+```text
+demo / source / article / external
+```
+
+站外信号支持以下类型：
+
+```text
+friend / reading / tool / inspiration / reference
 ```
 
 Use `构建校验` before packaging a release.

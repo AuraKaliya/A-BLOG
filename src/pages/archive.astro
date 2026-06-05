@@ -1,0 +1,84 @@
+---
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import PageHero from "../components/PageHero.astro";
+import { archiveKindLabels } from "../config/taxonomy";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getArchiveEntries } from "../lib/content";
+import { formatDate } from "../lib/format";
+import { buildBreadcrumbStructuredData, buildCollectionPageStructuredData } from "../lib/seo";
+
+const entries = await getArchiveEntries();
+const years = [...new Set(entries.map((entry) => entry.date.getFullYear()))].sort((a, b) => b - a);
+const kinds = Object.entries(archiveKindLabels).filter(([kind]) => entries.some((entry) => entry.kind === kind));
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "全站归档", path: "/archive" },
+  ]),
+  buildCollectionPageStructuredData({
+    title: "全站归档",
+    description: "按时间统一浏览文章、作品、世界档案、短动态、推荐链接与更新记录。",
+    path: "/archive",
+    itemCount: entries.length,
+  }),
+];
+---
+
+<BaseLayout
+  title="全站归档"
+  description="按时间统一浏览文章、作品、世界档案、短动态、推荐链接与更新记录。"
+  image="/og/page/archive.svg"
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <PageHero title="全站归档" description="当分类不是答案时，就沿时间向后走。这里汇集站内所有公开信号。" />
+
+    <section class="archive-section section-dark">
+      <div class="container archive-list" data-archive-filter-root>
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "全站归档" }]} />
+
+        <div class="archive-command-panel">
+          <div>
+            <span class="eyebrow">Master Index</span>
+            <strong data-archive-filter-summary>正在显示全部 {entries.length} 条公开内容</strong>
+          </div>
+          <div class="search-filter-row" role="group" aria-label="归档内容类型筛选">
+            <button class="filter-chip active" type="button" data-archive-filter="all" aria-pressed="true">全部 {entries.length}</button>
+            {
+              kinds.map(([kind, label]) => (
+                <button class="filter-chip" type="button" data-archive-filter={kind} aria-pressed="false">
+                  {label} {entries.filter((entry) => entry.kind === kind).length}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        {
+          years.map((year) => (
+            <section class="archive-year-section" data-archive-year-section>
+              <div class="archive-year-heading">
+                <span>{year}</span>
+                <strong>{entries.filter((entry) => entry.date.getFullYear() === year).length} 条记录</strong>
+              </div>
+              <div class="archive-year-list">
+                {
+                  entries
+                    .filter((entry) => entry.date.getFullYear() === year)
+                    .map((entry) => (
+                      <a class="archive-signal" href={entry.href} data-archive-kind={entry.kind}>
+                        <time datetime={entry.date.toISOString()}>{formatDate(entry.date)}</time>
+                        <span>{archiveKindLabels[entry.kind]} / {entry.type}</span>
+                        <strong>{entry.title}</strong>
+                        <p>{entry.description}</p>
+                      </a>
+                    ))
+                }
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>

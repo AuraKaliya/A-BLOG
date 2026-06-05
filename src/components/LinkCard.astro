@@ -1,0 +1,34 @@
+---
+import { linkKindLabels } from "../config/taxonomy";
+import type { LinkEntry } from "../lib/content";
+import { formatDate } from "../lib/format";
+
+interface Props {
+  entry: LinkEntry;
+  anchored?: boolean;
+}
+
+const { entry, anchored = false } = Astro.props;
+const hostname = new URL(entry.data.url).hostname.replace(/^www\./, "");
+---
+
+<article class:list={["link-card", `link-${entry.data.kind}`, { featured: entry.data.featured }]} id={anchored ? entry.slug : undefined} data-link-kind={entry.data.kind}>
+  <div class="link-card-meta">
+    <span>{linkKindLabels[entry.data.kind]}</span>
+    <span>{hostname}</span>
+    <time datetime={entry.data.addedDate.toISOString()}>收录于 {formatDate(entry.data.addedDate)}</time>
+  </div>
+  <h2>
+    <a href={entry.data.url} target="_blank" rel="noopener noreferrer">{entry.data.title}</a>
+  </h2>
+  <p>{entry.data.description}</p>
+  <div class="link-card-note">
+    <span>推荐理由</span>
+    <p>{entry.data.note}</p>
+  </div>
+  {entry.data.tags.length > 0 && <div class="tag-row">{entry.data.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}</div>}
+  <div class="link-card-actions">
+    <a class="text-link" href={entry.data.url} target="_blank" rel="noopener noreferrer">访问站点 ↗</a>
+    {entry.data.feedUrl && <a class="text-link" href={entry.data.feedUrl} target="_blank" rel="noopener noreferrer">订阅 RSS</a>}
+  </div>
+</article>

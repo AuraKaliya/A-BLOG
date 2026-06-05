@@ -1,6 +1,6 @@
-import type { BlogPost, TopicSummary, WorkEntry } from "./content-types";
+import type { BlogPost, NoteEntry, TopicSummary, WorkEntry, WorldEntry } from "./content-types";
 import { siteConfig } from "../config/site";
-import { workCategoryLabels } from "../config/taxonomy";
+import { noteKindLabels, workCategoryLabels, worldKindLabels } from "../config/taxonomy";
 
 type StructuredData = Record<string, unknown>;
 
@@ -65,7 +65,7 @@ export function buildCreativeWorkStructuredData(work: WorkEntry): StructuredData
     author: personSchema(),
     creator: personSchema(),
     dateCreated: `${work.data.year}-01-01`,
-    dateModified: `${work.data.year}-12-31`,
+    dateModified: (work.data.updatedDate ?? new Date(`${work.data.year}-12-31`)).toISOString(),
     url: absoluteUrl(`/works/${work.slug}`),
     genre: workCategoryLabels[work.data.category],
     keywords: [...work.data.techStack, ...work.data.topics].join(", "),
@@ -73,6 +73,42 @@ export function buildCreativeWorkStructuredData(work: WorkEntry): StructuredData
       "@type": "Thing",
       name: topic,
     })),
+  };
+}
+
+export function buildWorldEntryStructuredData(entry: WorldEntry): StructuredData {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    headline: entry.data.title,
+    name: entry.data.title,
+    description: entry.data.description,
+    author: personSchema(),
+    creator: personSchema(),
+    dateModified: entry.data.updatedDate.toISOString(),
+    url: absoluteUrl(`/world/${entry.slug}`),
+    genre: worldKindLabels[entry.data.kind],
+    keywords: [...entry.data.tags, ...entry.data.topics].join(", "),
+    about: entry.data.relatedEntries.map((relatedEntry) => ({
+      "@type": "Thing",
+      name: relatedEntry,
+    })),
+  };
+}
+
+export function buildNoteStructuredData(note: NoteEntry): StructuredData {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SocialMediaPosting",
+    headline: note.data.title,
+    name: note.data.title,
+    description: note.data.description,
+    datePublished: note.data.pubDate.toISOString(),
+    dateModified: (note.data.updatedDate ?? note.data.pubDate).toISOString(),
+    author: personSchema(),
+    url: absoluteUrl(`/notes/${note.slug}`),
+    articleSection: noteKindLabels[note.data.kind],
+    keywords: [...note.data.tags, ...note.data.topics].join(", "),
   };
 }
 
@@ -106,7 +142,7 @@ export function buildTopicSummaryStructuredData(topics: TopicSummary[]) {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "主题地图",
-    description: "把博客、作品和实验按照长期关注方向重新组织。",
+    description: "把文章、作品、世界档案、短动态和站外链接按照长期关注方向重新组织。",
     url: absoluteUrl("/topics"),
     mainEntity: {
       "@type": "ItemList",

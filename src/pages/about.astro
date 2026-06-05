@@ -2,6 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getAboutPageData } from "../lib/content";
 import { siteConfig } from "../config/site";
+import SectionHeading from "../components/SectionHeading.astro";
+import SocialCard from "../components/SocialCard.astro";
 
 const aboutPage = await getAboutPageData();
 const about = aboutPage.data;
@@ -11,7 +13,7 @@ const about = aboutPage.data;
   <main class="page-main">
     <section class="page-hero container">
       <h1>{about.title}</h1>
-      <p>这里是个人档案页的基础框架，可以继续替换为你的真实经历、方向和联系方式。</p>
+      <p>{about.description}</p>
     </section>
 
     <section class="about-section section-dark">
@@ -56,6 +58,19 @@ const about = aboutPage.data;
             <input type="text" value={siteConfig.author.social} readonly />
           </label>
           <a class="primary-cta submit" href={`mailto:${siteConfig.author.email}`}>{about.contact.ctaLabel}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="archive-section section-dark" id="socials">
+      <div class="container archive-list">
+        <SectionHeading
+          eyebrow="Find Me"
+          title="在哪里可以找到我"
+          description="不同入口承载不同类型的交流：代码、订阅和较完整的联系各自有合适的位置。"
+        />
+        <div class="social-grid">
+          {about.socialCards.map((card) => <SocialCard {...card} />)}
         </div>
       </div>
     </section>

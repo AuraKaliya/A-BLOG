@@ -1,0 +1,66 @@
+---
+import { render } from "astro:content";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { noteKindLabels } from "../../config/taxonomy";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublishedNotes, getTopicDefinitionMap } from "../../lib/content";
+import { formatDate } from "../../lib/format";
+import { buildBreadcrumbStructuredData, buildNoteStructuredData } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const notes = await getPublishedNotes();
+  return notes.map((note) => ({ params: { slug: note.slug }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const topicMap = await getTopicDefinitionMap();
+const structuredData = [
+  buildBreadcrumbStructuredData([
+    { name: "门户", path: "/" },
+    { name: "短动态", path: "/notes" },
+    { name: note.data.title, path: `/notes/${note.slug}` },
+  ]),
+  buildNoteStructuredData(note),
+];
+---
+
+<BaseLayout
+  title={note.data.title}
+  description={note.data.description}
+  ogType="article"
+  image={`/og/notes/${note.slug}.svg`}
+  keywords={[noteKindLabels[note.data.kind], ...note.data.tags, ...note.data.topics]}
+  publishedTime={note.data.pubDate.toISOString()}
+  modifiedTime={(note.data.updatedDate ?? note.data.pubDate).toISOString()}
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <article class="article-shell container note-detail">
+      <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "短动态", href: "/notes" }, { label: note.data.title }]} />
+      <header class="article-header note-entry-header">
+        <span class="eyebrow">Signal / {note.data.kind}</span>
+        <h1>{note.data.title}</h1>
+        <p>{note.data.description}</p>
+        <div class="meta-grid">
+          <span>{noteKindLabels[note.data.kind]}</span>
+          <time datetime={note.data.pubDate.toISOString()}>{formatDate(note.data.pubDate)}</time>
+          {note.data.updatedDate && <span>更新于 {formatDate(note.data.updatedDate)}</span>}
+          {note.data.mood && <span>{note.data.mood}</span>}
+        </div>
+        {note.data.tags.length > 0 && <div class="tag-row">{note.data.tags.map((tag) => <span>{tag}</span>)}</div>}
+        {
+          note.data.topics.length > 0 && (
+            <div class="tag-row">
+              {note.data.topics.map((topic) => <a href={`/topics#${topic}`}>{topicMap.get(topic)?.data.title ?? topic}</a>)}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose note-prose">
+        <Content />
+      </div>
+      {note.data.externalUrl && <div class="article-links"><a class="primary-cta" href={note.data.externalUrl} target="_blank" rel="noreferrer">访问分享链接</a></div>}
+    </article>
+  </main>
+</BaseLayout>

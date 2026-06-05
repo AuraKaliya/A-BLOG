@@ -4,6 +4,9 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import PageHero from "../components/PageHero.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import WorkCard from "../components/WorkCard.astro";
+import WorldCard from "../components/WorldCard.astro";
+import NoteCard from "../components/NoteCard.astro";
+import LinkCard from "../components/LinkCard.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getAllBlogCategories, getAllBlogTags, getTopicSummaries } from "../lib/content";
 import { buildBreadcrumbStructuredData, buildTopicSummaryStructuredData } from "../lib/seo";
@@ -32,11 +35,20 @@ const structuredData = [
       <div class="container archive-list">
         <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "主题地图" }]} />
 
+        <div class="topic-map-link-panel">
+          <div>
+            <span class="eyebrow">Constellation View</span>
+            <strong>想看见主题之外的直接引用关系？</strong>
+            <p>内容星图会把文章、作品、世界档案、短动态和站外链接之间的连接同时展开。</p>
+          </div>
+          <a class="primary-cta" href="/map">打开内容星图</a>
+        </div>
+
         <div class="topic-overview">
           {
             topics.map((topic) => (
               <a class:list={["topic-tile", `accent-${topic.accent}`]} href={`#${topic.id}`}>
-                <span>{topic.posts.length + topic.works.length}</span>
+                <span>{topic.posts.length + topic.works.length + topic.worlds.length + topic.notes.length + topic.links.length}</span>
                 <strong>{topic.title}</strong>
                 <p>{topic.description}</p>
               </a>
@@ -68,11 +80,14 @@ const structuredData = [
               <SectionHeading
                 eyebrow={topic.title}
                 title={`${topic.title}主题`}
-                description={`${topic.description} 当前关联 ${topic.posts.length} 篇文章、${topic.works.length} 个作品。`}
+                description={`${topic.description} 当前关联 ${topic.posts.length} 篇文章、${topic.works.length} 个作品、${topic.worlds.length} 份世界档案、${topic.notes.length} 条短动态、${topic.links.length} 个站外入口。`}
               />
               <div class="topic-keywords tag-row">{topic.keywords.map((keyword) => <span>{keyword}</span>)}</div>
               {topic.posts.length > 0 && <div class="archive-list compact-list">{topic.posts.map((post) => <ArticleCard post={post} />)}</div>}
               {topic.works.length > 0 && <div class="work-grid">{topic.works.map((work) => <WorkCard work={work} />)}</div>}
+              {topic.worlds.length > 0 && <div class="world-grid">{topic.worlds.map((entry) => <WorldCard entry={entry} />)}</div>}
+              {topic.notes.length > 0 && <div class="notes-grid">{topic.notes.map((note) => <NoteCard note={note} />)}</div>}
+              {topic.links.length > 0 && <div class="link-directory-grid">{topic.links.map((entry) => <LinkCard entry={entry} />)}</div>}
             </section>
           ))
         }

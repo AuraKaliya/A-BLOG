@@ -126,7 +126,7 @@ function initSearch() {
       const type = params.get("type") ?? "all";
 
       input.value = query;
-      if (["all", "blog", "work", "topic"].includes(type)) activeKind = type;
+      if (["all", "blog", "work", "world", "note", "link", "changelog", "topic"].includes(type)) activeKind = type;
 
       filterButtons.forEach((button) => {
         const isActive = button.dataset.searchFilter === activeKind;

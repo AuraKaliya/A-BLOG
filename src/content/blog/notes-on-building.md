@@ -3,6 +3,7 @@ title: "搭建首版时保留哪些能力"
 description: "一个展示型网站不需要复杂后台，但需要清晰的信息结构。"
 pubDate: 2026-06-01
 updatedDate: 2026-06-02
+section: "writings"
 category: "product"
 series: "个人站首版"
 featured: false

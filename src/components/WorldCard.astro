@@ -1,0 +1,27 @@
+---
+import { worldKindLabels, worldStatusLabels } from "../config/taxonomy";
+import type { WorldEntry } from "../lib/content";
+import { formatDate } from "../lib/format";
+
+interface Props {
+  entry: WorldEntry;
+}
+
+const { entry } = Astro.props;
+---
+
+<article class="world-card">
+  <div class="world-card-index" aria-hidden="true">{String(entry.data.sortOrder).padStart(2, "0")}</div>
+  <div class="meta-grid">
+    <span>{worldKindLabels[entry.data.kind]}</span>
+    <span>{worldStatusLabels[entry.data.status]}</span>
+    {entry.data.era && <span>{entry.data.era}</span>}
+  </div>
+  <h2><a href={`/world/${entry.slug}`}>{entry.data.title}</a></h2>
+  <p>{entry.data.description}</p>
+  <div class="tag-row">{entry.data.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}</div>
+  <div class="world-card-footer">
+    <time datetime={entry.data.updatedDate.toISOString()}>更新于 {formatDate(entry.data.updatedDate)}</time>
+    <a class="text-link" href={`/world/${entry.slug}`}>打开档案</a>
+  </div>
+</article>

@@ -1,6 +1,6 @@
 ---
 interface Props {
-  name: "article" | "grid" | "lab" | "nodes" | "rss" | "mail";
+  name: "article" | "grid" | "lab" | "nodes" | "rss" | "mail" | "world" | "spark" | "history";
 }
 
 const { name } = Astro.props;
@@ -55,6 +55,30 @@ const { name } = Astro.props;
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <rect x="4" y="6" width="16" height="12" rx="1.5"></rect>
       <path d="m5 7 7 6 7-6"></path>
+    </svg>
+  )
+}
+{
+  name === "world" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8"></circle>
+      <path d="M4 12h16M12 4c2.4 2.2 3.6 4.9 3.6 8S14.4 17.8 12 20M12 4C9.6 6.2 8.4 8.9 8.4 12S9.6 17.8 12 20"></path>
+    </svg>
+  )
+}
+{
+  name === "spark" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"></path>
+      <path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"></path>
+    </svg>
+  )
+}
+{
+  name === "history" && (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 8a8 8 0 1 1-1 7M5 8V4M5 8h4"></path>
+      <path d="M12 7v5l3 2"></path>
     </svg>
   )
 }

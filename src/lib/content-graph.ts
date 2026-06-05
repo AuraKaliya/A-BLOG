@@ -1,17 +1,28 @@
 import { getPublishedPosts } from "./queries/blog";
+import { getPublishedNotes } from "./queries/notes";
+import { getPublishedLinks } from "./queries/links";
 import { getTopicDefinitions } from "./queries/topics";
 import { getPublishedWorks } from "./queries/works";
+import { getPublishedWorldEntries } from "./queries/world";
 import { getDuplicates } from "./validation";
 
 let validationPromise: Promise<void> | undefined;
 
 async function validateContentGraph() {
-  const [posts, works, topics] = await Promise.all([getPublishedPosts(), getPublishedWorks(), getTopicDefinitions()]);
+  const [posts, works, worlds, notes, links, topics] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedWorks(),
+    getPublishedWorldEntries(),
+    getPublishedNotes(),
+    getPublishedLinks(),
+    getTopicDefinitions(),
+  ]);
   const issues: string[] = [];
 
   const topicIds = new Set(topics.map((topic) => topic.id));
   const postSlugs = new Set(posts.map((post) => post.slug));
   const workSlugs = new Set(works.map((work) => work.slug));
+  const worldSlugs = new Set(worlds.map((entry) => entry.slug));
   const topicUsage = new Map(topics.map((topic) => [topic.id, 0]));
 
   posts.forEach((post) => {
@@ -98,6 +109,81 @@ async function validateContentGraph() {
     });
   });
 
+  worlds.forEach((entry) => {
+    getDuplicates(entry.data.tags).forEach((tag) => {
+      issues.push(`world:${entry.slug} has duplicate tag "${tag}"`);
+    });
+
+    getDuplicates(entry.data.topics).forEach((topicId) => {
+      issues.push(`world:${entry.slug} has duplicate topic "${topicId}"`);
+    });
+
+    getDuplicates(entry.data.relatedEntries).forEach((relatedSlug) => {
+      issues.push(`world:${entry.slug} has duplicate related entry "${relatedSlug}"`);
+    });
+
+    entry.data.topics.forEach((topicId) => {
+      if (!topicIds.has(topicId)) {
+        issues.push(`world:${entry.slug} references missing topic "${topicId}"`);
+        return;
+      }
+
+      topicUsage.set(topicId, (topicUsage.get(topicId) ?? 0) + 1);
+    });
+
+    entry.data.relatedEntries.forEach((relatedSlug) => {
+      if (!worldSlugs.has(relatedSlug)) {
+        issues.push(`world:${entry.slug} references missing world entry "${relatedSlug}"`);
+      }
+
+      if (relatedSlug === entry.slug) {
+        issues.push(`world:${entry.slug} cannot reference itself`);
+      }
+    });
+  });
+
+  notes.forEach((note) => {
+    getDuplicates(note.data.tags).forEach((tag) => {
+      issues.push(`note:${note.slug} has duplicate tag "${tag}"`);
+    });
+
+    getDuplicates(note.data.topics).forEach((topicId) => {
+      issues.push(`note:${note.slug} has duplicate topic "${topicId}"`);
+    });
+
+    note.data.topics.forEach((topicId) => {
+      if (!topicIds.has(topicId)) {
+        issues.push(`note:${note.slug} references missing topic "${topicId}"`);
+        return;
+      }
+
+      topicUsage.set(topicId, (topicUsage.get(topicId) ?? 0) + 1);
+    });
+  });
+
+  links.forEach((link) => {
+    getDuplicates(link.data.tags).forEach((tag) => {
+      issues.push(`link:${link.slug} has duplicate tag "${tag}"`);
+    });
+
+    getDuplicates(link.data.topics).forEach((topicId) => {
+      issues.push(`link:${link.slug} has duplicate topic "${topicId}"`);
+    });
+
+    if (link.data.featured && link.data.topics.length === 0) {
+      issues.push(`link:${link.slug} is featured but has no topics`);
+    }
+
+    link.data.topics.forEach((topicId) => {
+      if (!topicIds.has(topicId)) {
+        issues.push(`link:${link.slug} references missing topic "${topicId}"`);
+        return;
+      }
+
+      topicUsage.set(topicId, (topicUsage.get(topicId) ?? 0) + 1);
+    });
+  });
+
   topics.forEach((topic) => {
     getDuplicates(topic.data.keywords).forEach((keyword) => {
       issues.push(`topic:${topic.id} has duplicate keyword "${keyword}"`);
@@ -109,7 +195,7 @@ async function validateContentGraph() {
 
     const usageCount = topicUsage.get(topic.id) ?? 0;
     if (usageCount === 0) {
-      issues.push(`topic:${topic.id} is never referenced by any post or work`);
+      issues.push(`topic:${topic.id} is never referenced by published content`);
     }
   });
 

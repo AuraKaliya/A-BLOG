@@ -6,7 +6,7 @@ import { siteConfig } from "../config/site";
 import { workCategoryLabels, workStatusLabels } from "../config/taxonomy";
 
 const [homePage, homepageFeed] = await Promise.all([getHomePageData(), getHomepageFeed()]);
-const { posts, works, featuredWorks } = homepageFeed;
+const { posts, works, featuredWorks, recentUpdates } = homepageFeed;
 const home = homePage.data;
 ---
 
@@ -25,9 +25,13 @@ const home = homePage.data;
           <div class="hero-actions-row">
             {
               home.hero.actions.map((action) => (
-                <a class={action.variant === "secondary" ? "secondary-cta" : "primary-cta"} href={action.href}>
-                  {action.label}
-                </a>
+                action.label === "随机漫游" ? (
+                  <button class="secondary-cta random-entry-button" type="button" data-random-entry>{action.label}</button>
+                ) : (
+                  <a class={action.variant === "secondary" ? "secondary-cta" : "primary-cta"} href={action.href}>
+                    {action.label}
+                  </a>
+                )
               ))
             }
           </div>
@@ -55,8 +59,8 @@ const home = homePage.data;
     <section class="statement-band">
       <div class="container">
         <p>
-          这个站点的首版目标很明确：
-          <strong>不是做复杂后台，而是先建立一个稳定、漂亮、可持续填充的公开档案。</strong>
+          你抵达了 Aura 的个人据点。
+          <strong>这里的内容不只按发布时间排列，也会沿着作品、主题和世界档案彼此连接。</strong>
         </p>
       </div>
     </section>
@@ -85,6 +89,36 @@ const home = homePage.data;
               </a>
             ))
           }
+        </div>
+      </div>
+    </section>
+
+    <section class="updates-section section-mid" id="updates">
+      <div class="container">
+        <div class="section-heading split">
+          <div>
+            <span class="eyebrow">Recent Signals</span>
+            <h2>最近从站点里传出的信号</h2>
+          </div>
+          <p>文章、作品、世界条目、短动态与站点版本共用一条更新流，让访客知道这里最近发生了什么。</p>
+        </div>
+        <div class="update-feed">
+          {
+            recentUpdates.map((update) => (
+              <a class="update-feed-item" href={update.href}>
+                <time datetime={update.date.toISOString()}>
+                  {update.date.toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })}
+                </time>
+                <span>{update.type}</span>
+                <strong>{update.title}</strong>
+                <p>{update.description}</p>
+              </a>
+            ))
+          }
+        </div>
+        <div class="update-feed-actions">
+          <button class="primary-cta random-entry-button" type="button" data-random-entry>随机漫游</button>
+          <a class="secondary-cta" href="/changelog">查看完整更新记录</a>
         </div>
       </div>
     </section>
@@ -128,9 +162,9 @@ const home = homePage.data;
         <div class="section-heading split">
           <div>
             <span class="eyebrow">Blog</span>
-            <h2>博客保持轻量，但要成为长期资产</h2>
+            <h2>文字与技术，各自保留合适的阅读预期</h2>
           </div>
-          <p>每篇文章就是一个 Markdown 文件，适合稳定写作、版本管理和未来迁移。</p>
+          <p>它们仍共享同一套 Markdown 内容模型，但通过分区让随笔和技术记录不必挤在同一条走廊里。</p>
         </div>
 
         <div class="learn-layout">
@@ -147,8 +181,12 @@ const home = homePage.data;
           </div>
 
           <div class="resource-column">
-            <h4>建议栏目</h4>
-            {home.suggestedPostColumns.map((item) => <a href="/blog">{item}</a>)}
+            <h4>阅读入口</h4>
+            <a href="/writings">文字与随笔</a>
+            <a href="/tech">技术与实现</a>
+            <a href="/blog">全部文章归档</a>
+            <a href="/topics">主题地图</a>
+            <a href="/links">站外信号</a>
           </div>
         </div>
       </div>

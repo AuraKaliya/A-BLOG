@@ -1,59 +1,71 @@
 {
   "kind": "home",
-  "title": "个人门户",
-  "description": "一个用于展示博客、作品、实验和个人档案的 Astro 个人网站。",
+  "title": "Aura 的个人空间",
+  "description": "一个保存文字、技术、作品、世界设定与未完成想法的个人内容宇宙入口。",
   "hero": {
-    "title": "博客之外\n也是你的\n作品入口",
-    "description": "一个简易但可扩展的个人网页框架：用门户首页分发博客、作品、实验和个人档案，让长期输出有统一的展示秩序。",
+    "title": "抵达一座\n临时搭建的\n观测站",
+    "description": "这里保存着文字、工具、世界设定、实验，以及一些尚未成形但值得留下的想法。请随意翻阅、停留，或者迷路。",
     "actions": [
       {
-        "label": "进入门户",
+        "label": "查看入口",
         "href": "#portal",
         "variant": "primary"
       },
       {
-        "label": "查看作品",
-        "href": "/works",
+        "label": "随机漫游",
+        "href": "/topics",
         "variant": "secondary"
       }
     ],
     "metrics": [
       {
         "eyebrow": "Content System",
-        "value": "04",
-        "description": "Blog / Works / Lab / About"
+        "value": "06",
+        "description": "Writings / Tech / Works / World / About / Log"
       },
       {
         "eyebrow": "Static First",
         "value": "MD",
-        "description": "文章和作品都从 Markdown 内容集合生成。"
+        "description": "所有公开内容都由 Markdown 与结构化数据生成。"
       }
     ]
   },
   "portalCards": [
     {
-      "title": "博客",
-      "description": "用于发布技术笔记、产品观察、读书整理和阶段性复盘。",
-      "href": "/blog",
+      "title": "文字",
+      "description": "随笔、观察、片段记录，以及还在形成中的想法。",
+      "href": "/writings",
       "icon": "article"
     },
     {
+      "title": "技术",
+      "description": "开发笔记、工具链、教程、踩坑与实现过程。",
+      "href": "/tech",
+      "icon": "nodes"
+    },
+    {
       "title": "作品",
-      "description": "展示项目、工具、设计稿、研究成果和可以被复用的产出。",
+      "description": "展示项目、工具、设计稿、研究成果与实验产出。",
       "href": "/works",
       "icon": "grid"
     },
     {
-      "title": "主题",
-      "description": "把文章、作品和实验按照长期关注方向重新组织。",
-      "href": "/topics",
-      "icon": "nodes"
+      "title": "世界",
+      "description": "角色、地区、事件、规则与术语构成的设定档案。",
+      "href": "/world",
+      "icon": "world"
     },
     {
-      "title": "实验",
-      "description": "容纳还在探索中的 AI 原型、交互 Demo、小工具和想法验证。",
-      "href": "/lab",
-      "icon": "lab"
+      "title": "关于",
+      "description": "我是谁、最近关注什么，以及在哪里可以找到我。",
+      "href": "/about",
+      "icon": "spark"
+    },
+    {
+      "title": "更新记录",
+      "description": "查看网站最近新增、调整和维护了什么。",
+      "href": "/changelog",
+      "icon": "history"
     }
   ],
   "suggestedPostColumns": [
@@ -82,16 +94,16 @@
   ],
   "roadmapItems": [
     {
-      "label": "站内搜索",
-      "value": "静态索引 / Pagefind 预留"
+      "label": "世界档案",
+      "value": "关系星图 / 时间线 / 随机漫游"
     },
     {
-      "label": "主题地图",
-      "value": "Topics / Series / Tags"
+      "label": "内容发现",
+      "value": "搜索 / 全站归档 / 内容星图 / 站外信号"
     },
     {
-      "label": "内容订阅",
-      "value": "RSS / 邮件列表"
+      "label": "长期维护",
+      "value": "内容校验 / 链接目录 JSON / RSS"
     }
   ],
   "aboutStory": {

@@ -3,6 +3,7 @@ title: "为什么先搭一个个人门户"
 description: "把博客、作品和实验统一放进一个轻量展示框架。"
 pubDate: 2026-06-03
 updatedDate: 2026-06-03
+section: "tech"
 category: "engineering"
 series: "个人站首版"
 featured: true

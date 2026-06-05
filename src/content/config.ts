@@ -4,6 +4,15 @@ import { blogCategoryKeys } from "../config/taxonomy";
 const linkSchema = z.object({
   label: z.string(),
   href: z.string(),
+  kind: z.enum(["demo", "source", "article", "external"]).default("external"),
+});
+
+const socialCardSchema = z.object({
+  platform: z.string(),
+  handle: z.string(),
+  description: z.string(),
+  href: z.string(),
+  accent: z.enum(["cyan", "orange", "green"]).default("cyan"),
 });
 
 const coverSchema = z.string().refine(
@@ -35,7 +44,7 @@ const cardSchema = z.object({
   href: z.string().optional(),
   actionLabel: z.string().optional(),
   featured: z.boolean().default(false),
-  icon: z.enum(["article", "grid", "lab", "nodes", "rss", "mail"]).optional(),
+  icon: z.enum(["article", "grid", "lab", "nodes", "rss", "mail", "world", "spark", "history"]).optional(),
   items: z.array(z.string()).default([]),
 });
 
@@ -76,6 +85,7 @@ const aboutPage = z.object({
   }),
   focusAreas: z.array(z.string()).default([]),
   stackCards: z.array(cardSchema).default([]),
+  socialCards: z.array(socialCardSchema).default([]),
   contact: z.object({
     ctaLabel: z.string(),
     emailLabel: z.string(),
@@ -125,6 +135,7 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
+    section: z.enum(["writings", "tech"]).default("tech"),
     category: z.enum(blogCategoryKeys).default("engineering"),
     series: z.string().optional(),
     cover: coverSchema.optional(),
@@ -142,6 +153,7 @@ const works = defineCollection({
     title: z.string(),
     description: z.string(),
     year: z.number(),
+    updatedDate: z.coerce.date().optional(),
     role: z.string(),
     category: z.enum(["project", "writing", "tool", "research", "experiment"]),
     status: z.enum(["concept", "building", "shipped", "archived"]).default("building"),
@@ -154,6 +166,75 @@ const works = defineCollection({
     relatedPosts: z.array(z.string()).default([]),
     relatedWorks: z.array(z.string()).default([]),
     links: z.array(linkSchema).default([]),
+  }),
+});
+
+const world = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    kind: z.enum(["character", "location", "organization", "event", "rule", "term"]),
+    status: z.enum(["seed", "organizing", "published"]).default("organizing"),
+    era: z.string().optional(),
+    eventDate: z.string().optional(),
+    sortOrder: z.number().default(0),
+    updatedDate: z.coerce.date(),
+    cover: coverSchema.optional(),
+    featured: z.boolean().default(false),
+    topics: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    relatedEntries: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const changelog = defineCollection({
+  type: "content",
+  schema: z.object({
+    version: z.string(),
+    date: z.coerce.date(),
+    summary: z.string(),
+    type: z.enum(["content", "feature", "design", "maintenance"]).default("content"),
+    changes: z.array(z.string()).default([]),
+    featured: z.boolean().default(false),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const notes = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    kind: z.enum(["thought", "status", "link", "fragment"]).default("thought"),
+    mood: z.string().optional(),
+    externalUrl: z.string().url().optional(),
+    featured: z.boolean().default(false),
+    topics: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const links = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    note: z.string(),
+    url: z.string().url(),
+    feedUrl: z.string().url().optional(),
+    kind: z.enum(["friend", "reading", "tool", "inspiration", "reference"]).default("reading"),
+    language: z.string().default("中文"),
+    addedDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    featured: z.boolean().default(false),
+    topics: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
   }),
 });
 
@@ -174,4 +255,4 @@ const pages = defineCollection({
   schema: z.discriminatedUnion("kind", [homePage, aboutPage, labPage, nowPage]),
 });
 
-export const collections = { blog, works, topics, pages };
+export const collections = { blog, works, world, changelog, notes, links, topics, pages };

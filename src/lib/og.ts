@@ -1,5 +1,5 @@
 import type { TopicEntry } from "./content-types";
-import { blogCategoryLabels, workCategoryLabels } from "../config/taxonomy";
+import { blogCategoryLabels, workCategoryLabels, worldKindLabels, worldStatusLabels } from "../config/taxonomy";
 import { siteConfig } from "../config/site";
 
 function escapeXml(value: string) {
@@ -90,6 +90,14 @@ export function blogOgMeta(category: keyof typeof blogCategoryLabels, tags: stri
 
 export function workOgMeta(category: keyof typeof workCategoryLabels, techStack: string[]) {
   return [workCategoryLabels[category], ...techStack].slice(0, 3).join(" / ");
+}
+
+export function worldOgMeta(
+  kind: keyof typeof worldKindLabels,
+  status: keyof typeof worldStatusLabels,
+  tags: string[],
+) {
+  return [worldKindLabels[kind], worldStatusLabels[status], ...tags].slice(0, 3).join(" / ");
 }
 
 export function topicAccent(topic: TopicEntry) {
