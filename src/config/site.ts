@@ -12,4 +12,17 @@ export const siteConfig = {
     social: "https://example.com",
   },
   footerCapabilities: ["Astro 静态构建", "Markdown 内容集合", "跨内容更新流与搜索", "RSS 与 Sitemap"],
+  footerLinks: [
+    { label: "短动态", href: "/notes" },
+    { label: "站外信号", href: "/links" },
+    { label: "内容星图", href: "/map" },
+    { label: "全站归档", href: "/archive" },
+    { label: "搜索", href: "/search" },
+    { label: "关于", href: "/about" },
+  ],
+  legal: {
+    copyrightName: "Aura",
+    icpFiling: "ICP备案号待填写",
+    sitemap: "/sitemap-index.xml",
+  },
 };

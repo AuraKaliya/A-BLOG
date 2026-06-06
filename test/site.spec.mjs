@@ -3,10 +3,24 @@ import { expect, test } from "playwright/test";
 test("home exposes the content universe entrances", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("临时搭建的");
-  await expect(page.locator(".portal-card")).toHaveCount(6);
-  await expect(page.getByRole("heading", { name: "最近从站点里传出的信号" })).toBeVisible();
-  await expect(page.locator(".update-feed-item")).toHaveCount(6);
+  await expect(page.locator('[data-home-screen="entry"]')).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Aura Kaliye" })).toBeVisible();
+  await expect(page.locator(".profile-avatar img")).toHaveAttribute("src", "/resource/default/default_image.png");
+  await expect(page.getByRole("heading", { name: "近期状态" })).toBeVisible();
+  await expect(page.locator(".recent-status-image img")).toHaveAttribute("src", "/resource/default/default_image.png");
+  await expect(page.getByRole("button", { name: "开始漫游" })).toBeVisible();
+
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("文字");
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("作品");
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("世界");
+
+  await expect(page.getByRole("heading", { name: "最新动态" })).toBeVisible();
+  await expect(page.locator(".home-update-item")).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "网站更新时间轴" })).toBeVisible();
+  await expect(page.locator(".home-timeline-item")).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "网站的运营数据" })).toBeVisible();
+  await expect(page.locator(".home-stat-item")).toHaveCount(6);
+  await expect(page.getByText("ICP备案号待填写")).toBeVisible();
 });
 
 test("world archive, detail, and timeline are connected", async ({ page }) => {
@@ -200,10 +214,27 @@ test("mobile navigation exposes the main sections", async ({ page }) => {
   await expect(navigation.getByRole("link", { name: "世界", exact: true })).toBeVisible();
 });
 
+test("navigation keeps works direct and toggles the about menu by click", async ({ page }) => {
+  await page.goto("/");
+
+  const navigation = page.getByRole("navigation", { name: "主导航" });
+  await expect(navigation.getByRole("link", { name: "作品", exact: true })).toHaveAttribute("href", "/works");
+  await expect(page.locator("#menu-works")).toHaveCount(0);
+
+  const aboutTrigger = navigation.getByRole("button", { name: "关于" });
+  await aboutTrigger.click();
+  await expect(aboutTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#menu-about")).toBeVisible();
+
+  await aboutTrigger.click();
+  await expect(aboutTrigger).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#menu-about")).toBeHidden();
+});
+
 test("new discovery views do not overflow on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
-  for (const path of ["/world?kind=event", "/notes?kind=link", "/links?kind=reference", "/archive?type=note", "/map?type=world", "/about#socials", "/works"]) {
+  for (const path of ["/", "/world?kind=event", "/notes?kind=link", "/links?kind=reference", "/archive?type=note", "/map?type=world", "/about#socials", "/works"]) {
     await page.goto(path);
     const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
     expect(hasOverflow).toBeFalsy();

@@ -1,115 +1,60 @@
 {
   "kind": "home",
   "title": "Aura 的个人空间",
-  "description": "一个保存文字、技术、作品、世界设定与未完成想法的个人内容宇宙入口。",
-  "hero": {
-    "title": "抵达一座\n临时搭建的\n观测站",
-    "description": "这里保存着文字、工具、世界设定、实验，以及一些尚未成形但值得留下的想法。请随意翻阅、停留，或者迷路。",
-    "actions": [
+  "description": "一个保存文字、技术、作品、世界设定与未完成想法的个人内容站点入口。",
+  "profile": {
+    "eyebrow": "Profile",
+    "name": "Aura Kaliye",
+    "role": "银花海 / 花海 ",
+    "status": "正在激情创作世界观中",
+    "location": "Online, mostly at night",
+    "bio": "欢迎来到Aura的个人空间！",
+    "imageIndex": "default/default_image",
+    "imageAlt": "Aura Kaliye 头像",
+    "tags": [],
+    "links": [
       {
-        "label": "查看入口",
-        "href": "#portal",
-        "variant": "primary"
-      },
-      {
-        "label": "随机漫游",
-        "href": "/topics",
-        "variant": "secondary"
-      }
-    ],
-    "metrics": [
-      {
-        "eyebrow": "Content System",
-        "value": "06",
-        "description": "Writings / Tech / Works / World / About / Log"
-      },
-      {
-        "eyebrow": "Static First",
-        "value": "MD",
-        "description": "所有公开内容都由 Markdown 与结构化数据生成。"
+        "label": "Twitter",
+        "href": "https://twitter.com/AuraKaliye"
       }
     ]
   },
-  "portalCards": [
-    {
-      "title": "文字",
-      "description": "随笔、观察、片段记录，以及还在形成中的想法。",
-      "href": "/writings",
-      "icon": "article"
-    },
-    {
-      "title": "技术",
-      "description": "开发笔记、工具链、教程、踩坑与实现过程。",
-      "href": "/tech",
-      "icon": "nodes"
-    },
-    {
-      "title": "作品",
-      "description": "展示项目、工具、设计稿、研究成果与实验产出。",
-      "href": "/works",
-      "icon": "grid"
-    },
-    {
-      "title": "世界",
-      "description": "角色、地区、事件、规则与术语构成的设定档案。",
-      "href": "/world",
-      "icon": "world"
-    },
-    {
-      "title": "关于",
-      "description": "我是谁、最近关注什么，以及在哪里可以找到我。",
-      "href": "/about",
-      "icon": "spark"
-    },
-    {
-      "title": "更新记录",
-      "description": "查看网站最近新增、调整和维护了什么。",
-      "href": "/changelog",
-      "icon": "history"
-    }
-  ],
-  "suggestedPostColumns": [
-    "技术笔记",
-    "产品观察",
-    "读书整理",
-    "阶段复盘"
-  ],
-  "labCards": [
-    {
-      "label": "Prototype",
-      "title": "AI 与自动化原型",
-      "description": "放置提示词实验、Agent 流程、小脚本和能展示方法论的 Demo。",
-      "href": "/lab",
-      "actionLabel": "查看实验索引",
-      "featured": true
-    },
-    {
-      "title": "交互与可视化",
-      "description": "适合放一些前端动效、数据图表、Canvas/SVG 练习和交互草图。"
-    },
-    {
-      "title": "想法仓库",
-      "description": "并不是所有想法都需要成熟后再出现，公开记录过程本身也有价值。"
-    }
-  ],
-  "roadmapItems": [
-    {
-      "label": "世界档案",
-      "value": "关系星图 / 时间线 / 随机漫游"
-    },
-    {
-      "label": "内容发现",
-      "value": "搜索 / 全站归档 / 内容星图 / 站外信号"
-    },
-    {
-      "label": "长期维护",
-      "value": "内容校验 / 链接目录 JSON / RSS"
-    }
-  ],
-  "aboutStory": {
-    "title": "一个个人站，不只是简历，也是长期输出的索引。",
-    "description": "首版先把骨架搭好：以后你每增加一篇文章、一个作品或一次实验，都能自然归档到这个系统里。",
-    "href": "/about",
-    "actionLabel": "完善关于页"
+  "recentStatus": {
+    "eyebrow": "Recent Status",
+    "title": "近期状态",
+    "description": "正在激情创作世界观中，顺手把个人站整理成更适合长期维护的展示板。",
+    "imageIndex": "default/default_image",
+    "imageAlt": "近期状态展示图"
+  },
+  "randomExplore": {
+    "eyebrow": "Explore",
+    "title": "随机探索",
+    "description": "从文章、作品、世界档案、短动态和站外链接里随机打开一个入口。",
+    "actionLabel": "开始漫游"
+  },
+  "intro": {
+    "eyebrow": "About this site",
+    "title": "来点正经介绍",
+    "lead": "这里会留存有我的生活记录、创作作品以及各种想法和实验。",
+    "highlights": [
+      {
+        "keyword": "文字",
+        "title": "生活随笔、技术博客",
+        "description": "梦和影子的留存之地",
+        "href": "/archive"
+      },
+      {
+        "keyword": "作品",
+        "title": "项目、工具",
+        "description": "一些想法和实践的产物归档之地",
+        "href": "/works"
+      },
+      {
+        "keyword": "世界",
+        "title": "Dreath世界观",
+        "description": "欢迎来到Aura的幻想世界",
+        "href": "/world"
+      }
+    ]
   }
 }

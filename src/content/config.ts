@@ -37,6 +37,11 @@ const heroMetricSchema = z.object({
   description: z.string(),
 });
 
+const simpleLinkSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+});
+
 const cardSchema = z.object({
   label: z.string().optional(),
   title: z.string(),
@@ -52,12 +57,51 @@ const homePage = z.object({
   kind: z.literal("home"),
   title: z.string(),
   description: z.string(),
+  profile: z.object({
+    eyebrow: z.string().default("Profile"),
+    name: z.string(),
+    role: z.string(),
+    status: z.string(),
+    location: z.string(),
+    bio: z.string(),
+    imageIndex: z.string().optional(),
+    imageAlt: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    links: z.array(simpleLinkSchema).default([]),
+  }),
+  recentStatus: z.object({
+    eyebrow: z.string().default("近期状态"),
+    title: z.string(),
+    description: z.string(),
+    imageIndex: z.string().optional(),
+    imageAlt: z.string().optional(),
+    href: z.string().optional(),
+  }),
+  randomExplore: z.object({
+    eyebrow: z.string().default("Explore"),
+    title: z.string(),
+    description: z.string(),
+    actionLabel: z.string(),
+  }),
+  intro: z.object({
+    eyebrow: z.string().default("About this site"),
+    title: z.string(),
+    lead: z.string(),
+    highlights: z.array(
+      z.object({
+        keyword: z.string(),
+        title: z.string(),
+        description: z.string(),
+        href: z.string(),
+      }),
+    ).default([]),
+  }),
   hero: z.object({
     title: z.string(),
     description: z.string(),
     actions: z.array(heroActionSchema).default([]),
     metrics: z.array(heroMetricSchema).default([]),
-  }),
+  }).optional(),
   portalCards: z.array(cardSchema).default([]),
   suggestedPostColumns: z.array(z.string()).default([]),
   labCards: z.array(cardSchema).default([]),
@@ -66,13 +110,13 @@ const homePage = z.object({
       label: z.string(),
       value: z.string(),
     }),
-  ),
+  ).default([]),
   aboutStory: z.object({
     title: z.string(),
     description: z.string(),
     href: z.string(),
     actionLabel: z.string(),
-  }),
+  }).optional(),
 });
 
 const aboutPage = z.object({

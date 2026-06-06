@@ -1,5 +1,5 @@
 ---
-import { aboutMenuLinks, mainNav, portfolioMenuGroups } from "../config/navigation";
+import { aboutMenuLinks, mainNav } from "../config/navigation";
 import { getTopicDefinitions } from "../lib/content";
 import { siteConfig } from "../config/site";
 import IconSymbol from "./IconSymbol.astro";
@@ -39,80 +39,11 @@ const isActivePath = (path: string) => {
     <div class="nav-group" id="site-nav">
       <nav class="site-nav" aria-label="主导航">
         {
-          mainNav.map((item) =>
-            "menu" in item && item.menu === "works" ? (
-              <div class="nav-item has-menu" data-menu-root>
-                <button
-                  class:list={["nav-trigger", { active: isActivePath(item.match) }]}
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="menu-works"
-                  data-menu-trigger="works"
-                >
-                  {item.label}
-                  <span class="nav-chevron" aria-hidden="true"></span>
-                </button>
-
-                <div class="mega-menu mega-menu-products" id="menu-works" data-menu="works">
-                  <div class="mega-shell">
-                    <div class="menu-kicker">
-                      <span class="eyebrow">Works</span>
-                      <h3>用作品、写作和实验构成你的公开档案</h3>
-                      <p>左侧按展示类型分组，右侧展示可以继续扩展的作品卡片。</p>
-                    </div>
-
-                    <div class="product-menu-layout" data-portfolio-menu>
-                      <div class="product-pillar-list" role="tablist" aria-label="作品分类">
-                        {
-                          portfolioMenuGroups.map((group, index) => (
-                            <button
-                              class:list={["pillar-tab", { "is-active": index === 0 }]}
-                              type="button"
-                              role="tab"
-                              aria-selected={index === 0 ? "true" : "false"}
-                              aria-controls={`portfolio-panel-${group.id}`}
-                              id={`portfolio-tab-${group.id}`}
-                              data-group-id={group.id}
-                            >
-                              <strong>{group.label}</strong>
-                              <span>{group.description}</span>
-                            </button>
-                          ))
-                        }
-                      </div>
-
-                      <div class="portfolio-panels">
-                        {
-                          portfolioMenuGroups.map((group, index) => (
-                            <div
-                              class="product-detail-panel"
-                              role="tabpanel"
-                              id={`portfolio-panel-${group.id}`}
-                              aria-labelledby={`portfolio-tab-${group.id}`}
-                              data-portfolio-panel={group.id}
-                              hidden={index !== 0}
-                            >
-                              {group.cards.map((card) => (
-                                <article class="product-detail-card">
-                                  <h4>{card.title}</h4>
-                                  <p>{card.text}</p>
-                                  <ul>{card.items.map((item) => <li>{item}</li>)}</ul>
-                                </article>
-                              ))}
-                            </div>
-                          ))
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <a class:list={["nav-link", { active: isActivePath(item.match) }]} href={item.href} aria-current={isActivePath(item.match) ? "page" : undefined}>
-                {item.label}
-              </a>
-            ),
-          )
+          mainNav.map((item) => (
+            <a class:list={["nav-link", { active: isActivePath(item.match) }]} href={item.href} aria-current={isActivePath(item.match) ? "page" : undefined}>
+              {item.label}
+            </a>
+          ))
         }
 
         <div class="nav-item has-menu" data-menu-root>

@@ -4,8 +4,6 @@ function initSiteInteractions() {
   const navGroup = document.querySelector(".nav-group");
   const menuRoots = [...document.querySelectorAll("[data-menu-root]")];
   const menuTriggers = [...document.querySelectorAll("[data-menu-trigger]")];
-  const pillarList = document.querySelector("[data-portfolio-menu] .product-pillar-list");
-  const portfolioPanels = [...document.querySelectorAll("[data-portfolio-panel]")];
   const randomEntryButtons = [...document.querySelectorAll("[data-random-entry]")];
   const themeToggle = document.querySelector("[data-theme-toggle]");
   const worldFilterRoot = document.querySelector("[data-world-filter-root]");
@@ -46,13 +44,6 @@ function initSiteInteractions() {
 
     if (isOpen) closeAllMenus();
     else openMenu(targetName);
-  }
-
-  function showPortfolioPanel(activeId) {
-    portfolioPanels.forEach((panel) => {
-      if (!(panel instanceof HTMLElement)) return;
-      panel.hidden = panel.dataset.portfolioPanel !== activeId;
-    });
   }
 
   function handleScrollState() {
@@ -348,25 +339,7 @@ function initSiteInteractions() {
     trigger.addEventListener("click", () => {
       const { menuTrigger } = trigger.dataset;
       if (!menuTrigger) return;
-      if (window.innerWidth >= 1024 && trigger.getAttribute("aria-expanded") === "true") return;
       toggleMenu(menuTrigger);
-    });
-
-    trigger.addEventListener("mouseenter", () => {
-      if (window.innerWidth < 1024) return;
-      const { menuTrigger } = trigger.dataset;
-      if (!menuTrigger) return;
-      openMenu(menuTrigger);
-    });
-  });
-
-  menuRoots.forEach((root) => {
-    root.addEventListener("mouseenter", () => {
-      if (window.innerWidth < 1024) return;
-      const trigger = root.querySelector(".nav-trigger");
-      const targetName = trigger?.dataset.menuTrigger;
-      if (!targetName) return;
-      openMenu(targetName);
     });
   });
 
@@ -385,25 +358,6 @@ function initSiteInteractions() {
       navGroup?.classList.remove("is-open");
       mobileToggle?.setAttribute("aria-expanded", "false");
     }
-  });
-
-  pillarList?.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-
-    const button = target.closest(".pillar-tab");
-    if (!(button instanceof HTMLButtonElement)) return;
-
-    const nextGroupId = button.dataset.groupId;
-    if (!nextGroupId) return;
-
-    pillarList.querySelectorAll(".pillar-tab").forEach((tab) => {
-      const isActive = tab instanceof HTMLElement && tab.dataset.groupId === nextGroupId;
-      tab.classList.toggle("is-active", isActive);
-      tab.setAttribute("aria-selected", String(isActive));
-    });
-
-    showPortfolioPanel(nextGroupId);
   });
 
   mobileToggle?.addEventListener("click", () => {
