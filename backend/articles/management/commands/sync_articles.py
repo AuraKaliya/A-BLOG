@@ -34,6 +34,7 @@ class Command(BaseCommand):
                     "category": resource.category,
                     "featured": resource.featured,
                     "draft": resource.draft,
+                    "content_source": Article.SOURCE_RESOURCE,
                     "word_count": resource.word_count,
                     "source_hash": resource.source_hash,
                 },

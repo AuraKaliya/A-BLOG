@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from .models import Article
+from .models import Article, SitePage
 from .services import read_article_html
 
 
@@ -44,4 +44,20 @@ class ArticleDetailSerializer(ArticleListSerializer):
         fields = [*ArticleListSerializer.Meta.fields, "html"]
 
     def get_html(self, obj: Article) -> str:
+        if obj.body_html:
+            return obj.body_html
+        if obj.content_source == Article.SOURCE_MANUAL:
+            return ""
         return read_article_html(obj.slug)
+
+
+class SitePageSerializer(serializers.ModelSerializer):
+    data = serializers.SerializerMethodField()
+    updatedAt = serializers.DateTimeField(source="updated_at")
+
+    class Meta:
+        model = SitePage
+        fields = ["key", "title", "description", "data", "updatedAt"]
+
+    def get_data(self, obj: SitePage) -> dict:
+        return obj.content

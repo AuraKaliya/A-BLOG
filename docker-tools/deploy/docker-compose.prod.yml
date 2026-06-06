@@ -27,6 +27,7 @@ services:
       - a-blog-db
     command: >
       sh -c "python manage.py migrate &&
+             python manage.py seed_pages &&
              python manage.py sync_articles &&
              gunicorn a_blog_backend.wsgi:application --bind 0.0.0.0:8000 --workers ${A_BLOG_BACKEND_WORKERS:-3}"
 

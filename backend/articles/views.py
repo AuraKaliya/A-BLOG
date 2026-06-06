@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Article, ArticleViewCount, ArticleViewEvent, Tag
-from .serializers import ArticleDetailSerializer, ArticleListSerializer
+from .models import Article, ArticleViewCount, ArticleViewEvent, SitePage, Tag
+from .serializers import ArticleDetailSerializer, ArticleListSerializer, SitePageSerializer
 
 
 def client_ip(request) -> str:
@@ -31,10 +31,25 @@ class ApiRootView(APIView):
         return Response(
             {
                 "articles": request.build_absolute_uri("/api/articles/"),
+                "pages": request.build_absolute_uri("/api/pages/"),
                 "tags": request.build_absolute_uri("/api/articles/tags/"),
                 "views": request.build_absolute_uri("/api/articles/views/"),
             }
         )
+
+
+class SitePageDetailView(APIView):
+    def get(self, request, key: str):
+        page = get_object_or_404(SitePage.objects.published(), key=key)
+        serializer = SitePageSerializer(page)
+        return Response(serializer.data)
+
+
+class SitePageListView(APIView):
+    def get(self, request):
+        pages = SitePage.objects.published()
+        serializer = SitePageSerializer(pages, many=True)
+        return Response({"items": serializer.data})
 
 
 class ArticleListView(APIView):

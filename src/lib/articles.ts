@@ -43,13 +43,54 @@ export interface ArticleTocItem {
   depth: 2 | 3;
 }
 
+interface RemoteArticlePayload {
+  slug: string;
+  title: string;
+  summary: string;
+  cover?: string;
+  category?: string;
+  tags?: string[];
+  pubDate: string;
+  updatedDate?: string | null;
+  featured?: boolean;
+  wordCount?: number;
+  html?: string;
+}
+
 type HtmlNode = DefaultTreeAdapterTypes.Node;
 type HtmlParentNode = DefaultTreeAdapterTypes.ParentNode;
 type HtmlElement = DefaultTreeAdapterTypes.Element;
 type HtmlTextNode = DefaultTreeAdapterTypes.TextNode;
 
+const DEFAULT_API_BASE = "http://127.0.0.1:8000/api/";
+const remoteArticleCache = new Map<string, Promise<ResourceArticle[] | undefined>>();
+
 function articleRoot() {
   return resolve(process.cwd(), "resource", "article");
+}
+
+function getApiBase() {
+  return process.env.A_BLOG_API_URL ?? process.env.PUBLIC_A_BLOG_API_URL ?? DEFAULT_API_BASE;
+}
+
+function buildApiUrl(path: string) {
+  const base = getApiBase();
+  return new URL(path.replace(/^\/+/, ""), base.endsWith("/") ? base : `${base}/`).toString();
+}
+
+async function fetchJson(url: string) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2000);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) return undefined;
+    return await response.json();
+  } catch {
+    return undefined;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function pathExists(path: string) {
@@ -293,7 +334,78 @@ export function sortArticlesByDate(articles: ResourceArticle[]) {
   return articles.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
-export async function getAllResourceArticles({ includeDrafts = false } = {}) {
+function parseRemoteDate(value: string | undefined | null, field: string, slug: string) {
+  if (!value) throw new Error(`Remote article ${slug} is missing ${field}.`);
+  const date = new Date(`${value}T00:00:00+08:00`);
+  if (Number.isNaN(date.valueOf())) {
+    throw new Error(`Remote article ${slug} has an invalid ${field}: ${value}`);
+  }
+  return date;
+}
+
+function parseOptionalRemoteDate(value: string | undefined | null, slug: string) {
+  if (!value) return undefined;
+  return parseRemoteDate(value, "updatedDate", slug);
+}
+
+function mapRemoteArticle(payload: RemoteArticlePayload): ResourceArticle {
+  const slug = payload.slug?.trim();
+  if (!slug) throw new Error("Remote article is missing slug.");
+  const title = payload.title?.trim();
+  const summary = payload.summary?.trim();
+  if (!title) throw new Error(`Remote article ${slug} is missing title.`);
+  if (!summary) throw new Error(`Remote article ${slug} is missing summary.`);
+
+  const rawHtml = payload.html ?? "";
+  const { html, toc } = enhanceHtmlWithToc(rawHtml);
+  const text = textFromHtml(rawHtml);
+
+  return {
+    slug,
+    title,
+    summary,
+    pubDate: parseRemoteDate(payload.pubDate, "pubDate", slug),
+    updatedDate: parseOptionalRemoteDate(payload.updatedDate, slug),
+    cover: payload.cover?.trim() || defaultCover,
+    category: payload.category?.trim() ?? "",
+    tags: (payload.tags ?? []).map((tag) => tag.trim()).filter(Boolean),
+    featured: Boolean(payload.featured),
+    draft: false,
+    wordCount: payload.wordCount ?? countTextUnits(text),
+    html,
+    toc,
+    text,
+  };
+}
+
+async function fetchRemoteArticles() {
+  const payload = await fetchJson(buildApiUrl("articles/"));
+  const items = payload?.items;
+  if (!Array.isArray(items)) return undefined;
+
+  const details = await Promise.all(
+    items.map(async (item: RemoteArticlePayload) => {
+      const slug = item.slug?.trim();
+      if (!slug) throw new Error("Remote article list item is missing slug.");
+      const detail = await fetchJson(buildApiUrl(`articles/${encodeURIComponent(slug)}/`));
+      if (!detail) throw new Error(`Remote article detail is unavailable: ${slug}`);
+      return mapRemoteArticle(detail as RemoteArticlePayload);
+    }),
+  );
+
+  return sortArticlesByDate(details);
+}
+
+async function getRemoteArticles() {
+  const cacheKey = getApiBase();
+  const cached = remoteArticleCache.get(cacheKey);
+  if (cached) return cached;
+  const next = fetchRemoteArticles().catch(() => undefined);
+  remoteArticleCache.set(cacheKey, next);
+  return next;
+}
+
+async function getLocalResourceArticles({ includeDrafts = false } = {}) {
   const root = articleRoot();
   if (!(await pathExists(root))) return [];
   const entries = await readdir(root, { withFileTypes: true });
@@ -301,6 +413,14 @@ export async function getAllResourceArticles({ includeDrafts = false } = {}) {
     entries.filter((entry) => entry.isDirectory()).map((entry) => readArticleDirectory(entry.name)),
   );
   return sortArticlesByDate(includeDrafts ? articles : articles.filter((article) => !article.draft));
+}
+
+export async function getAllResourceArticles({ includeDrafts = false } = {}) {
+  if (!includeDrafts) {
+    const remoteArticles = await getRemoteArticles();
+    if (remoteArticles) return remoteArticles;
+  }
+  return getLocalResourceArticles({ includeDrafts });
 }
 
 export async function getResourceArticleBySlug(slug: string) {
