@@ -1,6 +1,6 @@
 # Docker deployment
 
-This project is packaged as a static Astro site served by Nginx.
+This project is packaged as an Astro frontend served by Nginx plus a Django API backend.
 
 ## Local Docker test
 
@@ -25,6 +25,15 @@ Upload while building:
 ```
 
 The default server upload folder is `/root/A-BLOG/releases`.
+
+The release package includes both Docker images:
+
+```text
+aura-blog:<version>
+aura-blog-backend:<version>
+```
+
+`release.env` is generated at build time and carries the image tags plus deployment-only Django/Postgres secrets. Do not commit generated release packages.
 
 ## First server proxy setup
 

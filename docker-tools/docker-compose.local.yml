@@ -6,7 +6,32 @@ services:
     image: aura-blog:local
     container_name: aura-blog-local
     restart: unless-stopped
+    depends_on:
+      - a-blog-backend
     ports:
       - "127.0.0.1:8080:80"
     volumes:
-      - "../test-resource:/usr/share/nginx/html/resource:ro"
+      - "../resource:/usr/share/nginx/html/resource:ro"
+
+  a-blog-backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    image: aura-blog-backend:local
+    container_name: aura-blog-backend-local
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost,a-blog-backend"
+      A_BLOG_RESOURCE_ROOT: "/resource"
+      SQLITE_PATH: "/data/db.sqlite3"
+    volumes:
+      - "../resource:/resource:ro"
+      - "a-blog-backend-data:/data"
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py sync_articles &&
+             gunicorn a_blog_backend.wsgi:application --bind 0.0.0.0:8000 --workers 2"
+
+volumes:
+  a-blog-backend-data:

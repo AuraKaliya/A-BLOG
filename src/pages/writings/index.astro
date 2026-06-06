@@ -1,25 +1,112 @@
 ---
 import ArchivePageLayout from "../../components/ArchivePageLayout.astro";
-import ArticleCard from "../../components/ArticleCard.astro";
 import EmptyState from "../../components/EmptyState.astro";
+import ResourceArticleCard from "../../components/ResourceArticleCard.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getPostsBySection } from "../../lib/content";
+import { getAllResourceArticleTags, getAllResourceArticles } from "../../lib/articles";
 
-const posts = await getPostsBySection("writings");
+const [articles, tags] = await Promise.all([getAllResourceArticles(), getAllResourceArticleTags()]);
 ---
 
-<BaseLayout title="文字" description="随笔、观察、阶段复盘与还在形成中的想法。" image="/og/page/writings.svg">
+<BaseLayout title="文字" description="随笔、技术记录、阶段复盘与还在形成中的想法。" image="/og/page/writings.svg">
   <ArchivePageLayout
     title="文字"
-    description="这里收录不以解决技术问题为唯一目标的文字：随笔、观察、创作片段与尚未完成的判断。"
-    breadcrumbs={[{ label: "门户", href: "/" }, { label: "文字" }]}
+    description="这里把技术、随笔、观察和复盘收束成一个统一入口。文章主体来自 resource/article，每篇文章拥有自己的封面、正文与相关资源。"
+    breadcrumbs={[{ label: "入口", href: "/" }, { label: "文字" }]}
   >
+    <div class="article-command-panel" slot="before" data-article-controls>
+      <div>
+        <span class="eyebrow">Articles</span>
+        <h2>按节奏阅读，或按标签筛选</h2>
+        <p>时间轴适合回看写作脉络，网格适合快速扫过主题。筛选状态会保留在地址栏里。</p>
+      </div>
+      <div class="article-control-stack">
+        <div class="article-view-switch" aria-label="展示方式">
+          <button type="button" data-article-view="timeline" aria-pressed="true">时间轴</button>
+          <button type="button" data-article-view="grid" aria-pressed="false">网格</button>
+        </div>
+        <div class="article-tag-filter" aria-label="标签筛选">
+          <button type="button" data-article-tag="all" aria-pressed="true">全部 {articles.length}</button>
+          {tags.map((tag) => <button type="button" data-article-tag={tag.name} aria-pressed="false">{tag.name} {tag.count}</button>)}
+        </div>
+      </div>
+    </div>
+
     {
-      posts.length > 0 ? (
-        posts.map((post) => <ArticleCard post={post} />)
+      articles.length > 0 ? (
+        <div class="resource-article-collection view-timeline" data-article-collection>
+          {articles.map((article, index) => <ResourceArticleCard article={article} timelineSide={index % 2 === 0 ? "left" : "right"} />)}
+        </div>
       ) : (
-        <EmptyState title="还没有公开文字" description="为文章设置 section: writings 后，它会出现在这里。" />
+        <EmptyState title="还没有公开文章" description="在 resource/article 下添加文章文件夹后，这里会自动生成列表。" />
       )
     }
   </ArchivePageLayout>
+
+  <script is:inline>
+    (() => {
+      const collection = document.querySelector("[data-article-collection]");
+      const controls = document.querySelector("[data-article-controls]");
+      if (!collection || !controls) return;
+
+      const params = new URLSearchParams(window.location.search);
+      let currentView = params.get("view") === "grid" ? "grid" : "timeline";
+      let currentTag = params.get("tag") || "all";
+      const cards = [...collection.querySelectorAll("[data-article-card]")];
+
+      const setUrlState = () => {
+        const next = new URLSearchParams();
+        if (currentView !== "timeline") next.set("view", currentView);
+        if (currentTag !== "all") next.set("tag", currentTag);
+        const query = next.toString();
+        window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+      };
+
+      const applyState = () => {
+        collection.classList.toggle("view-grid", currentView === "grid");
+        collection.classList.toggle("view-timeline", currentView === "timeline");
+        controls.querySelectorAll("[data-article-view]").forEach((button) => {
+          button.setAttribute("aria-pressed", button.dataset.articleView === currentView ? "true" : "false");
+        });
+        controls.querySelectorAll("[data-article-tag]").forEach((button) => {
+          button.setAttribute("aria-pressed", button.dataset.articleTag === currentTag ? "true" : "false");
+        });
+        cards.forEach((card) => {
+          const tags = (card.dataset.articleTags || "").split(",").filter(Boolean);
+          card.hidden = currentTag !== "all" && !tags.includes(currentTag);
+        });
+        setUrlState();
+      };
+
+      controls.addEventListener("click", (event) => {
+        const target = event.target.closest("button");
+        if (!target) return;
+        if (target.dataset.articleView) currentView = target.dataset.articleView;
+        if (target.dataset.articleTag) currentTag = target.dataset.articleTag;
+        applyState();
+      });
+
+      collection.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-article-tag-jump]");
+        if (!target) return;
+        currentTag = target.dataset.articleTagJump;
+        applyState();
+      });
+
+      const slugs = cards.map((card) => card.dataset.articleSlug).filter(Boolean);
+      if (slugs.length > 0) {
+        fetch(`/api/articles/views/?slugs=${encodeURIComponent(slugs.join(","))}`)
+          .then((response) => (response.ok ? response.json() : Promise.reject()))
+          .then((payload) => {
+            document.querySelectorAll("[data-article-view-count]").forEach((node) => {
+              const slug = node.getAttribute("data-article-view-count");
+              node.textContent = String(payload.views?.[slug] ?? 0);
+            });
+          })
+          .catch(() => {});
+      }
+
+      applyState();
+    })();
+  </script>
 </BaseLayout>

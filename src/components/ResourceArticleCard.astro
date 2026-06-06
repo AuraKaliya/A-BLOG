@@ -1,0 +1,32 @@
+---
+import type { ResourceArticle } from "../lib/articles";
+import { formatWordCount } from "../lib/articles";
+import { formatDate } from "../lib/format";
+
+interface Props {
+  article: ResourceArticle;
+  timelineSide?: "left" | "right";
+}
+
+const { article, timelineSide = "left" } = Astro.props;
+const tagList = article.tags.join(",");
+---
+
+<article class="resource-article-card" data-article-card data-article-side={timelineSide} data-article-slug={article.slug} data-article-tags={tagList}>
+  <a class="resource-article-cover" href={`/writings/${article.slug}`} aria-label={`阅读 ${article.title}`}>
+    <img src={article.cover} alt="" loading="lazy" />
+  </a>
+  <div class="resource-article-body">
+    <div class="resource-article-meta">
+      <time datetime={article.pubDate.toISOString()}>{formatDate(article.pubDate)}</time>
+      {article.category && <span>{article.category}</span>}
+      <span>{formatWordCount(article.wordCount)}</span>
+      <span><span data-article-view-count={article.slug}>0</span> 浏览</span>
+    </div>
+    <h2><a href={`/writings/${article.slug}`}>{article.title}</a></h2>
+    <p>{article.summary}</p>
+    <div class="tag-row">
+      {article.tags.map((tag) => <button type="button" data-article-tag-jump={tag}>{tag}</button>)}
+    </div>
+  </div>
+</article>

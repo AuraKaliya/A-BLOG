@@ -7,7 +7,7 @@
 项目类型：
 
 ```text
-Astro 静态站点 + Docker 多阶段构建 + Nginx 容器托管
+Astro 前端 + Django API 后端 + PostgreSQL + Docker + Nginx 容器托管
 ```
 
 线上域名：
@@ -26,6 +26,8 @@ https://www.aurakaliye.com
 发布包目录：/root/A-BLOG/releases
 线上资源目录：/root/A-BLOG/resource
 容器名：aura-blog
+后端容器名：aura-blog-backend
+数据库容器名：a-blog-db
 容器本机端口：127.0.0.1:8080 -> 80
 宿主机入口：Nginx 80/443 -> 127.0.0.1:8080
 ```
@@ -67,7 +69,7 @@ output/docker-release/aura-blog-版本号.tar.gz.sha256
 发布包中包含：
 
 ```text
-image.tar
+image.tar（前端镜像 + Django 后端镜像）
 docker-compose.prod.yml
 release.env
 update.sh
@@ -130,9 +132,9 @@ ssh -i $key -o BatchMode=yes ubuntu@49.232.167.68 "sudo mkdir -p /root/A-BLOG/re
 查找 /root/A-BLOG 或 /root/A-BLOG/releases 下最新 aura-blog-*.tar.gz
 校验 sha256
 解压到 /root/A-BLOG/releases/版本目录
-docker load image.tar
+docker load image.tar 中的前端和后端镜像
 移除旧 aura-blog 容器
-用 docker compose 启动新容器
+用 docker compose 启动前端、Django 后端和 PostgreSQL
 保留资源目录 /root/A-BLOG/resource
 ```
 
@@ -283,6 +285,7 @@ test-resource
 
 ```text
 /root/A-BLOG/resource -> /usr/share/nginx/html/resource:ro
+/root/A-BLOG/resource -> Django backend /resource:ro
 ```
 
 线上 URL：

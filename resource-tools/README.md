@@ -13,6 +13,7 @@ The website should reference resources with public URLs like:
 ```text
 /resource/images/example.webp
 /resource/files/example.pdf
+/resource/article/post-slug/cover.webp
 ```
 
 Local Docker maps:
@@ -51,6 +52,20 @@ The content editor supports:
 更新记录：src/content/changelog/*.md
 页面配置：src/content/pages/*.json
 主题配置：src/content/topics/*.json
+```
+
+新的“文字”文章来源为：
+
+```text
+resource/article/<slug>/index.json
+resource/article/<slug>/index.html
+```
+
+Django 后端会通过以下命令同步这些文章的索引、字数和标签：
+
+```powershell
+npm run backend:migrate
+npm run backend:sync
 ```
 
 作品链接可以在 frontmatter 的 `links` 中使用以下类型：

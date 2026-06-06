@@ -1,7 +1,6 @@
 export const mainNav = [
   { label: "入口", href: "/", match: "/" },
   { label: "文字", href: "/writings", match: "/writings" },
-  { label: "技术", href: "/tech", match: "/tech" },
   { label: "作品", href: "/works", match: "/works" },
   { label: "世界", href: "/world", match: "/world" },
 ] as const;
@@ -28,7 +27,7 @@ export const aboutMenuLinks = [
       { label: "站外信号", href: "/links" },
       { label: "更新记录", href: "/changelog" },
       { label: "全站归档", href: "/archive" },
-      { label: "全部文章", href: "/blog" },
+      { label: "全部文字", href: "/writings" },
       { label: "RSS 订阅", href: "/rss.xml" },
     ],
   },

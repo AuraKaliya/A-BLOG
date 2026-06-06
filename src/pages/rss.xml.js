@@ -1,15 +1,16 @@
 import rss from "@astrojs/rss";
-import { getPublishedLinks, getPublishedNotes, getPublishedPosts } from "../lib/content";
+import { getAllResourceArticles } from "../lib/articles";
+import { getPublishedLinks, getPublishedNotes } from "../lib/content";
 import { siteConfig } from "../config/site";
 
 export async function GET(context) {
-  const [posts, notes, links] = await Promise.all([getPublishedPosts(), getPublishedNotes(), getPublishedLinks()]);
+  const [articles, notes, links] = await Promise.all([getAllResourceArticles(), getPublishedNotes(), getPublishedLinks()]);
   const items = [
-    ...posts.map((post) => ({
-      title: post.data.title,
-      description: post.data.description,
-      pubDate: post.data.pubDate,
-      link: `/blog/${post.slug}/`,
+    ...articles.map((article) => ({
+      title: article.title,
+      description: article.summary,
+      pubDate: article.pubDate,
+      link: `/writings/${article.slug}/`,
     })),
     ...notes.map((note) => ({
       title: `短动态：${note.data.title}`,

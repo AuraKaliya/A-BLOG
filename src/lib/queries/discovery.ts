@@ -1,7 +1,7 @@
-import { blogSectionLabels, changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { getAllResourceArticles } from "../articles";
 import type { ExploreEntry, RecentUpdate } from "../content-types";
 import { getPublishedChangelogEntries } from "./changelog";
-import { getPublishedPosts } from "./blog";
 import { getPublishedWorks } from "./works";
 import { getPublishedWorldEntries } from "./world";
 import { getPublishedNotes } from "./notes";
@@ -12,8 +12,8 @@ function workDate(year: number, updatedDate?: Date) {
 }
 
 export async function getRecentUpdates(limit = 8): Promise<RecentUpdate[]> {
-  const [posts, works, worldEntries, notes, links, changelogEntries] = await Promise.all([
-    getPublishedPosts(),
+  const [articles, works, worldEntries, notes, links, changelogEntries] = await Promise.all([
+    getAllResourceArticles(),
     getPublishedWorks(),
     getPublishedWorldEntries(),
     getPublishedNotes(),
@@ -22,13 +22,13 @@ export async function getRecentUpdates(limit = 8): Promise<RecentUpdate[]> {
   ]);
 
   return [
-    ...posts.map((post) => ({
+    ...articles.map((article) => ({
       kind: "blog" as const,
-      type: blogSectionLabels[post.data.section],
-      title: post.data.title,
-      description: post.data.description,
-      href: `/blog/${post.slug}`,
-      date: post.data.updatedDate ?? post.data.pubDate,
+      type: article.category || "文字",
+      title: article.title,
+      description: article.summary,
+      href: `/writings/${article.slug}`,
+      date: article.updatedDate ?? article.pubDate,
     })),
     ...works.map((work) => ({
       kind: "work" as const,
@@ -76,8 +76,8 @@ export async function getRecentUpdates(limit = 8): Promise<RecentUpdate[]> {
 }
 
 export async function getExploreEntries(): Promise<ExploreEntry[]> {
-  const [posts, works, worldEntries, notes, links] = await Promise.all([
-    getPublishedPosts(),
+  const [articles, works, worldEntries, notes, links] = await Promise.all([
+    getAllResourceArticles(),
     getPublishedWorks(),
     getPublishedWorldEntries(),
     getPublishedNotes(),
@@ -85,7 +85,7 @@ export async function getExploreEntries(): Promise<ExploreEntry[]> {
   ]);
 
   return [
-    ...posts.map((post) => ({ kind: "blog" as const, title: post.data.title, href: `/blog/${post.slug}` })),
+    ...articles.map((article) => ({ kind: "blog" as const, title: article.title, href: `/writings/${article.slug}` })),
     ...works.map((work) => ({ kind: "work" as const, title: work.data.title, href: `/works/${work.slug}` })),
     ...worldEntries.map((entry) => ({ kind: "world" as const, title: entry.data.title, href: `/world/${entry.slug}` })),
     ...notes.map((note) => ({ kind: "note" as const, title: note.data.title, href: `/notes/${note.slug}` })),

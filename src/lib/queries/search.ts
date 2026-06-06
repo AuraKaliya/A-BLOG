@@ -1,7 +1,7 @@
-import { blogCategoryLabels, blogSectionLabels, changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { getAllResourceArticles } from "../articles";
 import { assertValidContentGraph } from "../content-graph";
 import type { SearchEntry } from "../content-types";
-import { getPublishedPosts } from "./blog";
 import { getTopicSummaries } from "./topics";
 import { getPublishedWorks } from "./works";
 import { getPublishedWorldEntries } from "./world";
@@ -12,8 +12,8 @@ import { getPublishedLinks } from "./links";
 export async function getSearchEntries(): Promise<SearchEntry[]> {
   await assertValidContentGraph();
 
-  const [posts, works, worlds, notes, links, changelogEntries, topics] = await Promise.all([
-    getPublishedPosts(),
+  const [articles, works, worlds, notes, links, changelogEntries, topics] = await Promise.all([
+    getAllResourceArticles(),
     getPublishedWorks(),
     getPublishedWorldEntries(),
     getPublishedNotes(),
@@ -23,17 +23,17 @@ export async function getSearchEntries(): Promise<SearchEntry[]> {
   ]);
 
   return [
-    ...posts.map((post) => ({
+    ...articles.map((article) => ({
       type: "文章" as const,
       kind: "blog" as const,
-      title: post.data.title,
-      description: post.data.description,
-      href: `/blog/${post.slug}`,
-      category: `${blogSectionLabels[post.data.section]} / ${blogCategoryLabels[post.data.category]}`,
-      tags: [...post.data.tags, ...post.data.topics],
-      date: post.data.pubDate.toISOString(),
-      weight: post.data.featured ? 4 : 3,
-      text: `${post.data.title} ${post.data.description} ${blogCategoryLabels[post.data.category]} ${post.data.topics.join(" ")} ${post.data.tags.join(" ")} ${post.body}`,
+      title: article.title,
+      description: article.summary,
+      href: `/writings/${article.slug}`,
+      category: article.category || "文字",
+      tags: article.tags,
+      date: article.pubDate.toISOString(),
+      weight: article.featured ? 4 : 3,
+      text: `${article.title} ${article.summary} ${article.category} ${article.tags.join(" ")} ${article.text}`,
     })),
     ...works.map((work) => ({
       type: "作品" as const,

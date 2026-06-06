@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "backend:dev": "python backend/manage.py runserver 8000",
+    "backend:migrate": "python backend/manage.py migrate",
+    "backend:sync": "python backend/manage.py sync_articles",
     "build": "astro check && astro build",
     "test": "playwright test --reporter=line --workers=1",
     "preview": "astro preview",

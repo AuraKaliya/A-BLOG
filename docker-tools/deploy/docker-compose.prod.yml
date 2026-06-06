@@ -3,7 +3,43 @@ services:
     image: ${A_BLOG_IMAGE:-aura-blog:latest}
     container_name: ${A_BLOG_CONTAINER:-aura-blog}
     restart: unless-stopped
+    depends_on:
+      - a-blog-backend
     ports:
       - "${A_BLOG_BIND:-127.0.0.1}:${A_BLOG_PORT:-8080}:80"
     volumes:
       - "${A_BLOG_RESOURCE_DIR:-/opt/a-blog/resource}:/usr/share/nginx/html/resource:ro"
+
+  a-blog-backend:
+    image: ${A_BLOG_BACKEND_IMAGE:-aura-blog-backend:latest}
+    container_name: ${A_BLOG_BACKEND_CONTAINER:-aura-blog-backend}
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:?set DJANGO_SECRET_KEY}"
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-aurakaliye.com,www.aurakaliye.com,localhost,127.0.0.1}"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "${DJANGO_CSRF_TRUSTED_ORIGINS:-https://aurakaliye.com,https://www.aurakaliye.com}"
+      A_BLOG_RESOURCE_ROOT: "/resource"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-a_blog}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@a-blog-db:5432/${POSTGRES_DB:-a_blog}"
+    volumes:
+      - "${A_BLOG_RESOURCE_DIR:-/opt/a-blog/resource}:/resource:ro"
+    depends_on:
+      - a-blog-db
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py sync_articles &&
+             gunicorn a_blog_backend.wsgi:application --bind 0.0.0.0:8000 --workers ${A_BLOG_BACKEND_WORKERS:-3}"
+
+  a-blog-db:
+    image: postgres:16-alpine
+    container_name: ${A_BLOG_DB_CONTAINER:-a-blog-db}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-a_blog}"
+      POSTGRES_USER: "${POSTGRES_USER:-a_blog}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}"
+    volumes:
+      - "a-blog-postgres-data:/var/lib/postgresql/data"
+
+volumes:
+  a-blog-postgres-data:

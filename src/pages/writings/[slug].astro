@@ -1,0 +1,111 @@
+---
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatWordCount, getAdjacentResourceArticles, getAllResourceArticles } from "../../lib/articles";
+import { formatDate } from "../../lib/format";
+
+export async function getStaticPaths() {
+  const articles = await getAllResourceArticles();
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article, adjacent: getAdjacentResourceArticles(articles, article.slug) },
+  }));
+}
+
+const { article, adjacent } = Astro.props;
+const breadcrumbs = [
+  { label: "入口", href: "/" },
+  { label: "文字", href: "/writings" },
+  { label: article.title },
+];
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.label,
+      item: item.href ? new URL(item.href, Astro.site ?? Astro.url).toString() : Astro.url.toString(),
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.summary,
+    image: new URL(article.cover, Astro.site ?? Astro.url).toString(),
+    datePublished: article.pubDate.toISOString(),
+    dateModified: (article.updatedDate ?? article.pubDate).toISOString(),
+    wordCount: article.wordCount,
+  },
+];
+---
+
+<BaseLayout
+  title={article.title}
+  description={article.summary}
+  ogType="article"
+  image={article.cover}
+  keywords={[article.category, ...article.tags].filter(Boolean)}
+  publishedTime={article.pubDate.toISOString()}
+  modifiedTime={(article.updatedDate ?? article.pubDate).toISOString()}
+  structuredData={structuredData}
+>
+  <main class="page-main">
+    <article class="article-shell container" data-article-detail={article.slug}>
+      <Breadcrumbs items={breadcrumbs} />
+      <a class="text-link back-link" href="/writings">返回文字</a>
+      <header class="article-header resource-article-header">
+        <div class="meta-grid">
+          <time datetime={article.pubDate.toISOString()}>{formatDate(article.pubDate)}</time>
+          {article.updatedDate && <span>更新于 {formatDate(article.updatedDate)}</span>}
+          {article.category && <span>{article.category}</span>}
+          <span>{formatWordCount(article.wordCount)}</span>
+          <span><span data-article-detail-views>0</span> 浏览</span>
+        </div>
+        <h1>{article.title}</h1>
+        <p>{article.summary}</p>
+        <div class="tag-row">{article.tags.map((tag) => <a href={`/writings?tag=${encodeURIComponent(tag)}`}>{tag}</a>)}</div>
+        <figure class="article-cover-hero">
+          <img src={article.cover} alt="" loading="eager" />
+        </figure>
+      </header>
+      <div class="article-html prose" set:html={article.html}></div>
+      <nav class="article-nav" aria-label="文章导航">
+        {
+          adjacent.previous ? (
+            <a href={`/writings/${adjacent.previous.slug}`}>
+              <span>上一篇</span>
+              <strong>{adjacent.previous.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+        {
+          adjacent.next ? (
+            <a href={`/writings/${adjacent.next.slug}`}>
+              <span>下一篇</span>
+              <strong>{adjacent.next.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+      </nav>
+    </article>
+  </main>
+
+  <script is:inline define:vars={{ slug: article.slug }}>
+    (() => {
+      const target = document.querySelector("[data-article-detail-views]");
+      fetch(`/api/articles/${slug}/view/`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" })
+        .then((response) => (response.ok ? response.json() : Promise.reject()))
+        .then((payload) => {
+          if (target) target.textContent = String(payload.views ?? 0);
+        })
+        .catch(() => {});
+    })();
+  </script>
+</BaseLayout>

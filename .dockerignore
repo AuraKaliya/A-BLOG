@@ -6,7 +6,9 @@ output
 *.log
 .env
 .env.*
-resource
+resource/*
+!resource/article
+!resource/article/**
 test-resource
 resource-tools
 doc

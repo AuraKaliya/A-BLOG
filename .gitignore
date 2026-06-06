@@ -12,8 +12,13 @@ test-results/
 
 resource/*
 !resource/.gitkeep
+!resource/article/
+!resource/article/**
 test-resource/*
 !test-resource/.gitkeep
+
+backend/db.sqlite3
+backend/staticfiles/
 
 resource-tools/resource-manifest.json
 resource-tools/.tmp/

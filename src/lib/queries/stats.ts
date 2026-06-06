@@ -1,4 +1,4 @@
-import { getAllBlogCategories, getAllBlogTags, getFeaturedPosts, getPublishedPosts } from "./blog";
+import { getAllResourceArticleTags, getAllResourceArticles } from "../articles";
 import { getTopicSummaries } from "./topics";
 import { getAllWorkCategories, getFeaturedWorks, getPublishedWorks } from "./works";
 import { getPublishedWorldEntries } from "./world";
@@ -7,36 +7,36 @@ import { getPublishedNotes } from "./notes";
 import { getPublishedLinks } from "./links";
 
 export async function getContentStats() {
-  const [posts, works, worlds, notes, links, tags, categories, workCategories, topics] = await Promise.all([
-    getPublishedPosts(),
+  const [articles, works, worlds, notes, links, tags, workCategories, topics] = await Promise.all([
+    getAllResourceArticles(),
     getPublishedWorks(),
     getPublishedWorldEntries(),
     getPublishedNotes(),
     getPublishedLinks(),
-    getAllBlogTags(),
-    getAllBlogCategories(),
+    getAllResourceArticleTags(),
     getAllWorkCategories(),
     getTopicSummaries(),
   ]);
+  const articleCategories = new Set(articles.map((article) => article.category).filter(Boolean));
 
   return {
-    postCount: posts.length,
+    postCount: articles.length,
     workCount: works.length,
     worldCount: worlds.length,
     noteCount: notes.length,
     linkCount: links.length,
     tagCount: tags.length,
-    categoryCount: categories.length + workCategories.length,
+    categoryCount: articleCategories.size + workCategories.length,
     topicCount: topics.length,
   };
 }
 
 export async function getHomepageFeed() {
   const [posts, works, featuredWorks, recentUpdates] = await Promise.all([
-    getFeaturedPosts(3),
+    getAllResourceArticles(),
     getPublishedWorks(),
     getFeaturedWorks(4),
     getRecentUpdates(6),
   ]);
-  return { posts, works, featuredWorks, recentUpdates };
+  return { posts: posts.slice(0, 3), works, featuredWorks, recentUpdates };
 }

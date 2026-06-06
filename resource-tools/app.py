@@ -47,7 +47,7 @@ DEFAULT_CONFIG = {
     },
     "resource": {
         "public_prefix": "/resource",
-        "folders": ["images", "covers", "avatars", "files", "downloads"],
+        "folders": ["article", "images", "covers", "avatars", "files", "downloads"],
         "lowercase_names": True,
     },
     "remote": {

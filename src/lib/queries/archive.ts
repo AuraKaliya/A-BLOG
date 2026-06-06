@@ -1,6 +1,6 @@
-import { blogSectionLabels, changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { changelogTypeLabels, linkKindLabels, noteKindLabels, workCategoryLabels, worldKindLabels } from "../../config/taxonomy";
+import { getAllResourceArticles } from "../articles";
 import type { ArchiveEntry } from "../content-types";
-import { getPublishedPosts } from "./blog";
 import { getPublishedChangelogEntries } from "./changelog";
 import { getPublishedNotes } from "./notes";
 import { getPublishedLinks } from "./links";
@@ -12,8 +12,8 @@ function workDate(year: number, updatedDate?: Date) {
 }
 
 export async function getArchiveEntries(): Promise<ArchiveEntry[]> {
-  const [posts, works, worlds, notes, links, changelogEntries] = await Promise.all([
-    getPublishedPosts(),
+  const [articles, works, worlds, notes, links, changelogEntries] = await Promise.all([
+    getAllResourceArticles(),
     getPublishedWorks(),
     getPublishedWorldEntries(),
     getPublishedNotes(),
@@ -22,14 +22,14 @@ export async function getArchiveEntries(): Promise<ArchiveEntry[]> {
   ]);
 
   return [
-    ...posts.map((post) => ({
+    ...articles.map((article) => ({
       kind: "blog" as const,
-      type: blogSectionLabels[post.data.section],
-      title: post.data.title,
-      description: post.data.description,
-      href: `/blog/${post.slug}`,
-      date: post.data.updatedDate ?? post.data.pubDate,
-      tags: [...post.data.tags, ...post.data.topics],
+      type: article.category || "文字",
+      title: article.title,
+      description: article.summary,
+      href: `/writings/${article.slug}`,
+      date: article.updatedDate ?? article.pubDate,
+      tags: article.tags,
     })),
     ...works.map((work) => ({
       kind: "work" as const,

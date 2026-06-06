@@ -1,6 +1,7 @@
 param(
   [string]$Version = "",
   [string]$ImageName = "aura-blog",
+  [string]$BackendImageName = "aura-blog-backend",
   [string]$OutputDir = "",
   [string]$Remote = "",
   [string]$RemoteAppRoot = "/root/A-BLOG",
@@ -34,6 +35,34 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 $Version = $Version -replace '[^A-Za-z0-9_.-]', '-'
 $ImageTag = "${ImageName}:${Version}"
 $LatestTag = "${ImageName}:latest"
+$BackendImageTag = "${BackendImageName}:${Version}"
+$BackendLatestTag = "${BackendImageName}:latest"
+
+function New-ReleaseSecret {
+  param([int]$Bytes = 32)
+
+  $Buffer = New-Object byte[] $Bytes
+  $Generator = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  try {
+    $Generator.GetBytes($Buffer)
+  } finally {
+    $Generator.Dispose()
+  }
+  return -join ($Buffer | ForEach-Object { $_.ToString("x2") })
+}
+
+function Get-ReleaseSecret {
+  param(
+    [string]$Name,
+    [int]$Bytes = 32
+  )
+
+  $Value = [Environment]::GetEnvironmentVariable($Name)
+  if ([string]::IsNullOrWhiteSpace($Value)) {
+    return New-ReleaseSecret -Bytes $Bytes
+  }
+  return $Value
+}
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
   throw "Docker CLI was not found. Install Docker Desktop or Docker Engine, then run this script again."
@@ -77,10 +106,13 @@ try {
   if (-not $NoBuild) {
     Write-Host "Building Docker image $ImageTag"
     docker build --pull -t $ImageTag -t $LatestTag -f Dockerfile .
+
+    Write-Host "Building Docker image $BackendImageTag"
+    docker build --pull -t $BackendImageTag -t $BackendLatestTag -f backend/Dockerfile .
   }
 
-  Write-Host "Saving Docker image"
-  docker save -o (Join-Path $StageDir "image.tar") $ImageTag
+  Write-Host "Saving Docker images"
+  docker save -o (Join-Path $StageDir "image.tar") $ImageTag $BackendImageTag
 
   Copy-Item (Join-Path $RepoRoot "docker-tools/deploy/docker-compose.prod.yml") $StageDir
   Copy-Item (Join-Path $RepoRoot "docker-tools/deploy/update.sh") $StageDir
@@ -88,12 +120,19 @@ try {
   Copy-Item (Join-Path $RepoRoot "docker-tools/deploy/nginx-aurakaliye.com.conf") $StageDir
 
   $ReleaseEnvPath = Join-Path $StageDir "release.env"
+  $DjangoSecretKey = Get-ReleaseSecret -Name "DJANGO_SECRET_KEY" -Bytes 48
+  $PostgresPassword = Get-ReleaseSecret -Name "POSTGRES_PASSWORD" -Bytes 32
+  $ViewSalt = Get-ReleaseSecret -Name "A_BLOG_VIEW_SALT" -Bytes 32
   $ReleaseEnvContent = @"
 A_BLOG_IMAGE=$ImageTag
+A_BLOG_BACKEND_IMAGE=$BackendImageTag
 A_BLOG_VERSION=$Version
 A_BLOG_CONTAINER=aura-blog
 A_BLOG_BIND=127.0.0.1
 A_BLOG_PORT=8080
+DJANGO_SECRET_KEY=$DjangoSecretKey
+POSTGRES_PASSWORD=$PostgresPassword
+A_BLOG_VIEW_SALT=$ViewSalt
 "@
   [System.IO.File]::WriteAllText($ReleaseEnvPath, $ReleaseEnvContent, [System.Text.UTF8Encoding]::new($false))
 
