@@ -18,6 +18,7 @@ const { recentUpdates } = homepageFeed;
 const home = homePage.data;
 const resourceRoot = resolve("resource");
 const imageExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif"];
+const defaultResourceImage = "/resource/default/default_image.png";
 const normalizeResourceIndex = (index?: string) =>
   index
     ?.replace(/^\/?resource\//, "")
@@ -40,9 +41,8 @@ const findResourceImage = (index?: string) => {
       ? [cleanIndex]
       : imageExtensions.map((extension) => `${cleanIndex}${extension}`)
     : [];
-  const fallbackCandidates = imageExtensions.map((extension) => `default/default_image${extension}`);
-  const match = [...candidates, ...fallbackCandidates].find(isResourceFile);
-  return match ? toResourceUrl(match) : undefined;
+  const match = candidates.find(isResourceFile);
+  return match ? toResourceUrl(match) : defaultResourceImage;
 };
 const profileImage = findResourceImage(home.profile.imageIndex);
 const recentStatusImage = findResourceImage(home.recentStatus.imageIndex);
