@@ -64,7 +64,7 @@ const operationStats = [
   description={home.description ?? siteConfig.description}
   image="/og/site.svg"
 >
-  <main class="home-main">
+  <main class="home-main" data-cms-home>
     <section class="home-screen home-entry-screen" id="home" data-home-screen="entry">
       <div class="container home-entry-grid">
         <article class="profile-card">
@@ -72,31 +72,31 @@ const operationStats = [
             <div class:list={["profile-avatar", { "has-image": Boolean(profileImage) }]}>
               {
                 profileImage ? (
-                  <img src={profileImage} alt={home.profile.imageAlt ?? home.profile.name} loading="eager" />
+                  <img src={profileImage} alt={home.profile.imageAlt ?? home.profile.name} loading="eager" data-home-profile-image />
                 ) : (
                   <span aria-hidden="true">{home.profile.name.slice(0, 1)}</span>
                 )
               }
             </div>
             <div>
-              <span class="eyebrow">{home.profile.eyebrow}</span>
-              <h1>{home.profile.name}</h1>
-              <p>{home.profile.role}</p>
+              <span class="eyebrow" data-home-profile-eyebrow>{home.profile.eyebrow}</span>
+              <h1 data-home-profile-name>{home.profile.name}</h1>
+              <p data-home-profile-role>{home.profile.role}</p>
             </div>
           </div>
 
           <div class="profile-status">
-            <span>{home.profile.status}</span>
-            <strong>{home.profile.location}</strong>
+            <span data-home-profile-status>{home.profile.status}</span>
+            <strong data-home-profile-location>{home.profile.location}</strong>
           </div>
 
-          <p class="profile-bio">{home.profile.bio}</p>
+          <p class="profile-bio" data-home-profile-bio>{home.profile.bio}</p>
 
-          <div class="profile-tags">
+          <div class="profile-tags" data-home-profile-tags>
             {home.profile.tags.map((tag) => <span>{tag}</span>)}
           </div>
 
-          <div class="profile-actions">
+          <div class="profile-actions" data-home-profile-links>
             {home.profile.links.map((link) => <a class="text-link" href={link.href}>{link.label}</a>)}
           </div>
         </article>
@@ -104,23 +104,23 @@ const operationStats = [
         <div class="home-side-stack">
           <article class="recent-status-card">
             <div class="recent-status-image">
-              {recentStatusImage && <img src={recentStatusImage} alt={home.recentStatus.imageAlt ?? home.recentStatus.title} loading="eager" />}
+              {recentStatusImage && <img src={recentStatusImage} alt={home.recentStatus.imageAlt ?? home.recentStatus.title} loading="eager" data-home-recent-image />}
             </div>
             <div class="recent-status-copy">
-              <span class="eyebrow">{home.recentStatus.eyebrow}</span>
-              <h2>{home.recentStatus.title}</h2>
-              <p>{home.recentStatus.description}</p>
+              <span class="eyebrow" data-home-recent-eyebrow>{home.recentStatus.eyebrow}</span>
+              <h2 data-home-recent-title>{home.recentStatus.title}</h2>
+              <p data-home-recent-description>{home.recentStatus.description}</p>
               {home.recentStatus.href && <a class="text-link" href={home.recentStatus.href}>查看详情</a>}
             </div>
           </article>
 
           <article class="random-explore-card">
-            <span class="eyebrow">{home.randomExplore.eyebrow}</span>
-            <h2>{home.randomExplore.title}</h2>
-            <p>{home.randomExplore.description}</p>
+            <span class="eyebrow" data-home-random-eyebrow>{home.randomExplore.eyebrow}</span>
+            <h2 data-home-random-title>{home.randomExplore.title}</h2>
+            <p data-home-random-description>{home.randomExplore.description}</p>
             <button class="primary-cta home-random-button random-entry-button" type="button" data-random-entry>
               <IconSymbol name="spark" />
-              <span>{home.randomExplore.actionLabel}</span>
+              <span data-home-random-action>{home.randomExplore.actionLabel}</span>
             </button>
           </article>
         </div>
@@ -130,14 +130,14 @@ const operationStats = [
     <section class="home-screen home-intro-screen" id="intro" data-home-screen="intro">
       <div class="container home-intro-layout">
         <div class="home-intro-copy">
-          <span class="eyebrow">{home.intro.eyebrow}</span>
-          <h2>
+          <span class="eyebrow" data-home-intro-eyebrow>{home.intro.eyebrow}</span>
+          <h2 data-home-intro-title>
             {home.intro.title.split("\n").map((line) => <span>{line}</span>)}
           </h2>
-          <p>{home.intro.lead}</p>
+          <p data-home-intro-lead>{home.intro.lead}</p>
         </div>
 
-        <div class="home-highlight-list">
+        <div class="home-highlight-list" data-home-highlights>
           {
             home.intro.highlights.map((highlight, index) => (
               <a class="home-highlight-item" href={highlight.href}>

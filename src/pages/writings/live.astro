@@ -1,0 +1,39 @@
+---
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const breadcrumbs = [
+  { label: "入口", href: "/" },
+  { label: "文字", href: "/writings" },
+  { label: "文章" },
+];
+---
+
+<BaseLayout title="文章" description="正在读取最新文章内容。" ogType="article" image="/og/page/writings.svg">
+  <main class="page-main">
+    <article class="article-shell container" data-article-detail="">
+      <Breadcrumbs items={breadcrumbs} />
+      <a class="text-link back-link" href="/writings">返回文字</a>
+      <header class="article-header resource-article-header">
+        <div class="meta-grid">
+          <span>Loading</span>
+        </div>
+        <h1>正在读取文章</h1>
+        <p>请稍候。</p>
+        <div class="tag-row"></div>
+        <figure class="article-cover-hero">
+          <img src="/resource/default/default_image.png" alt="" loading="eager" />
+        </figure>
+      </header>
+      <div class="article-detail-layout">
+        <div class="article-detail-main">
+          <div class="article-html prose"></div>
+          <nav class="article-nav" aria-label="文章导航">
+            <span></span>
+            <span></span>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
