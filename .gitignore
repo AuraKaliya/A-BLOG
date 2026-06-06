@@ -8,6 +8,8 @@ playwright-report/
 test-results/
 .env
 .env.*
+backend/.env
+backend/.venv/*
 !.env.example
 
 resource/*

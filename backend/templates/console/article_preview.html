@@ -1,0 +1,48 @@
+{% extends "console/base.html" %}
+
+{% block title %}预览 {{ article.title }} - A-BLOG Console{% endblock %}
+
+{% block content %}
+  <header class="topline">
+    <div>
+      <h1>{{ article.title }}</h1>
+      <p class="muted">{{ article.summary }}</p>
+    </div>
+    <div class="actions">
+      <a class="button secondary" href="{% url 'console-writing-edit' article.pk %}">继续编辑</a>
+      {% if not article.draft %}
+        <a class="button secondary" href="/writings/{{ article.slug }}/">打开前台</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <section class="panel" style="margin-bottom: 16px;">
+    <div class="panel-body">
+      <div class="actions">
+        {% if article.draft %}
+          <span class="status draft">草稿预览</span>
+        {% else %}
+          <span class="status live">已发布</span>
+        {% endif %}
+        <span class="status resource">{{ article.content_source }}</span>
+      </div>
+      <p class="muted" style="margin-top: 12px;">
+        {{ article.pub_date }}
+        {% if article.updated_date %} · 更新 {{ article.updated_date }}{% endif %}
+        {% if article.category %} · {{ article.category }}{% endif %}
+        · {{ article.word_count }} 字
+      </p>
+      {% if article.tags.all %}
+        <p class="muted" style="margin-top: 8px;">
+          {% for tag in article.tags.all %}
+            #{{ tag.name }}{% if not forloop.last %} {% endif %}
+          {% endfor %}
+        </p>
+      {% endif %}
+    </div>
+  </section>
+
+  <article class="article-body">
+    {{ article.body_html|safe }}
+  </article>
+{% endblock %}

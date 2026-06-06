@@ -57,7 +57,6 @@ DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = csv_env("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,testserver")
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -83,7 +82,7 @@ ROOT_URLCONF = "a_blog_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -120,6 +119,8 @@ STORAGES = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+LOGIN_URL = "/console/"
+LOGIN_REDIRECT_URL = "/console/"
 
 RESOURCE_ROOT = Path(os.getenv("A_BLOG_RESOURCE_ROOT", str(REPO_ROOT / "resource"))).resolve()
 ARTICLE_RESOURCE_ROOT = RESOURCE_ROOT / "article"

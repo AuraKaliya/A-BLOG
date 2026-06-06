@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}A-BLOG Console{% endblock %}</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #18212f;
+        --muted: #667085;
+        --line: #d7dde5;
+        --panel: #ffffff;
+        --soft: #f5f7fa;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --warn: #a85519;
+        --danger: #b42318;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--soft);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+
+      a { color: inherit; text-decoration: none; }
+      button, input, textarea, select { font: inherit; }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: #18212f;
+        color: #fff;
+        padding: 22px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        background: #fff;
+        color: #18212f;
+        font-weight: 800;
+      }
+
+      .brand strong { display: block; }
+      .brand span { color: rgba(255, 255, 255, 0.68); display: block; font-size: 13px; margin-top: 2px; }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav a,
+      .logout-button {
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.76);
+        display: flex;
+        justify-content: space-between;
+        min-height: 40px;
+        padding: 10px 12px;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        background: rgba(255, 255, 255, 0.11);
+        color: #fff;
+      }
+
+      .logout-form {
+        margin-top: 24px;
+      }
+
+      .logout-button {
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        cursor: pointer;
+      }
+
+      .main {
+        padding: 28px;
+      }
+
+      .topline {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+
+      h1, h2, h3, p { margin: 0; }
+      h1 { font-size: 30px; line-height: 1.2; }
+      h2 { font-size: 18px; }
+
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 6px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .two-column {
+        grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.75fr);
+        align-items: start;
+      }
+
+      .panel, .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .panel-head {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        min-height: 56px;
+        padding: 0 18px;
+      }
+
+      .panel-body {
+        padding: 18px;
+      }
+
+      .stat {
+        min-height: 92px;
+        padding: 16px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 28px;
+        line-height: 1.1;
+      }
+
+      .stat span {
+        color: var(--muted);
+        display: block;
+        font-size: 13px;
+        margin-top: 10px;
+      }
+
+      .actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .button {
+        align-items: center;
+        background: var(--accent);
+        border: 0;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        font-weight: 700;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 14px;
+      }
+
+      .button:hover { background: var(--accent-dark); }
+
+      .button.secondary {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--ink);
+      }
+
+      .button.warn {
+        background: var(--warn);
+      }
+
+      .button.danger {
+        background: var(--danger);
+      }
+
+      .messages {
+        display: grid;
+        gap: 8px;
+        list-style: none;
+        margin: 0 0 18px;
+        padding: 0;
+      }
+
+      .messages li {
+        background: rgba(15, 118, 110, 0.1);
+        border: 1px solid rgba(15, 118, 110, 0.24);
+        border-radius: 6px;
+        color: var(--accent-dark);
+        padding: 11px 13px;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field label {
+        color: #344054;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .field input,
+      .field textarea,
+      .field select {
+        width: 100%;
+        border: 1px solid #cbd5df;
+        border-radius: 6px;
+        background: #fff;
+        color: var(--ink);
+        min-height: 40px;
+        padding: 9px 11px;
+      }
+
+      .field textarea {
+        line-height: 1.6;
+        resize: vertical;
+      }
+
+      .field input:focus,
+      .field textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+        outline: none;
+      }
+
+      .help, .error {
+        font-size: 13px;
+      }
+
+      .help { color: var(--muted); }
+      .error { color: var(--danger); }
+
+      .section-title {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th, td {
+        border-bottom: 1px solid var(--line);
+        padding: 14px 18px;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      tr:last-child td { border-bottom: 0; }
+
+      .status {
+        border-radius: 999px;
+        display: inline-flex;
+        font-size: 12px;
+        font-weight: 800;
+        min-height: 24px;
+        padding: 4px 10px;
+      }
+
+      .status.live {
+        background: rgba(15, 118, 110, 0.12);
+        color: var(--accent-dark);
+      }
+
+      .status.draft {
+        background: rgba(168, 85, 25, 0.12);
+        color: var(--warn);
+      }
+
+      .status.resource {
+        background: rgba(102, 112, 133, 0.12);
+        color: #475467;
+      }
+
+      .filters {
+        align-items: end;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) 160px 160px auto;
+        gap: 12px;
+      }
+
+      .article-body {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        line-height: 1.75;
+        padding: 24px;
+      }
+
+      .article-body img {
+        height: auto;
+        max-width: 100%;
+      }
+
+      @media (max-width: 960px) {
+        .layout { grid-template-columns: 1fr; }
+        .sidebar { position: static; }
+        .stats-grid, .two-column, .filters { grid-template-columns: 1fr; }
+        .main { padding: 18px; }
+        .topline { align-items: flex-start; flex-direction: column; }
+        table { min-width: 760px; }
+        .table-wrap { overflow-x: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <a class="brand" href="{% url 'console' %}">
+          <span class="brand-mark">A</span>
+          <span>
+            <strong>A-BLOG</strong>
+            <span>{{ request.user.get_username }}</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="后台导航">
+          <a class="{% if active == 'dashboard' %}active{% endif %}" href="{% url 'console' %}">控制台</a>
+          <a class="{% if active == 'home' %}active{% endif %}" href="{% url 'console-home' %}">首页</a>
+          <a class="{% if active == 'writings' %}active{% endif %}" href="{% url 'console-writings' %}">文字</a>
+        </nav>
+        <form class="logout-form" method="post" action="{% url 'console-logout' %}">
+          {% csrf_token %}
+          <button class="logout-button" type="submit">退出登录</button>
+        </form>
+      </aside>
+      <main class="main">
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

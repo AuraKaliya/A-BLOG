@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A-BLOG Console Login</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(135deg, rgba(15, 118, 110, 0.14), transparent 36%),
+          linear-gradient(315deg, rgba(168, 85, 25, 0.12), transparent 30%),
+          #f5f7fa;
+        color: #18212f;
+        display: grid;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+        place-items: center;
+        padding: 28px;
+      }
+      .panel {
+        width: min(440px, 100%);
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid #d7dde5;
+        border-radius: 8px;
+        box-shadow: 0 24px 60px rgba(24, 33, 47, 0.12);
+        padding: 32px;
+      }
+      .brand {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        margin-bottom: 26px;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 6px;
+        background: #18212f;
+        color: #fff;
+        font-weight: 800;
+      }
+      h1, p { margin: 0; }
+      h1 { font-size: 22px; }
+      p { color: #667085; font-size: 14px; margin-top: 4px; }
+      .field { display: grid; gap: 8px; margin-top: 18px; }
+      label { color: #344054; font-size: 13px; font-weight: 700; }
+      input {
+        width: 100%;
+        border: 1px solid #cbd5df;
+        border-radius: 6px;
+        min-height: 44px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+      input:focus {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+        outline: none;
+      }
+      button {
+        width: 100%;
+        background: #0f766e;
+        border: 0;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+        min-height: 44px;
+        margin-top: 24px;
+      }
+      .errors, .messages {
+        display: grid;
+        gap: 8px;
+        list-style: none;
+        margin: 0 0 18px;
+        padding: 0;
+      }
+      .errors li, .messages li {
+        border-radius: 6px;
+        font-size: 14px;
+        padding: 11px 13px;
+      }
+      .errors li {
+        background: rgba(180, 35, 24, 0.08);
+        border: 1px solid rgba(180, 35, 24, 0.24);
+        color: #b42318;
+      }
+      .messages li {
+        background: rgba(15, 118, 110, 0.1);
+        border: 1px solid rgba(15, 118, 110, 0.24);
+        color: #115e59;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <div class="brand">
+        <span class="mark">A</span>
+        <div>
+          <h1>A-BLOG Console</h1>
+          <p>线上内容后台</p>
+        </div>
+      </div>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <ul class="errors">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="post" action="{% url 'console' %}">
+        {% csrf_token %}
+        <div class="field">
+          <label for="id_username">用户名</label>
+          <input id="id_username" name="username" type="text" autocomplete="username" value="{{ form.username.value|default_if_none:'' }}" required>
+        </div>
+        <div class="field">
+          <label for="id_password">密码</label>
+          <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit">登录</button>
+      </form>
+    </main>
+  </body>
+</html>

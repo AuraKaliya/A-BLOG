@@ -1,0 +1,101 @@
+{% extends "console/base.html" %}
+
+{% block title %}文字管理 - A-BLOG Console{% endblock %}
+
+{% block content %}
+  <header class="topline">
+    <div>
+      <h1>文字管理</h1>
+      <p class="muted">管理后台手写文章，并查看 resource 同步文章状态。</p>
+    </div>
+    <div class="actions">
+      <a class="button" href="{% url 'console-writing-new' %}">新建文字</a>
+    </div>
+  </header>
+
+  <form class="panel" method="get" action="{% url 'console-writings' %}" style="margin-bottom: 16px;">
+    <div class="panel-body filters">
+      <div class="field">
+        <label for="q">搜索</label>
+        <input id="q" name="q" value="{{ query }}" placeholder="标题或 slug">
+      </div>
+      <div class="field">
+        <label for="status">状态</label>
+        <select id="status" name="status">
+          <option value="all" {% if status_filter == "all" %}selected{% endif %}>全部</option>
+          <option value="published" {% if status_filter == "published" %}selected{% endif %}>已发布</option>
+          <option value="draft" {% if status_filter == "draft" %}selected{% endif %}>草稿</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="source">来源</label>
+        <select id="source" name="source">
+          <option value="all" {% if source_filter == "all" %}selected{% endif %}>全部</option>
+          <option value="manual" {% if source_filter == "manual" %}selected{% endif %}>后台</option>
+          <option value="resource" {% if source_filter == "resource" %}selected{% endif %}>resource</option>
+        </select>
+      </div>
+      <button class="button secondary" type="submit">筛选</button>
+    </div>
+  </form>
+
+  <article class="panel">
+    {% if articles %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>标题</th>
+              <th>分类</th>
+              <th>日期</th>
+              <th>访问</th>
+              <th>来源</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for article in articles %}
+              <tr>
+                <td>
+                  <strong>{{ article.title }}</strong>
+                  <p class="muted">/{{ article.slug }}/</p>
+                </td>
+                <td>{{ article.category|default:"-" }}</td>
+                <td>
+                  {{ article.pub_date }}
+                  {% if article.updated_date %}<p class="muted">更新 {{ article.updated_date }}</p>{% endif %}
+                </td>
+                <td>{{ article.view_count.views|default:0 }}</td>
+                <td>
+                  {% if article.content_source == "manual" %}
+                    <span class="status live">后台</span>
+                  {% else %}
+                    <span class="status resource">resource</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if article.draft %}
+                    <span class="status draft">草稿</span>
+                  {% else %}
+                    <span class="status live">发布</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="actions">
+                    <a class="button secondary" href="{% url 'console-writing-edit' article.pk %}">编辑</a>
+                    <a class="button secondary" href="{% url 'console-writing-preview' article.pk %}">预览</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body">
+        <p class="muted">没有匹配的文字。</p>
+      </div>
+    {% endif %}
+  </article>
+{% endblock %}

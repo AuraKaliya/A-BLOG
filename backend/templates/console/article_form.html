@@ -1,0 +1,116 @@
+{% extends "console/base.html" %}
+
+{% block title %}{% if article %}编辑文字{% else %}新建文字{% endif %} - A-BLOG Console{% endblock %}
+
+{% block content %}
+  <header class="topline">
+    <div>
+      <h1>{% if article %}编辑文字{% else %}新建文字{% endif %}</h1>
+      <p class="muted">保存草稿不会公开；发布后会进入 /writings/ 和公开 API。</p>
+    </div>
+    <div class="actions">
+      {% if article %}
+        <a class="button secondary" href="{{ preview_url }}">预览</a>
+      {% endif %}
+      <a class="button secondary" href="{% url 'console-writings' %}">返回列表</a>
+    </div>
+  </header>
+
+  {% if form.non_field_errors %}
+    <ul class="messages">
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <section class="grid two-column">
+      <div class="grid">
+        <article class="panel">
+          <div class="panel-head"><h2>正文</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">
+              {{ form.title.label_tag }}{{ form.title }}
+              {% for error in form.title.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.slug.label_tag }}{{ form.slug }}
+              {% for error in form.slug.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.summary.label_tag }}{{ form.summary }}
+              {% for error in form.summary.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.body_markdown.label_tag }}{{ form.body_markdown }}
+              {% for error in form.body_markdown.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="grid">
+        <article class="panel">
+          <div class="panel-head"><h2>发布</h2></div>
+          <div class="panel-body">
+            {% if article %}
+              <p>
+                {% if article.draft %}
+                  <span class="status draft">草稿</span>
+                {% else %}
+                  <span class="status live">已发布</span>
+                {% endif %}
+                {% if article.content_source == "resource" %}
+                  <span class="status resource">resource 来源</span>
+                {% endif %}
+              </p>
+              <p class="muted" style="margin-top: 12px;">最近保存：{{ article.updated_at }}</p>
+            {% else %}
+              <p><span class="status draft">新草稿</span></p>
+            {% endif %}
+            <div class="actions" style="margin-top: 18px;">
+              <button class="button secondary" name="action" value="save" type="submit">保存草稿</button>
+              <button class="button" name="action" value="publish" type="submit">发布</button>
+              {% if article and not article.draft %}
+                <button class="button warn" name="action" value="unpublish" type="submit">下架</button>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h2>元信息</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">
+              {{ form.cover_url.label_tag }}{{ form.cover_url }}
+              {% for error in form.cover_url.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.category.label_tag }}{{ form.category }}
+              {% for error in form.category.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.tags_text.label_tag }}{{ form.tags_text }}
+              <span class="help">多个标签用逗号分隔。</span>
+              {% for error in form.tags_text.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.pub_date.label_tag }}{{ form.pub_date }}
+              {% for error in form.pub_date.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              {{ form.updated_date.label_tag }}{{ form.updated_date }}
+              {% for error in form.updated_date.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label>{{ form.featured }} 精选</label>
+              {% for error in form.featured.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </form>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "console/base.html" %}
+
+{% block title %}首页编辑 - A-BLOG Console{% endblock %}
+
+{% block content %}
+  <header class="topline">
+    <div>
+      <h1>首页编辑</h1>
+      <p class="muted">保存草稿不会影响线上首页，发布后才会更新公开内容。</p>
+    </div>
+    <div class="actions">
+      <a class="button secondary" href="{% url 'console-home-preview' %}">预览草稿</a>
+      <a class="button secondary" href="{% url 'console' %}">返回控制台</a>
+    </div>
+  </header>
+
+  <form method="post" action="{% url 'console-home' %}">
+    {% csrf_token %}
+    <section class="grid two-column">
+      <div class="grid">
+        <article class="panel">
+          <div class="panel-head"><h2>基础信息</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">{{ form.title.label_tag }}{{ form.title }}{% for error in form.title.errors %}<span class="error">{{ error }}</span>{% endfor %}</div>
+            <div class="field">{{ form.description.label_tag }}{{ form.description }}{% for error in form.description.errors %}<span class="error">{{ error }}</span>{% endfor %}</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h2>Profile</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">{{ form.profile_eyebrow.label_tag }}{{ form.profile_eyebrow }}</div>
+            <div class="field">{{ form.profile_name.label_tag }}{{ form.profile_name }}</div>
+            <div class="field">{{ form.profile_role.label_tag }}{{ form.profile_role }}</div>
+            <div class="field">{{ form.profile_status.label_tag }}{{ form.profile_status }}</div>
+            <div class="field">{{ form.profile_location.label_tag }}{{ form.profile_location }}</div>
+            <div class="field">{{ form.profile_bio.label_tag }}{{ form.profile_bio }}</div>
+            <div class="field">{{ form.profile_image_index.label_tag }}{{ form.profile_image_index }}</div>
+            <div class="field">{{ form.profile_image_alt.label_tag }}{{ form.profile_image_alt }}</div>
+            <div class="field">
+              {{ form.profile_tags.label_tag }}{{ form.profile_tags }}
+              <span class="help">多个标签用逗号分隔。</span>
+            </div>
+            <div class="field">
+              {{ form.profile_links_json.label_tag }}{{ form.profile_links_json }}
+              <span class="help">例如 [{"label":"Twitter","href":"https://example.com"}]</span>
+              {% for error in form.profile_links_json.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h2>Recent Status</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">{{ form.recent_eyebrow.label_tag }}{{ form.recent_eyebrow }}</div>
+            <div class="field">{{ form.recent_title.label_tag }}{{ form.recent_title }}</div>
+            <div class="field">{{ form.recent_description.label_tag }}{{ form.recent_description }}</div>
+            <div class="field">{{ form.recent_image_index.label_tag }}{{ form.recent_image_index }}</div>
+            <div class="field">{{ form.recent_image_alt.label_tag }}{{ form.recent_image_alt }}</div>
+            <div class="field">{{ form.recent_href.label_tag }}{{ form.recent_href }}</div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="grid">
+        <article class="panel">
+          <div class="panel-head"><h2>发布状态</h2></div>
+          <div class="panel-body">
+            <p>
+              {% if page.is_published %}
+                <span class="status live">已发布</span>
+              {% else %}
+                <span class="status draft">未发布</span>
+              {% endif %}
+            </p>
+            <p class="muted" style="margin-top: 12px;">最后保存：{{ page.updated_at }}</p>
+            <p class="muted">最后发布：{{ page.published_at|default:"尚未发布" }}</p>
+            <div class="actions" style="margin-top: 18px;">
+              <button class="button secondary" name="action" value="save" type="submit">保存草稿</button>
+              <button class="button" name="action" value="publish" type="submit">发布首页</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h2>Random Explore</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">{{ form.random_eyebrow.label_tag }}{{ form.random_eyebrow }}</div>
+            <div class="field">{{ form.random_title.label_tag }}{{ form.random_title }}</div>
+            <div class="field">{{ form.random_description.label_tag }}{{ form.random_description }}</div>
+            <div class="field">{{ form.random_action_label.label_tag }}{{ form.random_action_label }}</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><h2>Intro</h2></div>
+          <div class="panel-body form-grid">
+            <div class="field">{{ form.intro_eyebrow.label_tag }}{{ form.intro_eyebrow }}</div>
+            <div class="field">{{ form.intro_title.label_tag }}{{ form.intro_title }}</div>
+            <div class="field">{{ form.intro_lead.label_tag }}{{ form.intro_lead }}</div>
+            <div class="field">
+              {{ form.highlights_json.label_tag }}{{ form.highlights_json }}
+              <span class="help">每一项包含 keyword、title、description、href。</span>
+              {% for error in form.highlights_json.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </form>
+{% endblock %}

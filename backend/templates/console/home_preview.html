@@ -1,0 +1,52 @@
+{% extends "console/base.html" %}
+
+{% block title %}首页草稿预览 - A-BLOG Console{% endblock %}
+
+{% block content %}
+  <header class="topline">
+    <div>
+      <h1>首页草稿预览</h1>
+      <p class="muted">这里展示即将发布到公开首页 API 的草稿内容。</p>
+    </div>
+    <div class="actions">
+      <a class="button secondary" href="{% url 'console-home' %}">继续编辑</a>
+      <a class="button secondary" href="/">打开前台首页</a>
+    </div>
+  </header>
+
+  <section class="grid two-column">
+    <article class="panel">
+      <div class="panel-head"><h2>{{ payload.title }}</h2></div>
+      <div class="panel-body">
+        <p class="muted">{{ payload.description }}</p>
+        <hr style="border: 0; border-top: 1px solid #d7dde5; margin: 18px 0;">
+        <h3>{{ payload.profile.name }}</h3>
+        <p class="muted">{{ payload.profile.role }}</p>
+        <p style="margin-top: 12px;">{{ payload.profile.bio }}</p>
+        <p class="muted" style="margin-top: 12px;">{{ payload.profile.status }} · {{ payload.profile.location }}</p>
+      </div>
+    </article>
+
+    <aside class="panel">
+      <div class="panel-head"><h2>发布信息</h2></div>
+      <div class="panel-body">
+        <p>
+          {% if page.is_published %}
+            <span class="status live">当前线上已发布</span>
+          {% else %}
+            <span class="status draft">当前线上未发布</span>
+          {% endif %}
+        </p>
+        <p class="muted" style="margin-top: 12px;">草稿保存：{{ page.updated_at }}</p>
+        <p class="muted">线上发布：{{ page.published_at|default:"尚未发布" }}</p>
+      </div>
+    </aside>
+  </section>
+
+  <article class="panel" style="margin-top: 16px;">
+    <div class="panel-head"><h2>草稿 JSON</h2></div>
+    <div class="panel-body">
+      <pre style="white-space: pre-wrap; line-height: 1.6; margin: 0;">{{ payload }}</pre>
+    </div>
+  </article>
+{% endblock %}
