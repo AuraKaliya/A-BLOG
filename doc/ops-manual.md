@@ -136,6 +136,7 @@ docker load image.tar 中的前端和后端镜像
 移除旧 aura-blog 容器
 用 docker compose 启动前端、Django 后端和 PostgreSQL
 保留资源目录 /root/A-BLOG/resource
+保留运行时密钥 /root/A-BLOG/runtime.env，避免 PostgreSQL 持久化卷的密码随发布包轮换
 ```
 
 ## 服务器手动更新

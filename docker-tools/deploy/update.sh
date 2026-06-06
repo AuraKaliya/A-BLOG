@@ -7,6 +7,8 @@ RESOURCE_DIR=${A_BLOG_RESOURCE_DIR:-$APP_ROOT/resource}
 IMAGE_TAR=${IMAGE_TAR:-$SCRIPT_DIR/image.tar}
 COMPOSE_FILE=${COMPOSE_FILE:-$SCRIPT_DIR/docker-compose.prod.yml}
 
+mkdir -p "$APP_ROOT"
+
 if [ ! -f "$IMAGE_TAR" ]; then
   echo "Missing image tar: $IMAGE_TAR" >&2
   exit 1
@@ -24,6 +26,23 @@ if [ -f "$SCRIPT_DIR/release.env" ]; then
   . "$CLEAN_ENV"
   set +a
   rm -f "$CLEAN_ENV"
+fi
+
+RUNTIME_ENV=${A_BLOG_RUNTIME_ENV:-$APP_ROOT/runtime.env}
+if [ -f "$RUNTIME_ENV" ]; then
+  CLEAN_RUNTIME_ENV=$(mktemp)
+  sed '1s/^\xEF\xBB\xBF//' "$RUNTIME_ENV" > "$CLEAN_RUNTIME_ENV"
+  set -a
+  . "$CLEAN_RUNTIME_ENV"
+  set +a
+  rm -f "$CLEAN_RUNTIME_ENV"
+elif [ -n "${DJANGO_SECRET_KEY:-}" ] && [ -n "${POSTGRES_PASSWORD:-}" ] && [ -n "${A_BLOG_VIEW_SALT:-}" ]; then
+  umask 077
+  {
+    printf '%s\n' "DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY"
+    printf '%s\n' "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+    printf '%s\n' "A_BLOG_VIEW_SALT=$A_BLOG_VIEW_SALT"
+  } > "$RUNTIME_ENV"
 fi
 
 export A_BLOG_CONTAINER=${A_BLOG_CONTAINER:-aura-blog}
