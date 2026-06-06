@@ -1,6 +1,7 @@
 import { constants } from "node:fs";
 import { access, readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { parseFragment, serialize, type DefaultTreeAdapterTypes } from "parse5";
 
 const defaultCover = "/resource/default/default_image.png";
 
@@ -32,8 +33,20 @@ export interface ResourceArticle {
   draft: boolean;
   wordCount: number;
   html: string;
+  toc: ArticleTocItem[];
   text: string;
 }
+
+export interface ArticleTocItem {
+  id: string;
+  text: string;
+  depth: 2 | 3;
+}
+
+type HtmlNode = DefaultTreeAdapterTypes.Node;
+type HtmlParentNode = DefaultTreeAdapterTypes.ParentNode;
+type HtmlElement = DefaultTreeAdapterTypes.Element;
+type HtmlTextNode = DefaultTreeAdapterTypes.TextNode;
 
 function articleRoot() {
   return resolve(process.cwd(), "resource", "article");
@@ -142,6 +155,105 @@ function countTextUnits(text: string) {
   return cjkChars + words;
 }
 
+function hasChildNodes(node: HtmlNode): node is HtmlParentNode {
+  return "childNodes" in node;
+}
+
+function isElement(node: HtmlNode): node is HtmlElement {
+  return "tagName" in node;
+}
+
+function isTextNode(node: HtmlNode): node is HtmlTextNode {
+  return node.nodeName === "#text";
+}
+
+function isTocHeading(node: HtmlNode): node is HtmlElement {
+  return isElement(node) && (node.tagName === "h2" || node.tagName === "h3");
+}
+
+function getAttribute(node: HtmlElement, name: string) {
+  return node.attrs.find((attribute) => attribute.name === name)?.value;
+}
+
+function setAttribute(node: HtmlElement, name: string, value: string) {
+  const existing = node.attrs.find((attribute) => attribute.name === name);
+  if (existing) {
+    existing.value = value;
+    return;
+  }
+  node.attrs.push({ name, value });
+}
+
+function getNodeText(node: HtmlNode): string {
+  if (isTextNode(node)) return node.value;
+  if (!hasChildNodes(node)) return "";
+  return node.childNodes.map((child) => getNodeText(child)).join("");
+}
+
+function slugifyHeading(text: string) {
+  const slug = text
+    .trim()
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || "section";
+}
+
+function uniqueHeadingId(base: string, usedIds: Set<string>) {
+  let id = base;
+  let suffix = 2;
+  while (usedIds.has(id)) {
+    id = `${base}-${suffix}`;
+    suffix += 1;
+  }
+  usedIds.add(id);
+  return id;
+}
+
+function collectNonHeadingIds(node: HtmlNode, usedIds: Set<string>) {
+  if (isElement(node) && !isTocHeading(node)) {
+    const id = getAttribute(node, "id")?.trim();
+    if (id) usedIds.add(id);
+  }
+
+  if (hasChildNodes(node)) {
+    node.childNodes.forEach((child) => collectNonHeadingIds(child, usedIds));
+  }
+}
+
+function collectTocItems(node: HtmlNode, usedIds: Set<string>, toc: ArticleTocItem[]) {
+  if (isTocHeading(node)) {
+    const text = getNodeText(node).replace(/\s+/g, " ").trim();
+    if (text) {
+      const existingId = getAttribute(node, "id")?.trim();
+      const id = existingId && !usedIds.has(existingId) ? existingId : uniqueHeadingId(slugifyHeading(text), usedIds);
+      if (existingId && !usedIds.has(existingId)) usedIds.add(existingId);
+      setAttribute(node, "id", id);
+      toc.push({ id, text, depth: node.tagName === "h2" ? 2 : 3 });
+    }
+  }
+
+  if (hasChildNodes(node)) {
+    node.childNodes.forEach((child) => collectTocItems(child, usedIds, toc));
+  }
+}
+
+function enhanceHtmlWithToc(html: string) {
+  const fragment = parseFragment(html);
+  const usedIds = new Set<string>();
+  const toc: ArticleTocItem[] = [];
+
+  fragment.childNodes.forEach((node) => collectNonHeadingIds(node, usedIds));
+  fragment.childNodes.forEach((node) => collectTocItems(node, usedIds, toc));
+
+  return {
+    html: serialize(fragment),
+    toc,
+  };
+}
+
 async function readArticleDirectory(slug: string): Promise<ResourceArticle> {
   const directory = resolve(articleRoot(), slug);
   const indexPath = resolve(directory, "index.json");
@@ -154,7 +266,7 @@ async function readArticleDirectory(slug: string): Promise<ResourceArticle> {
   if (payload.tags && !Array.isArray(payload.tags)) throw new Error(`Article ${slug} tags must be an array.`);
 
   const rawHtml = await readFile(htmlPath, "utf-8");
-  const html = rewriteHtmlAssetUrls(slug, rawHtml);
+  const { html, toc } = enhanceHtmlWithToc(rewriteHtmlAssetUrls(slug, rawHtml));
   const text = textFromHtml(rawHtml);
   const wordCount = payload.wordCount ?? countTextUnits(text);
   const cover = payload.cover?.trim();
@@ -172,6 +284,7 @@ async function readArticleDirectory(slug: string): Promise<ResourceArticle> {
     draft: Boolean(payload.draft),
     wordCount,
     html,
+    toc,
     text,
   };
 }

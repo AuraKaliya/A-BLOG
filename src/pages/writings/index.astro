@@ -1,6 +1,7 @@
 ---
 import ArchivePageLayout from "../../components/ArchivePageLayout.astro";
 import EmptyState from "../../components/EmptyState.astro";
+import IconSymbol from "../../components/IconSymbol.astro";
 import ResourceArticleCard from "../../components/ResourceArticleCard.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllResourceArticleTags, getAllResourceArticles } from "../../lib/articles";
@@ -11,24 +12,23 @@ const [articles, tags] = await Promise.all([getAllResourceArticles(), getAllReso
 <BaseLayout title="文字" description="随笔、技术记录、阶段复盘与还在形成中的想法。" image="/og/page/writings.svg">
   <ArchivePageLayout
     title="文字"
-    description="这里把技术、随笔、观察和复盘收束成一个统一入口。文章主体来自 resource/article，每篇文章拥有自己的封面、正文与相关资源。"
+    description="关于随笔、想法、技术学习的文字记录。"
     breadcrumbs={[{ label: "入口", href: "/" }, { label: "文字" }]}
   >
     <div class="article-command-panel" slot="before" data-article-controls>
-      <div>
-        <span class="eyebrow">Articles</span>
-        <h2>按节奏阅读，或按标签筛选</h2>
-        <p>时间轴适合回看写作脉络，网格适合快速扫过主题。筛选状态会保留在地址栏里。</p>
+      <div class="article-tag-filter" aria-label="标签筛选">
+        <button type="button" data-article-tag="all" aria-pressed="true"><span>全部档案</span><small>{articles.length}</small></button>
+        {tags.map((tag) => <button type="button" data-article-tag={tag.name} aria-pressed="false"><span>{tag.name}</span><small>{tag.count}</small></button>)}
       </div>
-      <div class="article-control-stack">
-        <div class="article-view-switch" aria-label="展示方式">
-          <button type="button" data-article-view="timeline" aria-pressed="true">时间轴</button>
-          <button type="button" data-article-view="grid" aria-pressed="false">网格</button>
-        </div>
-        <div class="article-tag-filter" aria-label="标签筛选">
-          <button type="button" data-article-tag="all" aria-pressed="true">全部 {articles.length}</button>
-          {tags.map((tag) => <button type="button" data-article-tag={tag.name} aria-pressed="false">{tag.name} {tag.count}</button>)}
-        </div>
+      <div class="article-view-switch" aria-label="展示方式">
+        <button type="button" data-article-view="timeline" aria-pressed="true">
+          <IconSymbol name="history" />
+          <span>时间轴</span>
+        </button>
+        <button type="button" data-article-view="grid" aria-pressed="false">
+          <IconSymbol name="grid" />
+          <span>网格</span>
+        </button>
       </div>
     </div>
 
