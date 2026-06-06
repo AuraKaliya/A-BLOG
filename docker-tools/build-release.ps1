@@ -64,6 +64,18 @@ function Get-ReleaseSecret {
   return $Value
 }
 
+function Invoke-CheckedCommand {
+  param(
+    [string]$Description,
+    [scriptblock]$Command
+  )
+
+  & $Command
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Description failed with exit code $LASTEXITCODE."
+  }
+}
+
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
   throw "Docker CLI was not found. Install Docker Desktop or Docker Engine, then run this script again."
 }
@@ -105,14 +117,14 @@ Push-Location $RepoRoot
 try {
   if (-not $NoBuild) {
     Write-Host "Building Docker image $ImageTag"
-    docker build --pull -t $ImageTag -t $LatestTag -f Dockerfile .
+    Invoke-CheckedCommand "Building Docker image $ImageTag" { docker build --pull -t $ImageTag -t $LatestTag -f Dockerfile . }
 
     Write-Host "Building Docker image $BackendImageTag"
-    docker build --pull -t $BackendImageTag -t $BackendLatestTag -f backend/Dockerfile .
+    Invoke-CheckedCommand "Building Docker image $BackendImageTag" { docker build --pull -t $BackendImageTag -t $BackendLatestTag -f backend/Dockerfile . }
   }
 
   Write-Host "Saving Docker images"
-  docker save -o (Join-Path $StageDir "image.tar") $ImageTag $BackendImageTag
+  Invoke-CheckedCommand "Saving Docker images" { docker save -o (Join-Path $StageDir "image.tar") $ImageTag $BackendImageTag }
 
   Copy-Item (Join-Path $RepoRoot "docker-tools/deploy/docker-compose.prod.yml") $StageDir
   Copy-Item (Join-Path $RepoRoot "docker-tools/deploy/update.sh") $StageDir
@@ -163,7 +175,7 @@ The included nginx-aurakaliye.com.conf is a first-time reverse proxy template.
   Push-Location $StageParent
   try {
     Write-Host "Creating archive $ArchivePath"
-    tar -czf $ArchivePath $ReleaseName
+    Invoke-CheckedCommand "Creating archive $ArchivePath" { tar -czf $ArchivePath $ReleaseName }
   } finally {
     Pop-Location
   }
@@ -173,10 +185,10 @@ The included nginx-aurakaliye.com.conf is a first-time reverse proxy template.
 
   if (-not [string]::IsNullOrWhiteSpace($Remote) -and -not $NoUpload) {
     Write-Host "Uploading archive to ${Remote}:${RemoteDir}"
-    ssh $Remote "mkdir -p '$RemoteDir' '$RemoteAppRoot/resource'"
-    scp $ArchivePath "${Remote}:$RemoteDir/"
-    scp $ChecksumPath "${Remote}:$RemoteDir/"
-    scp (Join-Path $RepoRoot "docker-tools/deploy/update-latest.sh") "${Remote}:$RemoteAppRoot/update-latest.sh"
+    Invoke-CheckedCommand "Creating remote release directories" { ssh $Remote "mkdir -p '$RemoteDir' '$RemoteAppRoot/resource'" }
+    Invoke-CheckedCommand "Uploading release archive" { scp $ArchivePath "${Remote}:$RemoteDir/" }
+    Invoke-CheckedCommand "Uploading release checksum" { scp $ChecksumPath "${Remote}:$RemoteDir/" }
+    Invoke-CheckedCommand "Uploading update-latest.sh" { scp (Join-Path $RepoRoot "docker-tools/deploy/update-latest.sh") "${Remote}:$RemoteAppRoot/update-latest.sh" }
   }
 
   Write-Host ""
