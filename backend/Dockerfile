@@ -9,6 +9,7 @@ COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY backend /app
+COPY src/content/pages /app/src/content/pages
 
 RUN python manage.py collectstatic --noinput
 
