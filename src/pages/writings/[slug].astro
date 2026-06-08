@@ -103,7 +103,7 @@ const structuredData = [
             <aside class="article-toc-panel" aria-label="文章目录">
               <div class="article-toc-card">
                 <p class="article-toc-kicker">CONTENTS</p>
-                <nav class="article-toc-list">
+                <nav class="article-toc-list" aria-label="文章目录">
                   {article.toc.map((item) => (
                     <a class:list={["article-toc-link", `depth-${item.depth}`]} href={`#${item.id}`} data-article-toc-link={item.id}>
                       <span>{item.text}</span>

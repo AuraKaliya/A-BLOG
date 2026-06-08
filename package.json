@@ -8,8 +8,10 @@
     "backend:migrate": "python backend/manage.py migrate",
     "backend:seed-pages": "python backend/manage.py seed_pages",
     "backend:sync": "python backend/manage.py sync_articles",
+    "backend:test": "python backend/manage.py test articles",
     "build": "astro check && astro build",
     "test": "playwright test --reporter=line --workers=1",
+    "test:all": "npm run build && npm test && npm run backend:test",
     "preview": "astro preview",
     "astro": "astro"
   },

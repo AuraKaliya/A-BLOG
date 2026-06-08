@@ -256,7 +256,7 @@
     aside.innerHTML = `
       <div class="article-toc-card">
         <p class="article-toc-kicker">CONTENTS</p>
-        <nav class="article-toc-list">
+        <nav class="article-toc-list" aria-label="文章目录">
           ${toc.map((item) => `<a class="article-toc-link depth-${item.depth}" href="#${escapeHtml(item.id)}" data-article-toc-link="${escapeHtml(item.id)}"><span>${escapeHtml(item.text)}</span></a>`).join("")}
         </nav>
       </div>
