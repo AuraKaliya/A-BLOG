@@ -64,6 +64,12 @@ test("home page hydrates editable CMS content", async ({ page }) => {
 });
 
 test("writings index hydrates live articles and tags", async ({ page }) => {
+  await page.route("**/api/articles/views/**", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      json: { views: {} },
+    });
+  });
   await page.route("**/api/articles/tags/**", async (route) => {
     await route.fulfill({
       contentType: "application/json",

@@ -1,4 +1,9 @@
 import { expect, test } from "playwright/test";
+import { mockUnavailableCmsApi } from "./helpers/cmsApi.mjs";
+
+test.beforeEach(async ({ page }) => {
+  await mockUnavailableCmsApi(page);
+});
 
 test("home exposes the content universe entrances", async ({ page }) => {
   await page.goto("/");

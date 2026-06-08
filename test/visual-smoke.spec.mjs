@@ -1,8 +1,13 @@
 import { expect, test } from "playwright/test";
+import { mockUnavailableCmsApi } from "./helpers/cmsApi.mjs";
 import { hasTextQualityIssue } from "./helpers/textQuality.mjs";
 
 const desktopRoutes = ["/", "/writings", "/map", "/search", "/works"];
 const mobileRoutes = ["/", "/writings", "/archive", "/map?type=world"];
+
+test.beforeEach(async ({ page }) => {
+  await mockUnavailableCmsApi(page);
+});
 
 async function collectPageHealth(page) {
   return page.evaluate(() => {
