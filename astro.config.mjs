@@ -54,6 +54,9 @@ function resourceServerPlugin() {
 
 export default defineConfig({
   site: siteConfig.url,
+  legacy: {
+    collectionsBackwardsCompat: true,
+  },
   integrations: [sitemap()],
   vite: {
     server: {

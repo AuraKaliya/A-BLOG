@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BASE_DIR.parent
 
@@ -17,6 +19,13 @@ def env_bool(name: str, default: bool) -> bool:
 
 def csv_env(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+
+
+def int_env(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return int(value)
 
 
 def database_config() -> dict:
@@ -122,9 +131,26 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/console/"
 LOGIN_REDIRECT_URL = "/console/"
 
+SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", False)
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
+SESSION_COOKIE_HTTPONLY = True
+SECURE_HSTS_SECONDS = int_env("DJANGO_SECURE_HSTS_SECONDS", 0)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", SECURE_HSTS_SECONDS > 0)
+SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
+if env_bool("DJANGO_SECURE_PROXY_SSL_HEADER", not DEBUG):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 RESOURCE_ROOT = Path(os.getenv("A_BLOG_RESOURCE_ROOT", str(REPO_ROOT / "resource"))).resolve()
 ARTICLE_RESOURCE_ROOT = RESOURCE_ROOT / "article"
-ARTICLE_VIEW_SALT = os.getenv("A_BLOG_VIEW_SALT", SECRET_KEY)
+ARTICLE_VIEW_SALT = os.getenv("A_BLOG_VIEW_SALT")
+if ARTICLE_VIEW_SALT is None:
+    if DEBUG:
+        ARTICLE_VIEW_SALT = SECRET_KEY
+    else:
+        raise ImproperlyConfigured("A_BLOG_VIEW_SALT must be set when DJANGO_DEBUG=0.")
+ARTICLE_VIEW_THROTTLE_SECONDS = int_env("A_BLOG_VIEW_THROTTLE_SECONDS", 60)
+ARTICLE_VIEW_LOOKUP_LIMIT = int_env("A_BLOG_VIEW_LOOKUP_LIMIT", 100)
 
 CSRF_TRUSTED_ORIGINS = csv_env("DJANGO_CSRF_TRUSTED_ORIGINS")
 

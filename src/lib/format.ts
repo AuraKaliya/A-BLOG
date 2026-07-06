@@ -9,7 +9,7 @@ export function formatDate(date: Date) {
 }
 
 export function getReadingTime(post: BlogPost) {
-  const text = post.body.replace(/```[\s\S]*?```/g, "").replace(/[#>*_[\]()`-]/g, "");
+  const text = (post.body ?? "").replace(/```[\s\S]*?```/g, "").replace(/[#>*_[\]()`-]/g, "");
   const cjkChars = text.match(/[\u4e00-\u9fff]/g)?.length ?? 0;
   const words = text.replace(/[\u4e00-\u9fff]/g, " ").trim().split(/\s+/).filter(Boolean).length;
   const minutes = Math.max(1, Math.ceil((cjkChars + words) / 500));

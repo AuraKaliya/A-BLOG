@@ -49,6 +49,8 @@ https://aurakaliye.com/resource/
 ```text
 不要把 root 密码、SSH 私钥内容、证书私钥写入仓库或文档。
 当前推荐使用 SSH key 登录 ubuntu 用户，再 sudo 操作 /root/A-BLOG。
+生产环境必须提供 DJANGO_SECRET_KEY、POSTGRES_PASSWORD 和 A_BLOG_VIEW_SALT。
+A_BLOG_VIEW_SALT 用于访问统计去重，不应回退或复用 DJANGO_SECRET_KEY。
 ```
 
 ## 本地构建发布包
@@ -299,8 +301,31 @@ https://aurakaliye.com/resource/文件名
 
 ```text
 resource 和 test-resource 下的实际资源文件不提交 Git。
-只保留 .gitkeep。
+只保留 .gitkeep、resource/default/default_image.png 和 resource/article 示例文章。
+update.sh 会在服务器资源目录缺少默认图时自动种入 /resource/default/default_image.png。
 ```
+
+## Django 生产安全配置
+
+生产 compose 默认开启：
+
+```text
+DJANGO_DEBUG=0
+SESSION_COOKIE_SECURE=1
+CSRF_COOKIE_SECURE=1
+DJANGO_SECURE_PROXY_SSL_HEADER=1
+DJANGO_SECURE_HSTS_SECONDS=31536000
+A_BLOG_VIEW_SALT 必填
+```
+
+`python backend/manage.py check --deploy` 中以下两项属于当前部署拓扑的有意选择：
+
+```text
+SECURE_SSL_REDIRECT：由宿主机 Nginx/Certbot 在公网入口完成 HTTP -> HTTPS 跳转。
+SECURE_HSTS_PRELOAD：默认不自动开启 preload；确认所有子域长期 HTTPS 后再设 DJANGO_SECURE_HSTS_PRELOAD=1。
+```
+
+容器内 Nginx 会清洗传给 Django 的 `X-Forwarded-For`，Django 只使用可信反代提供的真实连接 IP。阅读量接口还有短窗口节流，避免通过伪造请求头快速刷量。
 
 ## Resource Tools
 

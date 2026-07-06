@@ -14,6 +14,8 @@ backend/.venv/*
 
 resource/*
 !resource/.gitkeep
+!resource/default/
+!resource/default/**
 !resource/article/
 !resource/article/**
 test-resource/*

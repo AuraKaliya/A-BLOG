@@ -1,4 +1,5 @@
 import { getCollection } from "astro:content";
+import { withSlug } from "../content-entry";
 import type { NoteEntry } from "../content-types";
 
 export function sortNotesByDate(notes: NoteEntry[]) {
@@ -7,7 +8,7 @@ export function sortNotesByDate(notes: NoteEntry[]) {
 
 export async function getPublishedNotes() {
   const notes = await getCollection("notes", ({ data }) => !data.draft);
-  return sortNotesByDate(notes);
+  return sortNotesByDate(notes.map(withSlug));
 }
 
 export async function getFeaturedNotes(limit = 3) {

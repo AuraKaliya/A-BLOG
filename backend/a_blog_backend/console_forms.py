@@ -4,53 +4,13 @@ import json
 from datetime import date, datetime
 from typing import Any
 
-import bleach
 import markdown
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.text import slugify
 
+from articles.html_sanitizer import sanitize_article_html
 from articles.models import Article
-
-
-ALLOWED_TAGS = [
-    "a",
-    "abbr",
-    "blockquote",
-    "br",
-    "code",
-    "del",
-    "div",
-    "em",
-    "figcaption",
-    "figure",
-    "h2",
-    "h3",
-    "h4",
-    "hr",
-    "img",
-    "li",
-    "ol",
-    "p",
-    "pre",
-    "span",
-    "strong",
-    "table",
-    "tbody",
-    "td",
-    "th",
-    "thead",
-    "tr",
-    "ul",
-]
-ALLOWED_ATTRIBUTES = {
-    "*": ["class", "id"],
-    "a": ["href", "title", "target", "rel"],
-    "img": ["src", "alt", "title", "width", "height", "loading"],
-    "td": ["colspan", "rowspan"],
-    "th": ["colspan", "rowspan", "scope"],
-}
-ALLOWED_PROTOCOLS = ["http", "https", "mailto"]
 
 
 def render_markdown(value: str) -> str:
@@ -59,14 +19,7 @@ def render_markdown(value: str) -> str:
         extensions=["extra", "sane_lists"],
         output_format="html5",
     )
-    cleaned = bleach.clean(
-        raw_html,
-        tags=ALLOWED_TAGS,
-        attributes=ALLOWED_ATTRIBUTES,
-        protocols=ALLOWED_PROTOCOLS,
-        strip=True,
-    )
-    return bleach.linkify(cleaned)
+    return sanitize_article_html(raw_html, linkify_text=True)
 
 
 def split_tags(value: str) -> list[str]:

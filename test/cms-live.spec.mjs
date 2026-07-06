@@ -132,7 +132,7 @@ test("article detail hydrates live body, toc, metadata, and view count", async (
         featured: false,
         wordCount: 256,
         views: 11,
-        html: "<h2>章节一</h2><p>正文由后端返回。</p>",
+        html: '<h2 onclick="alert(1)">章节一</h2><p>正文由后端返回。</p><script>alert(1)</script><img src="javascript:alert(1)" onerror="alert(1)">',
       },
     });
   });
@@ -165,5 +165,9 @@ test("article detail hydrates live body, toc, metadata, and view count", async (
   await expect(page.getByRole("heading", { level: 2, name: "章节一" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "文章目录" })).toBeVisible();
   await expect(page.locator("[data-article-detail-views]")).toHaveText("12");
+  await expect(page.locator(".article-html script")).toHaveCount(0);
+  await expect(page.locator(".article-html h2")).not.toHaveAttribute("onclick", /.+/);
+  await expect(page.locator(".article-html img")).not.toHaveAttribute("onerror", /.+/);
+  await expect(page.locator(".article-html img")).not.toHaveAttribute("src", /javascript:/);
   expect(hasTextQualityIssue(await page.locator("body").innerText())).toBeFalsy();
 });

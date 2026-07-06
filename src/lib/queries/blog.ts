@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import { blogCategoryKeys } from "../../config/taxonomy";
+import { withSlug } from "../content-entry";
 import type { BlogPost } from "../content-types";
 
 export function sortPostsByDate(posts: BlogPost[]) {
@@ -8,7 +9,7 @@ export function sortPostsByDate(posts: BlogPost[]) {
 
 export async function getPublishedPosts() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return sortPostsByDate(posts);
+  return sortPostsByDate(posts.map(withSlug));
 }
 
 export async function getFeaturedPosts(limit = 3) {

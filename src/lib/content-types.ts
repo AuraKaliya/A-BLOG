@@ -1,11 +1,12 @@
 import type { CollectionEntry } from "astro:content";
+import type { SluggedEntry } from "./content-entry";
 
-export type BlogPost = CollectionEntry<"blog">;
-export type WorkEntry = CollectionEntry<"works">;
-export type WorldEntry = CollectionEntry<"world">;
-export type ChangelogEntry = CollectionEntry<"changelog">;
-export type NoteEntry = CollectionEntry<"notes">;
-export type LinkEntry = CollectionEntry<"links">;
+export type BlogPost = SluggedEntry<CollectionEntry<"blog">>;
+export type WorkEntry = SluggedEntry<CollectionEntry<"works">>;
+export type WorldEntry = SluggedEntry<CollectionEntry<"world">>;
+export type ChangelogEntry = SluggedEntry<CollectionEntry<"changelog">>;
+export type NoteEntry = SluggedEntry<CollectionEntry<"notes">>;
+export type LinkEntry = SluggedEntry<CollectionEntry<"links">>;
 export type TopicEntry = CollectionEntry<"topics">;
 export type PageEntry = CollectionEntry<"pages">;
 export type HomePageEntry = Omit<PageEntry, "data"> & { data: Extract<PageEntry["data"], { kind: "home" }> };

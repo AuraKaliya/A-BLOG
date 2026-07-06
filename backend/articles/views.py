@@ -4,6 +4,7 @@ import hashlib
 from datetime import date
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Count, F
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -14,10 +15,7 @@ from .serializers import ArticleDetailSerializer, ArticleListSerializer, SitePag
 
 
 def client_ip(request) -> str:
-    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "")
+    return request.META.get("HTTP_X_REAL_IP", "").strip() or request.META.get("REMOTE_ADDR", "").strip()
 
 
 def visitor_hash(request, view_date: date) -> str:
@@ -86,7 +84,8 @@ class ArticleTagsView(APIView):
 class ArticleViewsView(APIView):
     def get(self, request):
         raw_slugs = request.query_params.get("slugs", "")
-        slugs = [slug.strip() for slug in raw_slugs.split(",") if slug.strip()]
+        slugs = list(dict.fromkeys(slug.strip() for slug in raw_slugs.split(",") if slug.strip()))
+        slugs = slugs[: settings.ARTICLE_VIEW_LOOKUP_LIMIT]
         counts = ArticleViewCount.objects.filter(article__slug__in=slugs).select_related("article")
         payload = {item.article.slug: item.views for item in counts}
         for slug in slugs:
@@ -97,14 +96,18 @@ class ArticleViewsView(APIView):
 class ArticleViewEventView(APIView):
     def post(self, request, slug: str):
         article = get_object_or_404(Article.objects.published(), slug=slug)
+        counter, _ = ArticleViewCount.objects.get_or_create(article=article)
+        throttle_key = "article-view-throttle:" + hashlib.sha256(f"{slug}|{client_ip(request)}".encode("utf-8")).hexdigest()
+        if not cache.add(throttle_key, "1", timeout=settings.ARTICLE_VIEW_THROTTLE_SECONDS):
+            return Response({"slug": slug, "views": counter.views, "counted": False, "throttled": True})
+
         today = date.today()
         _, created = ArticleViewEvent.objects.get_or_create(
             article=article,
             visitor_hash=visitor_hash(request, today),
             view_date=today,
         )
-        counter, _ = ArticleViewCount.objects.get_or_create(article=article)
         if created:
             ArticleViewCount.objects.filter(pk=counter.pk).update(views=F("views") + 1)
             counter.refresh_from_db()
-        return Response({"slug": slug, "views": counter.views, "counted": created})
+        return Response({"slug": slug, "views": counter.views, "counted": created, "throttled": False})

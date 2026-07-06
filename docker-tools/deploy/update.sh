@@ -52,6 +52,11 @@ export A_BLOG_RESOURCE_DIR=${A_BLOG_RESOURCE_DIR:-$RESOURCE_DIR}
 export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-aura-blog}
 
 mkdir -p "$A_BLOG_RESOURCE_DIR"
+mkdir -p "$A_BLOG_RESOURCE_DIR/default"
+if [ ! -f "$A_BLOG_RESOURCE_DIR/default/default_image.png" ] && command -v base64 >/dev/null 2>&1; then
+  printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=' |
+    base64 -d > "$A_BLOG_RESOURCE_DIR/default/default_image.png" || rm -f "$A_BLOG_RESOURCE_DIR/default/default_image.png"
+fi
 
 echo "Loading Docker image from $IMAGE_TAR"
 docker load -i "$IMAGE_TAR"

@@ -64,6 +64,48 @@ type HtmlTextNode = DefaultTreeAdapterTypes.TextNode;
 
 const DEFAULT_API_BASE = "http://127.0.0.1:8000/api/";
 const remoteArticleCache = new Map<string, Promise<ResourceArticle[] | undefined>>();
+const allowedHtmlTags = new Set([
+  "a",
+  "abbr",
+  "blockquote",
+  "br",
+  "code",
+  "del",
+  "div",
+  "em",
+  "figcaption",
+  "figure",
+  "h2",
+  "h3",
+  "h4",
+  "hr",
+  "img",
+  "li",
+  "ol",
+  "p",
+  "picture",
+  "pre",
+  "source",
+  "span",
+  "strong",
+  "table",
+  "tbody",
+  "td",
+  "th",
+  "thead",
+  "tr",
+  "ul",
+]);
+const unsafeContentTags = new Set(["script", "style", "iframe", "object", "embed", "template", "form"]);
+const globalHtmlAttributes = new Set(["class", "id"]);
+const htmlAttributesByTag: Record<string, Set<string>> = {
+  a: new Set(["href", "title", "target", "rel"]),
+  img: new Set(["src", "alt", "title", "width", "height", "loading"]),
+  source: new Set(["src", "srcset", "media", "type", "sizes"]),
+  td: new Set(["colspan", "rowspan"]),
+  th: new Set(["colspan", "rowspan", "scope"]),
+};
+const urlAttributes = new Set(["href", "src", "poster"]);
 
 function articleRoot() {
   return resolve(process.cwd(), "resource", "article");
@@ -71,6 +113,10 @@ function articleRoot() {
 
 function getApiBase() {
   return process.env.A_BLOG_API_URL ?? process.env.PUBLIC_A_BLOG_API_URL ?? DEFAULT_API_BASE;
+}
+
+function shouldBuildRemoteArticles() {
+  return process.env.A_BLOG_BUILD_REMOTE_CONTENT === "1" || process.env.A_BLOG_BUILD_REMOTE_ARTICLES === "1";
 }
 
 function buildApiUrl(path: string) {
@@ -127,9 +173,7 @@ function isExternalRef(value: string) {
     normalized.startsWith("http://") ||
     normalized.startsWith("https://") ||
     normalized.startsWith("mailto:") ||
-    normalized.startsWith("tel:") ||
-    normalized.startsWith("data:") ||
-    normalized.startsWith("javascript:")
+    normalized.startsWith("tel:")
   );
 }
 
@@ -149,6 +193,7 @@ function normalizeRelativeAsset(value: string) {
 }
 
 function articleAssetUrl(slug: string, value: string) {
+  if (hasUnsafeScheme(value)) return "";
   if (isExternalRef(value)) return value;
   return `/resource/article/${slug}/${normalizeRelativeAsset(value)}`;
 }
@@ -225,6 +270,62 @@ function setAttribute(node: HtmlElement, name: string, value: string) {
   node.attrs.push({ name, value });
 }
 
+function hasAllowedAttribute(tagName: string, attributeName: string) {
+  return globalHtmlAttributes.has(attributeName) || Boolean(htmlAttributesByTag[tagName]?.has(attributeName));
+}
+
+function hasUnsafeScheme(value: string) {
+  const normalized = value.trim().replace(/[\u0000-\u001F\u007F\s]+/g, "").toLowerCase();
+  if (!normalized || normalized.startsWith("/") || normalized.startsWith("#")) return false;
+  if (normalized.startsWith("http://") || normalized.startsWith("https://") || normalized.startsWith("mailto:") || normalized.startsWith("tel:")) {
+    return false;
+  }
+  return /^[a-z][a-z0-9+.-]*:/i.test(normalized);
+}
+
+function isSafeSrcset(value: string) {
+  return value
+    .split(",")
+    .map((candidate) => candidate.trim().split(/\s+/)[0])
+    .filter(Boolean)
+    .every((url) => !hasUnsafeScheme(url));
+}
+
+function sanitizeElementAttributes(node: HtmlElement) {
+  const tagName = node.tagName.toLowerCase();
+  node.attrs = node.attrs.filter((attribute) => {
+    const name = attribute.name.toLowerCase();
+    if (name.startsWith("on") || !hasAllowedAttribute(tagName, name)) return false;
+    if (name === "srcset") return isSafeSrcset(attribute.value);
+    if (urlAttributes.has(name)) return !hasUnsafeScheme(attribute.value);
+    return true;
+  });
+}
+
+function sanitizeHtmlChildren(parent: HtmlParentNode) {
+  const children = parent.childNodes as HtmlNode[];
+  for (let index = 0; index < children.length; ) {
+    const child = children[index];
+    if (isElement(child)) {
+      const tagName = child.tagName.toLowerCase();
+      if (!allowedHtmlTags.has(tagName)) {
+        if (unsafeContentTags.has(tagName) || !hasChildNodes(child)) {
+          children.splice(index, 1);
+          continue;
+        }
+        sanitizeHtmlChildren(child);
+        const replacement = [...(child.childNodes as HtmlNode[])];
+        children.splice(index, 1, ...replacement);
+        index += replacement.length;
+        continue;
+      }
+      sanitizeElementAttributes(child);
+    }
+    if (hasChildNodes(child)) sanitizeHtmlChildren(child);
+    index += 1;
+  }
+}
+
 function getNodeText(node: HtmlNode): string {
   if (isTextNode(node)) return node.value;
   if (!hasChildNodes(node)) return "";
@@ -283,6 +384,7 @@ function collectTocItems(node: HtmlNode, usedIds: Set<string>, toc: ArticleTocIt
 
 function enhanceHtmlWithToc(html: string) {
   const fragment = parseFragment(html);
+  sanitizeHtmlChildren(fragment);
   const usedIds = new Set<string>();
   const toc: ArticleTocItem[] = [];
 
@@ -416,7 +518,7 @@ async function getLocalResourceArticles({ includeDrafts = false } = {}) {
 }
 
 export async function getAllResourceArticles({ includeDrafts = false } = {}) {
-  if (!includeDrafts) {
+  if (!includeDrafts && shouldBuildRemoteArticles()) {
     const remoteArticles = await getRemoteArticles();
     if (remoteArticles) return remoteArticles;
   }

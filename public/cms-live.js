@@ -35,6 +35,102 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
 
+  const allowedArticleTags = new Set([
+    "a",
+    "abbr",
+    "blockquote",
+    "br",
+    "code",
+    "del",
+    "div",
+    "em",
+    "figcaption",
+    "figure",
+    "h2",
+    "h3",
+    "h4",
+    "hr",
+    "img",
+    "li",
+    "ol",
+    "p",
+    "picture",
+    "pre",
+    "source",
+    "span",
+    "strong",
+    "table",
+    "tbody",
+    "td",
+    "th",
+    "thead",
+    "tr",
+    "ul",
+  ]);
+  const unsafeArticleTags = new Set(["script", "style", "iframe", "object", "embed", "template", "form"]);
+  const globalArticleAttrs = new Set(["class", "id"]);
+  const articleAttrsByTag = {
+    a: new Set(["href", "title", "target", "rel"]),
+    img: new Set(["src", "alt", "title", "width", "height", "loading"]),
+    source: new Set(["src", "srcset", "media", "type", "sizes"]),
+    td: new Set(["colspan", "rowspan"]),
+    th: new Set(["colspan", "rowspan", "scope"]),
+  };
+  const articleUrlAttrs = new Set(["href", "src", "poster"]);
+
+  function hasUnsafeScheme(value) {
+    const normalized = String(value ?? "")
+      .trim()
+      .replace(/[\u0000-\u001F\u007F\s]+/g, "")
+      .toLowerCase();
+    if (!normalized || normalized.startsWith("/") || normalized.startsWith("#")) return false;
+    if (normalized.startsWith("http://") || normalized.startsWith("https://") || normalized.startsWith("mailto:") || normalized.startsWith("tel:")) return false;
+    return /^[a-z][a-z0-9+.-]*:/i.test(normalized);
+  }
+
+  const safeHref = (value, fallback = "#") => {
+    const href = String(value ?? "").trim();
+    if (!href || hasUnsafeScheme(href)) return fallback;
+    return href;
+  };
+
+  function isSafeSrcset(value) {
+    return String(value ?? "")
+      .split(",")
+      .map((candidate) => candidate.trim().split(/\s+/)[0])
+      .filter(Boolean)
+      .every((url) => !hasUnsafeScheme(url));
+  }
+
+  function sanitizeArticleHtml(root) {
+    [...root.querySelectorAll("*")].forEach((node) => {
+      const tag = node.tagName.toLowerCase();
+      if (!allowedArticleTags.has(tag)) {
+        if (unsafeArticleTags.has(tag)) {
+          node.remove();
+        } else {
+          node.replaceWith(...node.childNodes);
+        }
+        return;
+      }
+      [...node.attributes].forEach((attribute) => {
+        const name = attribute.name.toLowerCase();
+        const allowed = globalArticleAttrs.has(name) || articleAttrsByTag[tag]?.has(name);
+        if (!allowed || name.startsWith("on")) {
+          node.removeAttribute(attribute.name);
+          return;
+        }
+        if (name === "srcset" && !isSafeSrcset(attribute.value)) {
+          node.removeAttribute(attribute.name);
+          return;
+        }
+        if (articleUrlAttrs.has(name) && hasUnsafeScheme(attribute.value)) {
+          node.removeAttribute(attribute.name);
+        }
+      });
+    });
+  }
+
   const resourceImage = (index, fallback = "/resource/default/default_image.png") => {
     if (!index) return fallback;
     const raw = String(index).replace(/^\/?resource\//, "").replace(/^\/+/, "").replaceAll("\\", "/");
@@ -46,7 +142,7 @@
   function setLinks(container, links = []) {
     if (!container) return;
     container.innerHTML = links
-      .map((link) => `<a class="text-link" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`)
+      .map((link) => `<a class="text-link" href="${escapeHtml(safeHref(link.href))}">${escapeHtml(link.label)}</a>`)
       .join("");
   }
 
@@ -90,7 +186,7 @@
       recentImage.alt = home.recentStatus.imageAlt || home.recentStatus.title || "";
     }
     const recentLink = root.querySelector(".recent-status-copy a");
-    if (recentLink && home.recentStatus?.href) recentLink.href = home.recentStatus.href;
+    if (recentLink && home.recentStatus?.href) recentLink.href = safeHref(home.recentStatus.href, recentLink.href);
 
     text("[data-home-random-eyebrow]", home.randomExplore?.eyebrow, root);
     text("[data-home-random-title]", home.randomExplore?.title, root);
@@ -111,7 +207,7 @@
       highlights.innerHTML = home.intro.highlights
         .map(
           (item, index) => `
-            <a class="home-highlight-item" href="${escapeHtml(item.href)}">
+            <a class="home-highlight-item" href="${escapeHtml(safeHref(item.href))}">
               <span>${String(index + 1).padStart(2, "0")}</span>
               <strong>${escapeHtml(item.keyword)}</strong>
               <h3>${escapeHtml(item.title)}</h3>
@@ -218,6 +314,7 @@
   function enhanceArticleHtml(rawHtml) {
     const wrapper = document.createElement("div");
     wrapper.innerHTML = rawHtml || "";
+    sanitizeArticleHtml(wrapper);
     const used = new Set([...wrapper.querySelectorAll("[id]")].map((node) => node.id));
     const toc = [];
     wrapper.querySelectorAll("h2, h3").forEach((heading) => {

@@ -12,6 +12,8 @@ from typing import Iterable
 from django.conf import settings
 from django.utils.text import slugify
 
+from .html_sanitizer import sanitize_article_html
+
 INDEX_FILE = "index.json"
 HTML_FILE = "index.html"
 DEFAULT_COVER_URL = "/resource/default/default_image.png"
@@ -75,8 +77,17 @@ def is_external_ref(value: str) -> bool:
     normalized = value.strip().lower()
     return (
         not normalized
-        or normalized.startswith(("/", "#", "http://", "https://", "mailto:", "tel:", "data:", "javascript:"))
+        or normalized.startswith(("/", "#", "http://", "https://", "mailto:", "tel:"))
     )
+
+
+def has_unsafe_scheme(value: str) -> bool:
+    normalized = re.sub(r"[\x00-\x1f\x7f\s]+", "", value.strip().lower())
+    if not normalized or normalized.startswith(("/", "#")):
+        return False
+    if normalized.startswith(("http://", "https://", "mailto:", "tel:")):
+        return False
+    return re.match(r"^[a-z][a-z0-9+.-]*:", normalized) is not None
 
 
 def normalize_relative_asset(value: str) -> str:
@@ -98,6 +109,8 @@ def normalize_relative_asset(value: str) -> str:
 
 
 def article_asset_url(slug: str, value: str) -> str:
+    if has_unsafe_scheme(value):
+        return ""
     if is_external_ref(value):
         return value
     normalized = normalize_relative_asset(value)
@@ -183,7 +196,7 @@ def read_article_resource(article_dir: Path) -> ArticleResource:
         raise ValueError(f"{index_path} tags must be a string array")
 
     raw_html = html_path.read_text(encoding="utf-8")
-    rewritten_html = rewrite_html_asset_urls(slug, raw_html)
+    rewritten_html = sanitize_article_html(rewrite_html_asset_urls(slug, raw_html))
     word_count = payload.get("wordCount") or payload.get("word_count") or count_text_units(raw_html)
     cover = str(payload.get("cover") or "").strip()
 

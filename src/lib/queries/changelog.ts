@@ -1,4 +1,5 @@
 import { getCollection } from "astro:content";
+import { withSlug } from "../content-entry";
 import type { ChangelogEntry } from "../content-types";
 
 export function sortChangelogEntries(entries: ChangelogEntry[]) {
@@ -7,5 +8,5 @@ export function sortChangelogEntries(entries: ChangelogEntry[]) {
 
 export async function getPublishedChangelogEntries() {
   const entries = await getCollection("changelog", ({ data }) => !data.draft);
-  return sortChangelogEntries(entries);
+  return sortChangelogEntries(entries.map(withSlug));
 }

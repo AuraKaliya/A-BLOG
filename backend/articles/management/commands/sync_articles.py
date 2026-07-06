@@ -29,6 +29,7 @@ class Command(BaseCommand):
                     "summary": resource.summary,
                     "cover_url": resource.cover_url,
                     "html_path": resource.html_path,
+                    "body_html": resource.html,
                     "pub_date": resource.pub_date,
                     "updated_date": resource.updated_date,
                     "category": resource.category,

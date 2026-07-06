@@ -1,4 +1,4 @@
-import { getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import type { AboutPageEntry, HomePageEntry, LabPageEntry, NowPageEntry, PageEntry } from "../content-types";
 
 type PageId = "home" | "about" | "lab" | "now";
@@ -8,6 +8,10 @@ const remotePageCache = new Map<PageId, Promise<Record<string, unknown> | undefi
 
 function getApiBase() {
   return process.env.A_BLOG_API_URL ?? process.env.PUBLIC_A_BLOG_API_URL ?? DEFAULT_API_BASE;
+}
+
+function shouldBuildRemotePages() {
+  return process.env.A_BLOG_BUILD_REMOTE_CONTENT === "1" || process.env.A_BLOG_BUILD_REMOTE_PAGES === "1";
 }
 
 function buildApiUrl(path: string) {
@@ -42,10 +46,11 @@ async function getRemotePageData(id: PageId) {
 }
 
 async function requirePage(id: "home" | "about" | "lab" | "now") {
-  const page = await getEntry("pages", id);
+  const pages = await getCollection("pages");
+  const page = pages.find((entry) => entry.id === id || entry.id === `${id}.json`);
 
   if (!page) {
-    throw new Error(`Missing page content entry: ${id}`);
+    throw new Error(`Missing page content entry: ${id}; available: ${pages.map((entry) => entry.id).join(", ") || "(none)"}`);
   }
 
   return page;
@@ -53,7 +58,7 @@ async function requirePage(id: "home" | "about" | "lab" | "now") {
 
 async function getPage(id: PageId): Promise<PageEntry> {
   const localPage = (await requirePage(id)) as PageEntry;
-  const remoteData = await getRemotePageData(id);
+  const remoteData = shouldBuildRemotePages() ? await getRemotePageData(id) : undefined;
   return remoteData ? ({ ...localPage, data: remoteData } as PageEntry) : localPage;
 }
 

@@ -58,6 +58,29 @@ class ArticleResourceServiceTests(TestCase):
         self.assertEqual(resource.tags, ["测试", "资源"])
         self.assertGreater(resource.word_count, 0)
 
+    def test_article_resource_sanitizes_unsafe_html(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            article_dir = self.write_resource(root)
+            (article_dir / "index.html").write_text(
+                '<h2 onclick="alert(1)">标题</h2>'
+                '<script>alert(1)</script>'
+                '<p><img src="javascript:alert(1)" onerror="alert(1)"></p>'
+                '<a href="javascript:alert(1)">恶意链接</a>'
+                '<iframe src="https://example.com"></iframe>',
+                encoding="utf-8",
+            )
+
+            with override_settings(ARTICLE_RESOURCE_ROOT=root):
+                resource = read_article_resource(article_dir)
+
+        self.assertIn("<h2>标题</h2>", resource.html)
+        self.assertNotIn("<script", resource.html)
+        self.assertNotIn("onclick", resource.html)
+        self.assertNotIn("onerror", resource.html)
+        self.assertNotIn("javascript:", resource.html)
+        self.assertNotIn("<iframe", resource.html)
+
     def test_article_asset_paths_cannot_escape_article_folder(self):
         with self.assertRaises(ValueError):
             normalize_relative_asset("../secret.png")
@@ -77,6 +100,7 @@ class ArticleResourceServiceTests(TestCase):
         article = Article.objects.get(slug="resource-entry")
         self.assertEqual(article.title, "测试文章")
         self.assertEqual(article.cover_url, "/resource/article/resource-entry/cover.png")
+        self.assertIn("/resource/article/resource-entry/images/a.png", article.body_html)
         self.assertEqual(article.tags.count(), 2)
         self.assertTrue(ArticleViewCount.objects.filter(article=article).exists())
 
@@ -184,6 +208,37 @@ class ArticleApiTests(TestCase):
         self.assertFalse(second.json()["counted"])
         self.assertEqual(first.json()["views"], 4)
         self.assertEqual(second.json()["views"], 4)
+
+    def test_article_view_event_ignores_spoofed_forwarded_for(self):
+        first = self.client.post(
+            "/api/articles/published-entry/view/",
+            data="{}",
+            content_type="application/json",
+            HTTP_USER_AGENT="first-agent",
+            HTTP_X_FORWARDED_FOR="203.0.113.10",
+            REMOTE_ADDR="127.0.0.20",
+        )
+        second = self.client.post(
+            "/api/articles/published-entry/view/",
+            data="{}",
+            content_type="application/json",
+            HTTP_USER_AGENT="second-agent",
+            HTTP_X_FORWARDED_FOR="203.0.113.11",
+            REMOTE_ADDR="127.0.0.20",
+        )
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        self.assertTrue(first.json()["counted"])
+        self.assertFalse(second.json()["counted"])
+        self.assertTrue(second.json()["throttled"])
+        self.assertEqual(second.json()["views"], 4)
+
+    @override_settings(ARTICLE_VIEW_LOOKUP_LIMIT=2)
+    def test_article_view_lookup_limits_slug_count(self):
+        counts = self.client.get("/api/articles/views/", {"slugs": "published-entry,missing-one,missing-two"})
+        self.assertEqual(counts.status_code, 200)
+        self.assertEqual(set(counts.json()["views"]), {"published-entry", "missing-one"})
 
     def test_draft_article_is_not_public(self):
         response = self.client.get("/api/articles/draft-entry/")

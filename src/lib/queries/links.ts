@@ -1,4 +1,5 @@
 import { getCollection } from "astro:content";
+import { withSlug } from "../content-entry";
 import type { LinkEntry } from "../content-types";
 
 export function sortLinksByDate(links: LinkEntry[]) {
@@ -11,7 +12,7 @@ export function sortLinksByDate(links: LinkEntry[]) {
 
 export async function getPublishedLinks() {
   const links = await getCollection("links", ({ data }) => !data.draft);
-  return sortLinksByDate(links);
+  return sortLinksByDate(links.map(withSlug));
 }
 
 export async function getFeaturedLinks(limit = 4) {

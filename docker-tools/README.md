@@ -33,7 +33,7 @@ aura-blog:<version>
 aura-blog-backend:<version>
 ```
 
-`release.env` is generated at build time and carries the image tags plus deployment-only Django/Postgres secrets. Do not commit generated release packages.
+`release.env` is generated at build time and carries the image tags plus deployment-only Django/Postgres secrets, including `A_BLOG_VIEW_SALT` for view-count de-duplication. Do not commit generated release packages.
 
 ## First server proxy setup
 
@@ -55,4 +55,4 @@ cd /root/A-BLOG
 sh ./update-latest.sh
 ```
 
-Production resource files should be placed under `/root/A-BLOG/resource`. They are served at `/resource/`.
+Production resource files should be placed under `/root/A-BLOG/resource`. They are served at `/resource/`. The update script seeds `/resource/default/default_image.png` if it is missing so fallback images do not break when the resource directory is bind-mounted.

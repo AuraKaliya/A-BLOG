@@ -48,6 +48,63 @@ Use single-quoted PowerShell strings for regex patterns that contain double quot
 
 ---
 
+## [ERR-20260706-001] powershell_literal_bracket_path
+
+**Logged**: 2026-07-06T16:26:00+08:00
+**Priority**: low
+**Status**: pending
+**Area**: infra
+
+### Summary
+PowerShell treats square brackets in paths such as `src\pages\writings\[slug].astro` as wildcard character classes.
+
+### Error
+```text
+An object at the specified path src\pages\writings\[slug].astro does not exist, or has been filtered by the -Include or -Exclude parameter.
+```
+
+### Context
+- Attempted to read an Astro route file whose file name contains `[slug]`.
+- Environment: PowerShell on Windows.
+
+### Suggested Fix
+Use `Get-Content -LiteralPath` or other `-LiteralPath` aware cmdlets for bracketed route files.
+
+### Metadata
+- Reproducible: yes
+- Related Files: src/pages/writings/[slug].astro
+
+---
+
+## [ERR-20260706-002] astro7_content_entry_id_migration
+
+**Logged**: 2026-07-06T16:26:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: frontend
+
+### Summary
+After upgrading to Astro 7, content entries expose `id` instead of the legacy `slug`, and data collection IDs can include `.json`.
+
+### Error
+```text
+Property 'slug' does not exist on type CollectionEntry<...>
+Missing page content entry: about; available: about.json, home.json, lab.json, now.json
+```
+
+### Context
+- `npm audit fix --force` upgraded Astro to 7.0.6.
+- The project still had many callers expecting `entry.slug`.
+
+### Suggested Fix
+Use a compatibility helper that maps `entry.id` to extensionless `slug`, and normalize data collection IDs when looking up local JSON entries. Plan a later migration from `slug` call sites to `id`.
+
+### Metadata
+- Reproducible: yes
+- Related Files: src/lib/content-entry.ts, src/lib/queries/pages.ts, src/lib/queries/topics.ts
+
+---
+
 ## [ERR-20260604-002] start_process_npm_windows
 
 **Logged**: 2026-06-04T10:03:00+08:00
