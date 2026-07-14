@@ -11,7 +11,7 @@ const [labPage, labWorks] = await Promise.all([getLabPageData(), getLabWorks()])
 const lab = labPage.data;
 ---
 
-<BaseLayout title={lab.title} description={lab.description} image="/og/page/lab.svg">
+<BaseLayout title={lab.title} description={lab.description} image="/og/page/lab.svg" robots={lab.cards.length > 0 || labWorks.length > 0 ? "index,follow" : "noindex,follow"}>
   <main class="page-main">
     <PageHero title={lab.title} description={lab.description} />
 
@@ -19,7 +19,7 @@ const lab = labPage.data;
       lab.cards.length > 0 && (
         <section class="support-section section-mid">
           <div class="container archive-list">
-            <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "实验室" }]} />
+            <Breadcrumbs items={[{ label: "首页", href: "/" }, { label: "实验室" }]} />
             <SectionHeading eyebrow="实验室" title={lab.intro.title} description={lab.intro.description} />
             <div class="support-panel lab-panel">
               {lab.cards.map((card) => (

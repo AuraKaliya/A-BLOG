@@ -2,14 +2,15 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import IconSymbol from "../components/IconSymbol.astro";
 import { siteConfig } from "../config/site";
-import { getHomePageData, getHomepageFeed } from "../lib/content";
+import { getExploreEntries, getHomePageData, getHomepageFeed } from "../lib/content";
 import { formatDate } from "../lib/format";
 import { existsSync, statSync } from "node:fs";
 import { extname, resolve, sep } from "node:path";
 
-const [homePage, homepageFeed] = await Promise.all([
+const [homePage, homepageFeed, exploreEntries] = await Promise.all([
   getHomePageData(),
   getHomepageFeed(),
+  getExploreEntries(),
 ]);
 
 const { recentUpdates } = homepageFeed;
@@ -34,6 +35,7 @@ const isResourceFile = (index: string) => {
 };
 const findResourceImage = (index?: string) => {
   const cleanIndex = normalizeResourceIndex(index);
+  if (!cleanIndex) return undefined;
   const candidates = cleanIndex
     ? extname(cleanIndex)
       ? [cleanIndex]
@@ -45,6 +47,8 @@ const findResourceImage = (index?: string) => {
 const profileImage = findResourceImage(home.profile.imageIndex);
 const recentStatusImage = findResourceImage(home.recentStatus.imageIndex);
 const updateItems = recentUpdates.filter((update) => update.kind !== "changelog" && update.kind !== "link").slice(0, 5);
+const featuredUpdate = updateItems[0];
+const hasRandomChoices = exploreEntries.length > 1;
 ---
 
 <BaseLayout
@@ -68,7 +72,7 @@ const updateItems = recentUpdates.filter((update) => update.kind !== "changelog"
                     data-home-profile-image
                   />
                 ) : (
-                  <span aria-hidden="true">{home.profile.name.slice(0, 1)}</span>
+                  <span aria-hidden="true" data-home-profile-fallback>{home.profile.name.slice(0, 1)}</span>
                 )
               }
             </div>
@@ -116,15 +120,29 @@ const updateItems = recentUpdates.filter((update) => update.kind !== "changelog"
             </div>
           </article>
 
-          <article class="random-explore-card">
-            <span class="eyebrow" data-home-random-eyebrow>{home.randomExplore.eyebrow}</span>
-            <h2 data-home-random-title>{home.randomExplore.title}</h2>
-            <p data-home-random-description>{home.randomExplore.description}</p>
-            <button class="primary-cta home-random-button random-entry-button" type="button" data-random-entry>
-              <IconSymbol name="spark" />
-              <span data-home-random-action>{home.randomExplore.actionLabel}</span>
-            </button>
-          </article>
+          {
+            hasRandomChoices ? (
+              <article class="random-explore-card">
+                <span class="eyebrow" data-home-random-eyebrow>{home.randomExplore.eyebrow}</span>
+                <h2 data-home-random-title>{home.randomExplore.title}</h2>
+                <p data-home-random-description>{home.randomExplore.description}</p>
+                <button class="primary-cta home-random-button random-entry-button" type="button" data-random-entry>
+                  <IconSymbol name="spark" />
+                  <span data-home-random-action>{home.randomExplore.actionLabel}</span>
+                </button>
+              </article>
+            ) : featuredUpdate ? (
+              <article class="random-explore-card">
+                <span class="eyebrow">最新随记</span>
+                <h2>{featuredUpdate.title}</h2>
+                <p>{featuredUpdate.description}</p>
+                <a class="primary-cta home-random-button" href={featuredUpdate.href}>
+                  <IconSymbol name="article" />
+                  <span>阅读这条随记</span>
+                </a>
+              </article>
+            ) : null
+          }
         </div>
       </div>
     </section>
@@ -154,60 +172,64 @@ const updateItems = recentUpdates.filter((update) => update.kind !== "changelog"
       </div>
     </section>
 
-    <section class="home-screen home-status-screen" id="signals" data-home-screen="signals">
-      <div class="container">
-        <div class="home-status-heading">
-          <span class="eyebrow">最近公开</span>
-          <h2>最近更新</h2>
-          <p>从最新公开的内容开始浏览。</p>
-        </div>
+    {
+      updateItems.length > 1 && (
+        <section class="home-screen home-status-screen" id="signals" data-home-screen="signals">
+          <div class="container">
+            <div class="home-status-heading">
+              <span class="eyebrow">最近公开</span>
+              <h2>最近更新</h2>
+              <p>从最新公开的内容开始浏览。</p>
+            </div>
 
-        <div class="home-status-grid">
-          <article class="home-status-panel latest-panel">
-            <div class="home-panel-heading">
-              <h3>内容更新</h3>
-              <a class="text-link" href="/archive">查看归档</a>
-            </div>
-            <div class="home-update-list">
-              {
-                updateItems.map((update) => (
-                  <a class="home-update-item" href={update.href}>
-                    <time datetime={update.date.toISOString()}>{formatDate(update.date)}</time>
-                    <span>{update.type}</span>
-                    <strong>{update.title}</strong>
-                    <p>{update.description}</p>
-                  </a>
-                ))
-              }
-            </div>
-          </article>
+            <div class="home-status-grid">
+              <article class="home-status-panel latest-panel">
+                <div class="home-panel-heading">
+                  <h3>公开记录</h3>
+                  <a class="text-link" href="/archive">查看归档</a>
+                </div>
+                <div class="home-update-list">
+                  {
+                    updateItems.map((update) => (
+                      <a class="home-update-item" href={update.href}>
+                        <time datetime={update.date.toISOString()}>{formatDate(update.date)}</time>
+                        <span>{update.type}</span>
+                        <strong>{update.title}</strong>
+                        <p>{update.description}</p>
+                      </a>
+                    ))
+                  }
+                </div>
+              </article>
 
-          <article class="home-status-panel timeline-panel home-focus-panel">
-            <div class="home-panel-heading">
-              <h3>正在创作</h3>
-              <a class="text-link" href="/now">查看现在</a>
-            </div>
-            <div class="home-focus-copy">
-              <span class="eyebrow">当前创作</span>
-              <h3>Dreath 世界观</h3>
-              <p>{home.recentStatus.description}</p>
-              <a class="secondary-cta" href="/world">进入世界档案</a>
-            </div>
-          </article>
+              <article class="home-status-panel timeline-panel home-focus-panel">
+                <div class="home-panel-heading">
+                  <h3>当前创作</h3>
+                  <a class="text-link" href="/now">查看现在</a>
+                </div>
+                <div class="home-focus-copy">
+                  <span class="eyebrow">本阶段重点</span>
+                  <h3>基础结构整理</h3>
+                  <p>当前范围包括人物关系、地点脉络与事件顺序。</p>
+                  <a class="secondary-cta" href="/now">查看当前状态</a>
+                </div>
+              </article>
 
-          <article class="home-status-panel stats-panel home-continue-panel">
-            <div class="home-panel-heading">
-              <h3>继续浏览</h3>
+              <article class="home-status-panel stats-panel home-continue-panel">
+                <div class="home-panel-heading">
+                  <h3>继续浏览</h3>
+                </div>
+                <div class="home-continue-list">
+                  <a href="/notes"><strong>随记</strong><span>已经公开的近况与思考</span></a>
+                  <a href="/now"><strong>现在</strong><span>当前整理范围与创作重点</span></a>
+                  <a href="/about"><strong>关于</strong><span>创作方向与署名说明</span></a>
+                  <a href="/archive"><strong>归档</strong><span>按时间浏览公开内容</span></a>
+                </div>
+              </article>
             </div>
-            <div class="home-continue-list">
-              <a href="/writings"><strong>文字</strong><span>随笔与技术记录</span></a>
-              <a href="/notes"><strong>随记</strong><span>状态、片段与分享</span></a>
-              <a href="/links"><strong>收藏</strong><span>阅读、工具与资料</span></a>
-              <a href="/topics"><strong>主题</strong><span>按长期关注方向浏览</span></a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
+          </div>
+        </section>
+      )
+    }
   </main>
 </BaseLayout>

@@ -21,7 +21,7 @@ const [relatedPosts, relatedWorks, topicMap] = await Promise.all([
 ]);
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "作品", path: "/works" },
     { name: work.data.title, path: `/works/${work.slug}` },
   ]),

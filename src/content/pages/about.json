@@ -1,26 +1,26 @@
 {
   "kind": "about",
   "title": "关于 Aura Kaliye",
-  "description": "关于 Aura Kaliye 使用的署名、当前创作与这个个人空间。",
+  "description": "Aura Kaliye 的创作方向、署名与这个个人空间。",
   "intro": {
-    "title": "关于我的署名",
-    "description": "我使用 Aura Kaliye、Aura、银花海和花海作为署名。Aura Kaliye 是这个个人空间的主要展示名称。"
+    "title": "关于我",
+    "description": "我是 Aura Kaliye，目前主要投入幻想世界项目 Dreath 的创作。这里整理已经公开的创作近况与思考。"
   },
   "focusAreas": [],
   "stackCards": [
     {
       "label": "当前创作",
       "title": "Dreath",
-      "description": "Dreath 是我目前投入最多精力的创作。当前工作集中在人物、地点、事件和规则之间的关系。",
+      "description": "Dreath 是一个正在创作中的幻想世界项目，围绕人物、地点、事件与规则展开。",
       "featured": true
     },
     {
-      "title": "写作",
-      "description": "文字部分会包含随笔、创作笔记，以及值得单独展开的思考。"
+      "title": "记录方式",
+      "description": "我先整理内容之间的关系，再公开能够独立阅读的近况、片段与思考。"
     },
     {
-      "title": "技术实践",
-      "description": "与工具、前端和交互有关的实践，会在形成可说明的结果后公开。"
+      "title": "关于署名",
+      "description": "本站统一使用 Aura Kaliye；Aura、银花海和花海也是我使用的署名。"
     }
   ],
   "socialCards": [],

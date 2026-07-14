@@ -20,7 +20,7 @@ const { Content } = await render(post);
 const [relatedWorks, topicMap] = await Promise.all([getWorksBySlugs(post.data.relatedWorks), getTopicDefinitionMap()]);
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "博客", path: "/blog" },
     { name: post.data.title, path: `/blog/${post.slug}` },
   ]),

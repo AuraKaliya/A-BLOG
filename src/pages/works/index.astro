@@ -21,7 +21,7 @@ const filterGroups = [
 ];
 ---
 
-<BaseLayout title="作品" description="项目、写作、工具、研究和实验的展示归档。" image="/og/page/works.svg">
+<BaseLayout title="作品" description="项目、写作、工具、研究和实验的展示归档。" image="/og/page/works.svg" robots={works.length > 0 ? "index,follow" : "noindex,follow"}>
   <ArchivePageLayout title="作品" description="项目、工具、写作与创作成果。" sectionTone="section-mid">
     {works.length > 0 && <ArchiveFilters slot="before" groups={filterGroups} />}
 

@@ -1,4 +1,5 @@
 import { expect, test } from "playwright/test";
+import { readFileSync } from "node:fs";
 import { mockUnavailableCmsApi } from "./helpers/cmsApi.mjs";
 
 test.beforeEach(async ({ page }) => {
@@ -10,20 +11,20 @@ test("home prioritizes personal content and clear entrances", async ({ page }) =
 
   await expect(page.locator('[data-home-screen="entry"]')).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Aura Kaliye" })).toBeVisible();
-  await expect(page.locator(".profile-avatar img")).toHaveAttribute("src", "/resource/default/default_image.png");
-  await expect(page.getByRole("heading", { name: "Dreath 近况" })).toBeVisible();
+  await expect(page.locator(".profile-avatar img")).toHaveCount(0);
+  await expect(page.locator("[data-home-profile-fallback]")).toHaveText("A");
+  await expect(page.locator('[data-home-screen="entry"]').getByRole("heading", { name: "Dreath", exact: true })).toBeVisible();
   await expect(page.locator(".recent-status-image img")).toHaveAttribute("src", "/resource/default/default_image.png");
-  await expect(page.getByRole("button", { name: "随机打开" })).toBeVisible();
-  await expect(page.getByText("笔名：Aura、银花海、花海")).toBeVisible();
+  await expect(page.getByRole("button", { name: "随机打开" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "阅读这条随记" })).toBeVisible();
+  await expect(page.getByText("独立创作者")).toBeVisible();
 
-  await expect(page.locator('[data-home-screen="intro"]')).toContainText("文字");
-  await expect(page.locator('[data-home-screen="intro"]')).toContainText("作品");
-  await expect(page.locator('[data-home-screen="intro"]')).toContainText("世界");
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("随记");
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("现在");
+  await expect(page.locator('[data-home-screen="intro"]')).toContainText("关于");
 
-  await expect(page.getByRole("heading", { name: "内容更新" })).toBeVisible();
-  await expect(page.locator(".home-update-item")).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "正在创作" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "继续浏览" })).toBeVisible();
+  await expect(page.locator('[data-home-screen="signals"]')).toHaveCount(0);
+  await expect(page.locator(".home-update-item")).toHaveCount(0);
   await expect(page.getByText("网站更新时间轴")).toHaveCount(0);
   await expect(page.getByText("网站的运营数据")).toHaveCount(0);
   await expect(page.getByText("ICP备案号待填写")).toHaveCount(0);
@@ -49,13 +50,13 @@ test("world archive does not expose empty filters", async ({ page }) => {
   await expect(page.getByRole("button", { name: "随机进入一个条目" })).toHaveCount(0);
 });
 
-test("notes keep the real Dreath update and open its detail page", async ({ page }) => {
+test("notes provide a distinct Dreath update and open its detail page", async ({ page }) => {
   await page.goto("/notes");
 
   await expect(page.locator(".note-card")).toHaveCount(1);
   await expect(page.locator(".note-card:not([hidden])")).toHaveCount(1);
-  await page.getByRole("link", { name: "Dreath 创作近况", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Dreath 创作近况" })).toBeVisible();
+  await page.getByRole("link", { name: "Dreath：先整理结构，再公开设定", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Dreath：先整理结构，再公开设定" })).toBeVisible();
 });
 
 test("links keep their route and show a formal empty state", async ({ page }) => {
@@ -110,7 +111,7 @@ test("links JSON is empty and RSS only exposes real public content", async ({ re
 
   const rssResponse = await request.get("/rss.xml");
   const rss = await rssResponse.text();
-  expect(rss).toContain("随记：Dreath 创作近况");
+  expect(rss).toContain("随记：Dreath：先整理结构，再公开设定");
   expect(rss).not.toContain("Astro Documentation");
 });
 
@@ -118,14 +119,15 @@ test("search finds notes", async ({ page }) => {
   await page.goto("/search");
 
   await page.getByPlaceholder("输入关键词，例如 Dreath、创作、人物").fill("Dreath");
-  await expect(page.getByRole("link", { name: "Dreath 创作近况" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Dreath：先整理结构，再公开设定" })).toBeVisible();
 });
 
 test("about introduces Aura Kaliye without placeholder contact entries", async ({ page }) => {
   await page.goto("/about");
 
   await expect(page.getByRole("heading", { level: 1, name: "关于 Aura Kaliye" })).toBeVisible();
-  await expect(page.getByText("我使用 Aura Kaliye、Aura、银花海和花海作为署名。")).toBeVisible();
+  await expect(page.getByText("我是 Aura Kaliye，目前主要投入幻想世界项目 Dreath 的创作。这里整理已经公开的创作近况与思考。")).toBeVisible();
+  await expect(page.getByText("本站统一使用 Aura Kaliye；Aura、银花海和花海也是我使用的署名。")).toBeVisible();
   await expect(page.locator(".social-card")).toHaveCount(0);
   await expect(page.locator("#contact")).toHaveCount(0);
   await expect(page.getByText("your-name@example.com")).toHaveCount(0);
@@ -153,6 +155,39 @@ test("public pages do not expose template or implementation guidance", async ({ 
   }
 });
 
+test("empty public collections stay out of search indexing", async ({ page }) => {
+  for (const path of ["/writings", "/works", "/world", "/links", "/topics", "/lab", "/map", "/changelog", "/world/timeline"]) {
+    await page.goto(path);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex,follow");
+  }
+});
+
+test("legacy and incomplete routes have a deliberate public outcome", async ({ page }) => {
+  await page.goto("/blog");
+  await expect(page).toHaveURL(/\/writings\/?$/);
+
+  await page.goto("/tech");
+  await expect(page).toHaveURL(/\/writings\/?\?tag=%E6%8A%80%E6%9C%AF$/);
+
+  await page.goto("/writings/live");
+  await expect(page).toHaveURL(/\/writings\/?$/);
+
+  await page.goto("/writings/live?slug=missing-preview");
+  await expect(page.getByRole("heading", { name: "文章预览不可用" })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex,nofollow");
+});
+
+test("sitemap only exposes pages with meaningful public content", async () => {
+  const sitemap = readFileSync("dist/sitemap-0.xml", "utf8");
+
+  for (const path of ["about", "archive", "notes", "notes/first-open-signal", "now", "search"]) {
+    expect(sitemap).toContain(`https://aurakaliye.com/${path}/`);
+  }
+  for (const path of ["blog", "changelog", "lab", "links", "map", "tech", "topics", "works", "world", "writings"]) {
+    expect(sitemap).not.toContain(`https://aurakaliye.com/${path}/`);
+  }
+});
+
 test("works use a clean empty state instead of template cards", async ({ page }) => {
   await page.goto("/works");
 
@@ -170,11 +205,11 @@ test("draft world entries do not expose dedicated OG images", async ({ request }
 test("notes have dedicated OG images and join RSS", async ({ request }) => {
   const ogResponse = await request.get("/og/notes/first-open-signal.svg");
   expect(ogResponse.ok()).toBeTruthy();
-  expect(await ogResponse.text()).toContain("Dreath 创作近况");
+  expect(await ogResponse.text()).toContain("Dreath：先整理结构，再公开设定");
 
   const rssResponse = await request.get("/rss.xml");
   expect(rssResponse.ok()).toBeTruthy();
-  expect(await rssResponse.text()).toContain("随记：Dreath 创作近况");
+  expect(await rssResponse.text()).toContain("随记：Dreath：先整理结构，再公开设定");
 });
 
 test("theme toggle persists the selected theme", async ({ page }) => {
@@ -195,15 +230,17 @@ test("mobile navigation exposes the main sections", async ({ page }) => {
 
   await page.getByRole("button", { name: "切换导航" }).click();
   const navigation = page.getByRole("navigation", { name: "主导航" });
-  await expect(navigation.getByRole("link", { name: "文字", exact: true })).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "世界", exact: true })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "随记", exact: true })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "现在", exact: true })).toBeVisible();
 });
 
-test("navigation keeps works direct and toggles the about menu by click", async ({ page }) => {
+test("navigation only exposes populated sections and toggles the about menu by click", async ({ page }) => {
   await page.goto("/");
 
   const navigation = page.getByRole("navigation", { name: "主导航" });
-  await expect(navigation.getByRole("link", { name: "作品", exact: true })).toHaveAttribute("href", "/works");
+  await expect(navigation.getByRole("link", { name: "作品", exact: true })).toHaveCount(0);
+  await expect(navigation.getByRole("link", { name: "世界", exact: true })).toHaveCount(0);
+  await expect(navigation.getByRole("link", { name: "文字", exact: true })).toHaveCount(0);
   await expect(page.locator("#menu-works")).toHaveCount(0);
 
   const aboutTrigger = navigation.getByRole("button", { name: "关于" });
@@ -226,9 +263,9 @@ test("new discovery views do not overflow on mobile", async ({ page }) => {
   }
 });
 
-test("random exploration leaves the home page", async ({ page }) => {
+test("the single public note uses a direct home action instead of fake randomness", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("button", { name: "随机打开" }).click();
-  await expect(page).not.toHaveURL(/\/$/);
+  await page.getByRole("link", { name: "阅读这条随记" }).click();
+  await expect(page).toHaveURL(/\/notes\/first-open-signal\/?$/);
 });

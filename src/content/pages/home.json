@@ -1,56 +1,56 @@
 {
   "kind": "home",
   "title": "Aura Kaliye 的个人空间",
-  "description": "Aura Kaliye 的创作、写作与技术实践。",
+  "description": "Aura Kaliye 的创作记录与个人空间。",
   "profile": {
-    "eyebrow": "个人简介",
+    "eyebrow": "关于我",
     "name": "Aura Kaliye",
-    "role": "笔名：Aura、银花海、花海",
-    "status": "正在创作 Dreath",
+    "role": "独立创作者",
+    "status": "正在构建幻想世界 Dreath",
     "location": "",
-    "bio": "我使用 Aura Kaliye、Aura、银花海和花海作为署名。",
-    "imageIndex": "default/default_image",
-    "imageAlt": "Aura Kaliye 头像",
+    "bio": "我以 Aura Kaliye 作为本站署名，记录世界观创作、写作片段与相关实践。",
+    "imageAlt": "Aura Kaliye",
     "imagePosition": "50% 50%",
     "tags": [],
     "links": []
   },
   "recentStatus": {
-    "eyebrow": "近期状态",
-    "title": "Dreath 近况",
-    "description": "最近主要在推进 Dreath，当前工作集中在人物、地点和事件之间的关系。",
+    "eyebrow": "当前创作",
+    "title": "Dreath",
+    "description": "Dreath 是一个正在创作中的幻想世界项目，围绕人物、地点、事件与规则展开。",
     "imageIndex": "default/default_image",
-    "imageAlt": "近期状态展示图",
-    "imagePosition": "42% 50%"
+    "imageAlt": "Dreath 创作近况插图",
+    "imagePosition": "42% 50%",
+    "href": "/now"
   },
   "randomExplore": {
     "eyebrow": "随机浏览",
-    "title": "随意看看",
-    "description": "从已经公开的文字、随记、收藏和其他内容中随机打开一页。",
+    "title": "随机阅读",
+    "description": "从两篇以上已经公开的内容中随机打开一页。",
     "actionLabel": "随机打开"
   },
   "intro": {
     "eyebrow": "关于这里",
-    "title": "创作、写作与实践",
-    "lead": "这个空间以 Dreath 为当前创作核心，也会收录其他已经完成或正在推进的内容。",
+    "title": "从已经公开的内容开始",
+    "lead": "这里从 Dreath 的创作过程开始，记录已经公开的近况与思考。",
     "highlights": [
       {
-        "keyword": "文字",
-        "title": "写下来的内容",
-        "description": "随笔、创作笔记与技术实践",
-        "href": "/writings"
+        "keyword": "随记",
+        "title": "创作近况与阶段想法",
+        "description": "已经公开的短记录",
+        "href": "/notes"
       },
       {
-        "keyword": "作品",
-        "title": "完成的创作",
-        "description": "准备好公开的项目、工具与作品",
-        "href": "/works"
+        "keyword": "现在",
+        "title": "当前正在处理的内容",
+        "description": "Dreath 的整理范围与本阶段重点",
+        "href": "/now"
       },
       {
-        "keyword": "世界",
-        "title": "Dreath",
-        "description": "人物、地点、事件与规则构成的幻想世界",
-        "href": "/world"
+        "keyword": "关于",
+        "title": "关于 Aura Kaliye",
+        "description": "主要署名、创作方向与这个个人空间",
+        "href": "/about"
       }
     ]
   }

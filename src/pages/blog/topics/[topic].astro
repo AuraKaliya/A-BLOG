@@ -19,7 +19,7 @@ const { topic } = Astro.props as { topic: TopicEntry };
 const posts = await getPostsByTopic(topic.id);
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "博客", path: "/blog" },
     { name: topic.data.title, path: `/blog/topics/${topic.id}` },
   ]),

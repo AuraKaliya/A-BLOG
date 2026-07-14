@@ -48,6 +48,38 @@ Use single-quoted PowerShell strings for regex patterns that contain double quot
 
 ---
 
+## [ERR-20260714-003] unscoped_duplicate_heading_locator
+
+**Logged**: 2026-07-14T16:43:00+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: tests
+
+### Summary
+An exact accessible-name locator was still ambiguous because the redesigned homepage intentionally repeats the project name at two heading levels.
+
+### Error
+```text
+strict mode violation: getByRole('heading', { name: 'Dreath', exact: true }) resolved to 2 elements
+```
+
+### Context
+- The entry card and current-creation panel both use `Dreath` as a heading.
+- The test attempted to verify the entry card without scoping its locator to that section.
+
+### Suggested Fix
+Scope repeated content locators to the stable page section that owns the assertion.
+
+### Metadata
+- Reproducible: yes
+- Related Files: test/site.spec.mjs, src/pages/index.astro
+
+### Resolution
+- **Resolved**: 2026-07-14T16:44:00+08:00
+- **Notes**: Scoped the heading assertion to the homepage entry screen.
+
+---
+
 ## [ERR-20260706-001] powershell_literal_bracket_path
 
 **Logged**: 2026-07-06T16:26:00+08:00

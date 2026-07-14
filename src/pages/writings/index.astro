@@ -9,11 +9,11 @@ import { getAllResourceArticleTags, getAllResourceArticles } from "../../lib/art
 const [articles, tags] = await Promise.all([getAllResourceArticles(), getAllResourceArticleTags()]);
 ---
 
-<BaseLayout title="文字" description="随笔、创作笔记与技术实践。" image="/og/page/writings.svg">
+<BaseLayout title="文字" description="随笔、创作笔记与技术实践。" image="/og/page/writings.svg" robots={articles.length > 0 ? "index,follow" : "noindex,follow"}>
   <ArchivePageLayout
     title="文字"
     description="随笔、创作笔记与技术实践。"
-    breadcrumbs={[{ label: "入口", href: "/" }, { label: "文字" }]}
+    breadcrumbs={[{ label: "首页", href: "/" }, { label: "文字" }]}
   >
     <div class="article-command-panel" slot="before" data-article-controls hidden={articles.length === 0}>
       <div class="article-tag-filter" aria-label="标签筛选">

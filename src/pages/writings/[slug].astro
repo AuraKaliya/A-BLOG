@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 const { article, adjacent } = Astro.props;
 const hasToc = article.toc.length > 0;
 const breadcrumbs = [
-  { label: "入口", href: "/" },
+  { label: "首页", href: "/" },
   { label: "文字", href: "/writings" },
   { label: article.title },
 ];

@@ -15,7 +15,7 @@ const feedCount = links.filter((entry) => entry.data.feedUrl).length;
 const topicCount = new Set(links.flatMap((entry) => entry.data.topics)).size;
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "收藏", path: "/links" },
   ]),
   buildCollectionPageStructuredData({
@@ -31,6 +31,7 @@ const structuredData = [
   title="收藏"
   description="友链、推荐阅读、工具、资料与持续提供灵感的站点。"
   image="/og/page/links.svg"
+  robots={links.length > 0 ? "index,follow" : "noindex,follow"}
   structuredData={structuredData}
 >
   <main class="page-main">
@@ -38,7 +39,7 @@ const structuredData = [
 
     <section class="archive-section section-dark">
       <div class="container archive-list" data-link-filter-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "收藏" }]} />
+        <Breadcrumbs items={[{ label: "首页", href: "/" }, { label: "收藏" }]} />
 
         {links.length > 0 ? <>
         <div class="link-command-panel">

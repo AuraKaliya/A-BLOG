@@ -13,7 +13,7 @@ const entries = await getPublishedWorldEntries();
 const kinds = Object.entries(worldKindLabels).filter(([kind]) => entries.some((entry) => entry.data.kind === kind));
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "世界档案", path: "/world" },
   ]),
   buildCollectionPageStructuredData({
@@ -29,6 +29,7 @@ const structuredData = [
   title="Dreath 世界档案"
   description="Dreath 的人物、地点、组织、事件、规则与术语。"
   image="/og/page/world.svg"
+  robots={entries.length > 0 ? "index,follow" : "noindex,follow"}
   structuredData={structuredData}
 >
   <main class="page-main">
@@ -36,7 +37,7 @@ const structuredData = [
 
     <section class="archive-section world-archive-section">
       <div class="container archive-list" data-world-filter-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "世界档案" }]} />
+        <Breadcrumbs items={[{ label: "首页", href: "/" }, { label: "世界档案" }]} />
 
         {
           entries.length > 0 ? (

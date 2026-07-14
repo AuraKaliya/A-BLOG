@@ -21,7 +21,7 @@ const contactFields = [
       <p>{about.description}</p>
     </section>
 
-    <section class="about-section section-dark" id="identity">
+    <section class="about-section section-dark" id="about">
       <div class:list={["container", "about-grid", { "single-column": about.focusAreas.length === 0 }]}>
         <article class="about-story">
           <h3>{about.intro.title}</h3>
@@ -34,11 +34,11 @@ const contactFields = [
     <section class="support-section section-mid" id="focus">
       <div class:list={["container", "support-layout", { "single-column": contactFields.length === 0 }]}>
         <div class="archive-list">
-          <SectionHeading eyebrow="当前内容" title="我在做什么" description="Dreath 是目前的创作核心，写作和技术实践也会在形成具体内容后公开。" />
+          <SectionHeading eyebrow="创作方向" title="我在做什么" description="目前的创作核心是幻想世界项目 Dreath。" />
           <div class="support-panel">
             {
               about.stackCards.map((card) => (
-                <article class:list={["support-card", { primary: card.featured }]}>
+                <article id={card.title === "关于署名" ? "identity" : undefined} class:list={["support-card", { primary: card.featured }]}>
                   {card.label && <span class="eyebrow">{card.label}</span>}
                   <h3>{card.title}</h3>
                   <p>{card.description}</p>
@@ -60,9 +60,9 @@ const contactFields = [
     {about.socialCards.length > 0 && <section class="archive-section section-dark" id="socials">
       <div class="container archive-list">
         <SectionHeading
-          eyebrow="其他入口"
+          eyebrow="站外链接"
           title="可以找到我的地方"
-          description="当前可用的站外入口。"
+          description="当前可用的站外主页。"
         />
         <div class="social-grid">
           {about.socialCards.map((card) => <SocialCard {...card} />)}

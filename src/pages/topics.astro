@@ -15,7 +15,7 @@ import { buildBreadcrumbStructuredData, buildTopicSummaryStructuredData } from "
 const [topics, categories, tags] = await Promise.all([getTopicSummaries(), getAllBlogCategories(), getAllBlogTags()]);
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "主题", path: "/topics" },
   ]),
   buildTopicSummaryStructuredData(topics),
@@ -27,6 +27,7 @@ const structuredData = [
   description="把博客、作品和实验按照长期关注方向重新组织。"
   image="/og/page/topics.svg"
   keywords={topics.flatMap((topic) => topic.keywords)}
+  robots={topics.length > 0 ? "index,follow" : "noindex,follow"}
   structuredData={structuredData}
 >
   <main class="page-main">
@@ -34,7 +35,7 @@ const structuredData = [
 
     <section class="archive-section section-dark">
       <div class="container archive-list">
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "主题" }]} />
+        <Breadcrumbs items={[{ label: "首页", href: "/" }, { label: "主题" }]} />
 
         {topics.length > 0 ? <>
         <div class="topic-map-link-panel">
@@ -93,7 +94,7 @@ const structuredData = [
             </section>
           ))
         }
-        </> : <EmptyState title="还没有公开主题" description="主题会随公开内容出现。" />}
+        </> : <EmptyState title="还没有公开主题" description="当前没有可浏览的主题。" />}
       </div>
     </section>
   </main>

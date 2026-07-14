@@ -58,7 +58,8 @@ test("home page hydrates editable CMS content", async ({ page }) => {
 
   await expect(page.getByRole("heading", { level: 1, name: "Live Aura" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "实时状态" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /打开实时入口/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /打开实时入口/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "阅读这条随记" })).toBeVisible();
   await expect(page.getByRole("link", { name: "测试链接" })).toHaveAttribute("href", "/about");
   expect(hasTextQualityIssue(await page.locator("body").innerText())).toBeFalsy();
 });

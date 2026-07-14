@@ -180,7 +180,16 @@
     text("[data-home-profile-bio]", home.profile?.bio, root);
     setTags(root.querySelector("[data-home-profile-tags]"), home.profile?.tags);
     setLinks(root.querySelector("[data-home-profile-links]"), home.profile?.links);
-    const profileImage = root.querySelector("[data-home-profile-image]");
+    let profileImage = root.querySelector("[data-home-profile-image]");
+    if (!profileImage && home.profile?.imageIndex) {
+      const avatar = root.querySelector(".profile-avatar");
+      profileImage = document.createElement("img");
+      profileImage.loading = "eager";
+      profileImage.dataset.homeProfileImage = "";
+      avatar?.querySelector("[data-home-profile-fallback]")?.remove();
+      avatar?.appendChild(profileImage);
+      avatar?.classList.add("has-image");
+    }
     if (profileImage && home.profile?.imageIndex) {
       profileImage.src = resourceImage(home.profile.imageIndex);
       profileImage.alt = home.profile.imageAlt || home.profile.name || "";
@@ -382,7 +391,19 @@
     const slug = shell.dataset.articleDetail || slugFromPath();
     if (!slug) return;
 
-    const [article, listPayload] = await Promise.all([api.get(`/api/articles/${encodeURIComponent(slug)}/`), api.get("/api/articles/")]);
+    let article;
+    let listPayload;
+    try {
+      [article, listPayload] = await Promise.all([api.get(`/api/articles/${encodeURIComponent(slug)}/`), api.get("/api/articles/")]);
+    } catch {
+      if (window.location.pathname === "/writings/live") {
+        text(".article-header h1", "文章预览不可用", shell);
+        text(".article-header > p", "请返回内容管理后台，确认文章标识和发布状态。", shell);
+        const meta = shell.querySelector(".meta-grid");
+        if (meta) meta.innerHTML = "<span>读取失败</span>";
+      }
+      return;
+    }
     const { html, toc } = enhanceArticleHtml(article.html);
     shell.dataset.articleDetail = article.slug;
 

@@ -5,6 +5,20 @@ import { createReadStream, existsSync, statSync } from "node:fs";
 import { extname, resolve, sep } from "node:path";
 
 const resourceRoot = resolve("resource");
+const hiddenFromSitemapPrefixes = [
+  "/blog/",
+  "/changelog/",
+  "/lab/",
+  "/links/",
+  "/map/",
+  "/tech/",
+  "/topics/",
+  "/works/",
+  "/world/",
+  "/world/timeline/",
+  "/writings/",
+  "/writings/live/",
+];
 const mimeTypes = {
   ".avif": "image/avif",
   ".gif": "image/gif",
@@ -54,10 +68,21 @@ function resourceServerPlugin() {
 
 export default defineConfig({
   site: siteConfig.url,
+  redirects: {
+    "/blog": "/writings",
+    "/tech": "/writings?tag=技术",
+  },
   legacy: {
     collectionsBackwardsCompat: true,
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return !hiddenFromSitemapPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(prefix));
+      },
+    }),
+  ],
   vite: {
     server: {
       proxy: {

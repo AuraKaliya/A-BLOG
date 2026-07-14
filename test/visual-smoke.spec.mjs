@@ -2,8 +2,8 @@ import { expect, test } from "playwright/test";
 import { mockUnavailableCmsApi } from "./helpers/cmsApi.mjs";
 import { hasTextQualityIssue } from "./helpers/textQuality.mjs";
 
-const desktopRoutes = ["/", "/writings", "/map", "/search", "/works"];
-const mobileRoutes = ["/", "/writings", "/archive", "/map?type=world"];
+const desktopRoutes = ["/", "/about", "/now", "/notes", "/search"];
+const mobileRoutes = ["/", "/about", "/now", "/notes", "/archive"];
 
 test.beforeEach(async ({ page }) => {
   await mockUnavailableCmsApi(page);

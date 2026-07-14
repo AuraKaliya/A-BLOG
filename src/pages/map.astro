@@ -14,7 +14,7 @@ const hasRelations = graph.edges.length > 0;
 const graphKinds = Object.entries(contentGraphKindLabels);
 const structuredData = [
   buildBreadcrumbStructuredData([
-    { name: "门户", path: "/" },
+    { name: "首页", path: "/" },
     { name: "内容关系", path: "/map" },
   ]),
   buildCollectionPageStructuredData({
@@ -30,6 +30,7 @@ const structuredData = [
   title="内容关系"
   description="把主题关联和跨内容引用展开成一张可以探索的关系图。"
   image="/og/page/map.svg"
+  robots={hasRelations ? "index,follow" : "noindex,follow"}
   structuredData={structuredData}
 >
   <main class="page-main">
@@ -37,7 +38,7 @@ const structuredData = [
 
     <section class="archive-section content-map-section">
       <div class="container archive-list" data-content-map-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "内容关系" }]} />
+        <Breadcrumbs items={[{ label: "首页", href: "/" }, { label: "内容关系" }]} />
 
         {hasRelations ? <>
         <div class="content-map-command-panel">
@@ -80,7 +81,7 @@ const structuredData = [
             }
           </div>
         </section>
-        </> : <EmptyState title="还没有可展示的内容关系" description="公开内容建立关联后，关系图会显示在这里。" />}
+        </> : <EmptyState title="还没有可展示的内容关系" description="当前没有已建立的内容关系。" />}
       </div>
     </section>
   </main>

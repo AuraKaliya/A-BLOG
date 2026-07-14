@@ -3,13 +3,18 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const breadcrumbs = [
-  { label: "入口", href: "/" },
+  { label: "首页", href: "/" },
   { label: "文字", href: "/writings" },
   { label: "文章" },
 ];
 ---
 
-<BaseLayout title="文章" description="正在读取最新文章内容。" ogType="article" image="/og/page/writings.svg">
+<BaseLayout title="文章预览" description="内容管理后台的文章预览页面。" ogType="article" image="/og/page/writings.svg" robots="noindex,nofollow">
+  <script is:inline>
+    if (!new URLSearchParams(window.location.search).get("slug")) {
+      window.location.replace("/writings");
+    }
+  </script>
   <main class="page-main">
     <article class="article-shell container" data-article-detail="">
       <Breadcrumbs items={breadcrumbs} />
@@ -18,8 +23,8 @@ const breadcrumbs = [
         <div class="meta-grid">
           <span>读取中</span>
         </div>
-        <h1>正在读取文章</h1>
-        <p>请稍候。</p>
+        <h1>正在打开文章预览</h1>
+        <p>正在读取最新内容。</p>
         <div class="tag-row"></div>
         <figure class="article-cover-hero">
           <img src="/resource/default/default_image.png" alt="" loading="eager" />

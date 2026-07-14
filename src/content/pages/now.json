@@ -1,30 +1,34 @@
 {
   "kind": "now",
   "title": "现在",
-  "description": "Aura Kaliye 最近的创作重点。",
+  "description": "Dreath 当前的整理范围与创作重点。",
   "updatedDate": "2026-07-14",
   "intro": {
     "title": "最近在做什么",
-    "description": "最近主要在推进 Dreath。当前工作集中在人物、地点和事件之间的关系，以及哪些设定适合首先公开。"
+    "description": "这一阶段先整理 Dreath 的基础结构，当前范围包括人物关系、地点脉络与事件顺序。"
   },
   "focusAreas": [
     {
-      "title": "世界结构",
-      "description": "梳理人物、地点和事件之间的关系，让核心设定保持一致。"
+      "title": "人物关系",
+      "description": "整理主要人物之间已经确定的直接关系。"
     },
     {
-      "title": "公开顺序",
-      "description": "确认适合首先进入世界档案的基础设定。"
+      "title": "地点脉络",
+      "description": "区分地点层级，并核对地点与人物、事件的联系。"
+    },
+    {
+      "title": "事件顺序",
+      "description": "整理事件的先后关系，检查现有设定是否一致。"
     }
   ],
   "tracks": [
     {
-      "title": "Dreath 基础结构",
-      "description": "当前先处理 Dreath 的基础结构和核心名词。",
+      "title": "基础结构整理",
+      "description": "本阶段集中处理支撑当前创作的基础信息。",
       "items": [
-        "人物关系",
-        "地点脉络",
-        "事件顺序"
+        "人物之间的直接关系",
+        "地点与事件的对应",
+        "核心名词的统一写法"
       ]
     }
   ]

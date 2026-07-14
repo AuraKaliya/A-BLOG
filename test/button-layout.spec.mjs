@@ -85,25 +85,10 @@ test("header controls keep stable geometry across responsive modes", async ({ pa
   expect(mobile.links.every((item) => item.width === mobile.nav.width)).toBeTruthy();
 });
 
-test("CMS command copy stays inside its mobile button", async ({ page }) => {
-  const actionLabel = "打开一个文字更长但仍然保持清晰排版的随机内容入口";
-  await page.route("**/api/pages/home/**", async (route) => {
-    await route.fulfill({
-      contentType: "application/json",
-      json: {
-        data: {
-          kind: "home",
-          title: "按钮布局测试",
-          randomExplore: { actionLabel },
-        },
-        title: "按钮布局测试",
-      },
-    });
-  });
-
+test("the direct latest-note action stays inside its mobile card", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const button = page.getByRole("button", { name: actionLabel });
+  const button = page.getByRole("link", { name: "阅读这条随记" });
   await expect(button).toBeVisible();
 
   const geometry = await button.evaluate((element) => {
