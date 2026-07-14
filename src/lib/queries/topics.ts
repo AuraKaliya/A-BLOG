@@ -4,7 +4,7 @@ import { getPublishedWorks } from "./works";
 import { getPublishedWorldEntries } from "./world";
 import { getPublishedNotes } from "./notes";
 import { getPublishedLinks } from "./links";
-import { contentSlug } from "../content-entry";
+import { contentSlug, hasCollectionSource } from "../content-entry";
 import type { TopicEntry, TopicSummary } from "../content-types";
 import { assertValidContentGraph } from "../content-graph";
 
@@ -17,6 +17,7 @@ export function sortTopicEntries(topics: TopicEntry[]) {
 }
 
 export async function getTopicDefinitions() {
+  if (!hasCollectionSource("topics", [".json", ".yaml", ".yml", ".toml"])) return [];
   const topics = await getCollection("topics");
   return sortTopicEntries(topics.map((topic) => Object.assign(topic, { id: contentSlug(topic.id) })));
 }

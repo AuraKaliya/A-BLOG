@@ -60,7 +60,7 @@ export async function getSearchEntries(): Promise<SearchEntry[]> {
       text: `${entry.data.title} ${entry.data.description} ${worldKindLabels[entry.data.kind]} ${entry.data.status} ${entry.data.era ?? ""} ${entry.data.eventDate ?? ""} ${entry.data.topics.join(" ")} ${entry.data.tags.join(" ")} ${entry.body}`,
     })),
     ...notes.map((note) => ({
-      type: "短动态" as const,
+      type: "随记" as const,
       kind: "note" as const,
       title: note.data.title,
       description: note.data.description,
@@ -72,7 +72,7 @@ export async function getSearchEntries(): Promise<SearchEntry[]> {
       text: `${note.data.title} ${note.data.description} ${noteKindLabels[note.data.kind]} ${note.data.mood ?? ""} ${note.data.topics.join(" ")} ${note.data.tags.join(" ")} ${note.body}`,
     })),
     ...links.map((link) => ({
-      type: "推荐链接" as const,
+      type: "收藏" as const,
       kind: "link" as const,
       title: link.data.title,
       description: link.data.description,
@@ -84,7 +84,7 @@ export async function getSearchEntries(): Promise<SearchEntry[]> {
       text: `${link.data.title} ${link.data.description} ${link.data.note} ${linkKindLabels[link.data.kind]} ${link.data.language} ${link.data.topics.join(" ")} ${link.data.tags.join(" ")} ${link.body}`,
     })),
     ...changelogEntries.map((entry) => ({
-      type: "更新记录" as const,
+      type: "网站更新" as const,
       kind: "changelog" as const,
       title: entry.data.version,
       description: entry.data.summary,
@@ -101,7 +101,7 @@ export async function getSearchEntries(): Promise<SearchEntry[]> {
       title: topic.title,
       description: topic.description,
       href: `/topics#${topic.id}`,
-      category: "主题地图",
+      category: "主题",
       tags: topic.keywords,
       date: String(topic.posts.length + topic.works.length + topic.worlds.length + topic.notes.length + topic.links.length),
       weight: 1,

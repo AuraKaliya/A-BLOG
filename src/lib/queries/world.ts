@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { withSlug } from "../content-entry";
+import { hasCollectionSource, withSlug } from "../content-entry";
 import type { WorldEntry } from "../content-types";
 
 export function sortWorldEntries(entries: WorldEntry[]) {
@@ -15,6 +15,7 @@ export function sortWorldEntries(entries: WorldEntry[]) {
 }
 
 export async function getPublishedWorldEntries() {
+  if (!hasCollectionSource("world", [".md", ".mdx"])) return [];
   const entries = await getCollection("world", ({ data }) => !data.draft);
   return sortWorldEntries(entries.map(withSlug));
 }

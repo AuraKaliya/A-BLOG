@@ -1,56 +1,29 @@
 {
   "kind": "about",
-  "title": "关于",
-  "description": "个人介绍、关注方向、技术栈和联系方式。",
+  "title": "关于 Aura Kaliye",
+  "description": "关于 Aura Kaliye 使用的署名、当前创作与这个个人空间。",
   "intro": {
-    "title": "先把自己放进一个清晰的结构里。",
-    "description": "个人网站最有用的地方，是让别人快速理解你长期关注什么、做过什么、正在构建什么，以及为什么这些内容放在一起。"
+    "title": "关于我的署名",
+    "description": "我使用 Aura Kaliye、Aura、银花海和花海作为署名。Aura Kaliye 是这个个人空间的主要展示名称。"
   },
-  "focusAreas": [
-    "前端与展示系统",
-    "AI 应用与自动化",
-    "产品与内容结构",
-    "长期写作与复盘"
-  ],
+  "focusAreas": [],
   "stackCards": [
     {
-      "label": "Stack",
-      "title": "当前技术栈",
-      "description": "Astro、Markdown、TypeScript、现代 CSS，以及后续可以接入的搜索、评论和数据分析。",
+      "label": "当前创作",
+      "title": "Dreath",
+      "description": "Dreath 是我目前投入最多精力的创作。当前工作集中在人物、地点、事件和规则之间的关系。",
       "featured": true
     },
     {
-      "title": "站点定位",
-      "description": "纯展示为主，优先保证内容组织、视觉质感、SEO 和维护成本。"
+      "title": "写作",
+      "description": "文字部分会包含随笔、创作笔记，以及值得单独展开的思考。"
     },
     {
-      "title": "后续扩展",
-      "description": "可以逐步加入主题索引、系列文章、作品筛选、站内搜索和订阅能力。"
+      "title": "技术实践",
+      "description": "与工具、前端和交互有关的实践，会在形成可说明的结果后公开。"
     }
   ],
-  "socialCards": [
-    {
-      "platform": "GitHub",
-      "handle": "your-name",
-      "description": "查看公开代码、实验项目与持续维护中的仓库。",
-      "href": "https://github.com/your-name",
-      "accent": "cyan"
-    },
-    {
-      "platform": "RSS",
-      "handle": "站点订阅",
-      "description": "通过阅读器接收新文章，不依赖任何社交平台算法。",
-      "href": "/rss.xml",
-      "accent": "orange"
-    },
-    {
-      "platform": "Email",
-      "handle": "your-name@example.com",
-      "description": "适合较完整的交流、合作或反馈。",
-      "href": "mailto:your-name@example.com",
-      "accent": "green"
-    }
-  ],
+  "socialCards": [],
   "contact": {
     "ctaLabel": "发送邮件",
     "emailLabel": "邮箱",

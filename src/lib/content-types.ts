@@ -28,7 +28,7 @@ export interface TopicSummary {
 }
 
 export interface SearchEntry {
-  type: "文章" | "作品" | "世界条目" | "短动态" | "推荐链接" | "更新记录" | "主题";
+  type: "文章" | "作品" | "世界条目" | "随记" | "收藏" | "网站更新" | "主题";
   kind: "blog" | "work" | "world" | "note" | "link" | "changelog" | "topic";
   title: string;
   description: string;

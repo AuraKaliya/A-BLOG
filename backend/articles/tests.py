@@ -104,6 +104,22 @@ class ArticleResourceServiceTests(TestCase):
         self.assertEqual(article.tags.count(), 2)
         self.assertTrue(ArticleViewCount.objects.filter(article=article).exists())
 
+    def test_sync_articles_prunes_missing_resource_articles(self):
+        article = Article.objects.create(
+            slug="removed-entry",
+            title="待移除文章",
+            summary="这篇文章已经不在资源目录中。",
+            pub_date=date(2026, 1, 1),
+            draft=False,
+            content_source=Article.SOURCE_RESOURCE,
+        )
+
+        with TemporaryDirectory() as tmp, override_settings(ARTICLE_RESOURCE_ROOT=Path(tmp)):
+            call_command("sync_articles", "--prune", stdout=io.StringIO())
+
+        article.refresh_from_db()
+        self.assertTrue(article.draft)
+
 
 class SitePageCommandTests(TestCase):
     def test_seed_pages_creates_home_page_from_json(self):

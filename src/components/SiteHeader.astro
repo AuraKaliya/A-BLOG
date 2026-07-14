@@ -1,15 +1,9 @@
 ---
 import { aboutMenuLinks, mainNav } from "../config/navigation";
-import { getTopicDefinitions } from "../lib/content";
 import { siteConfig } from "../config/site";
 import IconSymbol from "./IconSymbol.astro";
 
 const pathname = Astro.url.pathname;
-const topics = await getTopicDefinitions();
-const quickTopicLinks = topics.map((topic) => ({
-  label: topic.data.title,
-  href: `/topics#${topic.id}`,
-}));
 const isActivePath = (path: string) => {
   if (path === "/") return pathname === "/";
   return pathname === path || pathname.startsWith(`${path}/`);
@@ -18,7 +12,7 @@ const isActivePath = (path: string) => {
 
 <header class="site-header" id="top">
   <div class="nav-shell">
-    <a class="brand" href="/" aria-label="返回门户首页">
+    <a class="brand" href="/" aria-label="返回个人空间首页">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 64 64" role="img">
           <path d="M12 44 28 12h12l-9 18h17L28 58l7-24H18z"></path>
@@ -61,9 +55,9 @@ const isActivePath = (path: string) => {
           <div class="mega-menu" id="menu-about" data-menu="about">
             <div class="mega-shell">
               <div class="menu-kicker">
-                <span class="eyebrow">About</span>
-                <h3>把个人介绍做成可以快速理解的入口</h3>
-                <p>适合放你的身份、能力边界、联系方式和当前关注方向。</p>
+                <span class="eyebrow">关于</span>
+                <h3>Aura Kaliye 的署名与创作</h3>
+                <p>了解我使用的署名、当前创作和最近状态。</p>
               </div>
 
               <div class="menu-columns three-up">
@@ -76,12 +70,9 @@ const isActivePath = (path: string) => {
                   ))
                 }
                 <article class="featured-menu-card">
-                  <span class="eyebrow">Now</span>
-                  <h4>当前主题</h4>
-                  <p>搭建一个长期可维护的个人展示系统，让内容、项目和想法有统一的归宿。</p>
-                  <div class="mini-link-list">
-                    {quickTopicLinks.map((link) => <a href={link.href}>{link.label}</a>)}
-                  </div>
+                  <span class="eyebrow">现在</span>
+                  <h4>正在创作 Dreath</h4>
+                  <p>当前工作集中在人物、地点和事件之间的关系。</p>
                   <a href="/now" class="text-link">查看当前状态</a>
                 </article>
               </div>
@@ -99,9 +90,9 @@ const isActivePath = (path: string) => {
         </a>
         <a class:list={["utility-chip", { active: isActivePath("/search") }]} href="/search" aria-label="站内搜索">
           <IconSymbol name="nodes" />
-          <span>Search</span>
+          <span>搜索</span>
         </a>
-        <a class="contact-link" href="/about#contact">联系我</a>
+        <a class="contact-link" href="/about">关于我</a>
       </div>
     </div>
   </div>

@@ -216,3 +216,65 @@ Use a different loop variable name such as `$processId`.
 - Related Files: none
 
 ---
+
+## [ERR-20260714-001] ripgrep_windows_glob_argument
+
+**Logged**: 2026-07-14T10:00:00+08:00
+**Priority**: low
+**Status**: pending
+**Area**: config
+
+### Summary
+Passing a Windows wildcard path such as `src\content\works\*.md` directly to `rg` fails because ripgrep does not expand the glob.
+
+### Error
+```text
+rg: src\content\works\*.md: IO error for operation on src\content\works\*.md: 文件名、目录名或卷标语法不正确。 (os error 123)
+```
+
+### Context
+- Attempted to search Markdown files in two content directories from PowerShell.
+- Environment: Windows, PowerShell.
+
+### Suggested Fix
+Pass the directory to `rg` and filter with `-g "*.md"` instead of embedding `*` in the path argument.
+
+### Metadata
+- Reproducible: yes
+- Related Files: src/content/works, src/content/world
+- See Also: ERR-20260706-001
+
+---
+
+## [ERR-20260714-002] homepage_filter_after_limit
+
+**Logged**: 2026-07-14T10:35:00+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: frontend
+
+### Summary
+The redesigned homepage showed only one personal update because changelog and link entries were filtered after the recent-update query had already limited the result set.
+
+### Error
+```text
+Expected .home-update-item count: 5
+Received: 1
+```
+
+### Context
+- The homepage intentionally excludes changelog and link entries.
+- `getHomepageFeed()` requested only six mixed updates before the page applied that filter.
+
+### Suggested Fix
+Request enough mixed updates before applying the homepage-specific content-kind filter.
+
+### Metadata
+- Reproducible: yes
+- Related Files: src/lib/queries/stats.ts, src/pages/index.astro, test/site.spec.mjs
+
+### Resolution
+- **Resolved**: 2026-07-14T10:35:00+08:00
+- **Notes**: Increased the homepage feed query limit so five personal-content updates remain after filtering.
+
+---

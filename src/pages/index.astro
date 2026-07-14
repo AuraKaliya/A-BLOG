@@ -2,16 +2,14 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import IconSymbol from "../components/IconSymbol.astro";
 import { siteConfig } from "../config/site";
-import { getContentStats, getHomePageData, getHomepageFeed, getPublishedChangelogEntries } from "../lib/content";
+import { getHomePageData, getHomepageFeed } from "../lib/content";
 import { formatDate } from "../lib/format";
 import { existsSync, statSync } from "node:fs";
 import { extname, resolve, sep } from "node:path";
 
-const [homePage, homepageFeed, contentStats, changelogEntries] = await Promise.all([
+const [homePage, homepageFeed] = await Promise.all([
   getHomePageData(),
   getHomepageFeed(),
-  getContentStats(),
-  getPublishedChangelogEntries(),
 ]);
 
 const { recentUpdates } = homepageFeed;
@@ -46,17 +44,7 @@ const findResourceImage = (index?: string) => {
 };
 const profileImage = findResourceImage(home.profile.imageIndex);
 const recentStatusImage = findResourceImage(home.recentStatus.imageIndex);
-const latestDate = recentUpdates[0]?.date ?? changelogEntries[0]?.data.date;
-const timelineEntries = changelogEntries.slice(0, 3);
-const updateItems = recentUpdates.slice(0, 3);
-const operationStats = [
-  { value: String(contentStats.postCount), label: "公开文章", description: "文字与技术记录" },
-  { value: String(contentStats.workCount), label: "作品条目", description: "项目、实验与研究" },
-  { value: String(contentStats.worldCount), label: "世界档案", description: "设定、事件与规则" },
-  { value: String(contentStats.noteCount), label: "短动态", description: "未完成想法与状态" },
-  { value: String(contentStats.topicCount), label: "主题索引", description: "跨内容连接线索" },
-  { value: latestDate ? formatDate(latestDate) : "待更新", label: "最近更新", description: "站点最后一次公开变动", compact: true },
-];
+const updateItems = recentUpdates.filter((update) => update.kind !== "changelog" && update.kind !== "link").slice(0, 5);
 ---
 
 <BaseLayout
@@ -72,7 +60,13 @@ const operationStats = [
             <div class:list={["profile-avatar", { "has-image": Boolean(profileImage) }]}>
               {
                 profileImage ? (
-                  <img src={profileImage} alt={home.profile.imageAlt ?? home.profile.name} loading="eager" data-home-profile-image />
+                  <img
+                    src={profileImage}
+                    alt={home.profile.imageAlt ?? home.profile.name}
+                    loading="eager"
+                    style={`object-position: ${home.profile.imagePosition ?? "50% 50%"}`}
+                    data-home-profile-image
+                  />
                 ) : (
                   <span aria-hidden="true">{home.profile.name.slice(0, 1)}</span>
                 )
@@ -87,7 +81,7 @@ const operationStats = [
 
           <div class="profile-status">
             <span data-home-profile-status>{home.profile.status}</span>
-            <strong data-home-profile-location>{home.profile.location}</strong>
+            <strong data-home-profile-location hidden={!home.profile.location}>{home.profile.location}</strong>
           </div>
 
           <p class="profile-bio" data-home-profile-bio>{home.profile.bio}</p>
@@ -104,7 +98,15 @@ const operationStats = [
         <div class="home-side-stack">
           <article class="recent-status-card">
             <div class="recent-status-image">
-              {recentStatusImage && <img src={recentStatusImage} alt={home.recentStatus.imageAlt ?? home.recentStatus.title} loading="eager" data-home-recent-image />}
+              {recentStatusImage && (
+                <img
+                  src={recentStatusImage}
+                  alt={home.recentStatus.imageAlt ?? home.recentStatus.title}
+                  loading="eager"
+                  style={`object-position: ${home.recentStatus.imagePosition ?? "50% 50%"}`}
+                  data-home-recent-image
+                />
+              )}
             </div>
             <div class="recent-status-copy">
               <span class="eyebrow" data-home-recent-eyebrow>{home.recentStatus.eyebrow}</span>
@@ -155,15 +157,16 @@ const operationStats = [
     <section class="home-screen home-status-screen" id="signals" data-home-screen="signals">
       <div class="container">
         <div class="home-status-heading">
-          <span class="eyebrow">Site Status</span>
-          <h2>站点正在发生什么</h2>
+          <span class="eyebrow">最近公开</span>
+          <h2>最近更新</h2>
+          <p>从最新公开的内容开始浏览。</p>
         </div>
 
         <div class="home-status-grid">
           <article class="home-status-panel latest-panel">
             <div class="home-panel-heading">
-              <h3>最新动态</h3>
-              <a class="text-link" href="/archive">全站归档</a>
+              <h3>内容更新</h3>
+              <a class="text-link" href="/archive">查看归档</a>
             </div>
             <div class="home-update-list">
               {
@@ -179,39 +182,28 @@ const operationStats = [
             </div>
           </article>
 
-          <article class="home-status-panel timeline-panel">
+          <article class="home-status-panel timeline-panel home-focus-panel">
             <div class="home-panel-heading">
-              <h3>网站更新时间轴</h3>
-              <a class="text-link" href="/changelog">完整记录</a>
+              <h3>正在创作</h3>
+              <a class="text-link" href="/now">查看现在</a>
             </div>
-            <div class="home-timeline-list">
-              {
-                timelineEntries.map((entry) => (
-                  <a class="home-timeline-item" href={`/changelog#${entry.slug}`}>
-                    <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
-                    <strong>{entry.data.version}</strong>
-                    <p>{entry.data.summary}</p>
-                  </a>
-                ))
-              }
+            <div class="home-focus-copy">
+              <span class="eyebrow">当前创作</span>
+              <h3>Dreath 世界观</h3>
+              <p>{home.recentStatus.description}</p>
+              <a class="secondary-cta" href="/world">进入世界档案</a>
             </div>
           </article>
 
-          <article class="home-status-panel stats-panel">
+          <article class="home-status-panel stats-panel home-continue-panel">
             <div class="home-panel-heading">
-              <h3>网站的运营数据</h3>
-              <a class="text-link" href="/map">内容星图</a>
+              <h3>继续浏览</h3>
             </div>
-            <div class="home-stat-grid">
-              {
-                operationStats.map((stat) => (
-                  <div class:list={["home-stat-item", { compact: stat.compact }]}>
-                    <strong>{stat.value}</strong>
-                    <span>{stat.label}</span>
-                    <p>{stat.description}</p>
-                  </div>
-                ))
-              }
+            <div class="home-continue-list">
+              <a href="/writings"><strong>文字</strong><span>随笔与技术记录</span></a>
+              <a href="/notes"><strong>随记</strong><span>状态、片段与分享</span></a>
+              <a href="/links"><strong>收藏</strong><span>阅读、工具与资料</span></a>
+              <a href="/topics"><strong>主题</strong><span>按长期关注方向浏览</span></a>
             </div>
           </article>
         </div>

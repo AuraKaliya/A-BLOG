@@ -1,14 +1,14 @@
 ---
-title: "第一条公开动态"
-description: "短动态入口接通后，留下的第一条轻量状态记录。"
+title: "Dreath 创作近况"
+description: "当前工作集中在人物、地点和事件之间的关系。"
 pubDate: 2026-06-05
 updatedDate: 2026-06-05
 kind: "status"
-mood: "信号清晰"
+mood: "创作中"
 featured: true
-topics: ["build"]
-tags: ["站点", "动态", "上线"]
+topics: []
+tags: ["Dreath", "创作近况"]
 draft: false
 ---
 
-不是所有更新都需要长成一篇文章。先把一句判断、一段状态和一个正在发生的变化留在这里，之后再决定它是否值得继续生长。
+最近的时间主要留给 Dreath。当前先处理世界结构和核心设定，再决定哪些内容适合公开。

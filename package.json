@@ -7,7 +7,7 @@
     "backend:dev": "python backend/manage.py runserver 8000",
     "backend:migrate": "python backend/manage.py migrate",
     "backend:seed-pages": "python backend/manage.py seed_pages",
-    "backend:sync": "python backend/manage.py sync_articles",
+    "backend:sync": "python backend/manage.py sync_articles --prune",
     "backend:test": "node -e \"require('node:fs').mkdirSync('backend/staticfiles', { recursive: true })\" && python backend/manage.py test articles",
     "build": "astro check && astro build",
     "test": "playwright test --reporter=line --workers=1",

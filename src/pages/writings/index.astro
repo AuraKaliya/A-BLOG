@@ -9,16 +9,16 @@ import { getAllResourceArticleTags, getAllResourceArticles } from "../../lib/art
 const [articles, tags] = await Promise.all([getAllResourceArticles(), getAllResourceArticleTags()]);
 ---
 
-<BaseLayout title="文字" description="随笔、技术记录、阶段复盘与还在形成中的想法。" image="/og/page/writings.svg">
+<BaseLayout title="文字" description="随笔、创作笔记与技术实践。" image="/og/page/writings.svg">
   <ArchivePageLayout
     title="文字"
-    description="关于随笔、想法、技术学习的文字记录。"
+    description="随笔、创作笔记与技术实践。"
     breadcrumbs={[{ label: "入口", href: "/" }, { label: "文字" }]}
   >
-    <div class="article-command-panel" slot="before" data-article-controls>
+    <div class="article-command-panel" slot="before" data-article-controls hidden={articles.length === 0}>
       <div class="article-tag-filter" aria-label="标签筛选">
         <button type="button" data-article-tag="all" aria-pressed="true"><span>全部档案</span><small>{articles.length}</small></button>
-        {tags.map((tag) => <button type="button" data-article-tag={tag.name} aria-pressed="false"><span>{tag.name}</span><small>{tag.count}</small></button>)}
+        {tags.map((tag) => <button type="button" data-article-tag={tag.name} aria-pressed="false" title={tag.name}><span>{tag.name}</span><small>{tag.count}</small></button>)}
       </div>
       <div class="article-view-switch" aria-label="展示方式">
         <button type="button" data-article-view="timeline" aria-pressed="true">
@@ -32,15 +32,12 @@ const [articles, tags] = await Promise.all([getAllResourceArticles(), getAllReso
       </div>
     </div>
 
-    {
-      articles.length > 0 ? (
-        <div class="resource-article-collection view-timeline" data-article-collection>
-          {articles.map((article, index) => <ResourceArticleCard article={article} timelineSide={index % 2 === 0 ? "left" : "right"} />)}
-        </div>
-      ) : (
-        <EmptyState title="还没有公开文章" description="在 resource/article 下添加文章文件夹后，这里会自动生成列表。" />
-      )
-    }
+    <div class="resource-article-collection view-timeline" data-article-collection hidden={articles.length === 0}>
+      {articles.map((article, index) => <ResourceArticleCard article={article} timelineSide={index % 2 === 0 ? "left" : "right"} />)}
+    </div>
+    <div data-article-empty hidden={articles.length > 0}>
+      <EmptyState title="还没有公开文字" description="当前暂无可阅读内容。" />
+    </div>
   </ArchivePageLayout>
 
   <script is:inline>

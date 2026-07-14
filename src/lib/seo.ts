@@ -141,8 +141,8 @@ export function buildTopicSummaryStructuredData(topics: TopicSummary[]) {
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "主题地图",
-    description: "把文章、作品、世界档案、短动态和站外链接按照长期关注方向重新组织。",
+    name: "主题",
+    description: "按照长期关注方向重新浏览文章、作品、世界档案、随记和收藏。",
     url: absoluteUrl("/topics"),
     mainEntity: {
       "@type": "ItemList",

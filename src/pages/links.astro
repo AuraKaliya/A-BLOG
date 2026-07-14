@@ -16,10 +16,10 @@ const topicCount = new Set(links.flatMap((entry) => entry.data.topics)).size;
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "站外信号", path: "/links" },
+    { name: "收藏", path: "/links" },
   ]),
   buildCollectionPageStructuredData({
-    title: "站外信号",
+    title: "收藏",
     description: "友链、推荐阅读、工具、资料与持续提供灵感的站点。",
     path: "/links",
     itemCount: links.length,
@@ -28,25 +28,26 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title="站外信号"
+  title="收藏"
   description="友链、推荐阅读、工具、资料与持续提供灵感的站点。"
   image="/og/page/links.svg"
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="站外信号" description="内容宇宙不会只向内生长。这里收录值得反复访问的站点、工具、资料和创作来源。" />
+    <PageHero title="收藏" description="这里收录值得再次访问的阅读、工具、资料与创作来源。" />
 
     <section class="archive-section section-dark">
       <div class="container archive-list" data-link-filter-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "站外信号" }]} />
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "收藏" }]} />
 
+        {links.length > 0 ? <>
         <div class="link-command-panel">
           <div>
-            <span class="eyebrow">Signal Directory</span>
-            <strong data-link-filter-summary>正在显示全部 {links.length} 个站外入口</strong>
-            <p>{feedCount} 个入口提供 RSS，当前关联 {topicCount} 个站内主题。</p>
+            <span class="eyebrow">收藏</span>
+            <strong data-link-filter-summary>正在显示全部 {links.length} 项收藏</strong>
+            <p>{feedCount} 项提供 RSS，当前关联 {topicCount} 个主题。</p>
           </div>
-          <div class="search-filter-row" role="group" aria-label="站外信号类型筛选">
+          <div class="search-filter-row" role="group" aria-label="收藏类型筛选">
             <button class="filter-chip active" type="button" data-link-filter="all" aria-pressed="true">全部 {links.length}</button>
             {
               kinds.map(([kind, label]) => (
@@ -58,13 +59,13 @@ const structuredData = [
           </div>
         </div>
 
-        {links.length > 0 ? <div class="link-directory-grid">{links.map((entry) => <LinkCard entry={entry} anchored />)}</div> : <EmptyState title="还没有站外信号" description="新增 links 内容后，这里会形成可筛选的推荐目录。" />}
+        <div class="link-directory-grid">{links.map((entry) => <LinkCard entry={entry} anchored />)}</div>
 
         <section class="link-exchange-panel">
           <div>
-            <span class="eyebrow">Exchange Protocol</span>
+            <span class="eyebrow">友链</span>
             <h2>友链交换信息</h2>
-            <p>这里暂不把陌生站点伪装成友链。建立持续往来后，可以将对应条目的类型改为“友链”。</p>
+            <p>友链只记录已经建立持续往来的站点，其他内容会按照阅读、工具或资料分类。</p>
           </div>
           <dl>
             <div><dt>名称</dt><dd>{siteConfig.title}</dd></div>
@@ -73,6 +74,7 @@ const structuredData = [
             <div><dt>订阅</dt><dd><a href="/rss.xml">{new URL("/rss.xml", siteConfig.url).toString()}</a></dd></div>
           </dl>
         </section>
+        </> : <EmptyState title="还没有公开收藏" description="当前暂无可浏览条目。" />}
       </div>
     </section>
   </main>

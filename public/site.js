@@ -148,8 +148,8 @@ function initSiteInteractions() {
       });
 
       if (summary) summary.textContent = activeKind === "all"
-        ? `正在显示全部 ${cards.length} 条动态`
-        : `当前筛选显示 ${visibleCount} 条动态`;
+        ? `正在显示全部 ${cards.length} 条随记`
+        : `当前筛选显示 ${visibleCount} 条随记`;
 
       if (syncUrl) {
         const url = new URL(window.location.href);
@@ -237,8 +237,8 @@ function initSiteInteractions() {
       });
 
       if (summary) summary.textContent = activeKind === "all"
-        ? `正在显示全部 ${cards.length} 个站外入口`
-        : `当前筛选显示 ${visibleCount} 个站外入口`;
+        ? `正在显示全部 ${cards.length} 项收藏`
+        : `当前筛选显示 ${visibleCount} 项收藏`;
 
       if (syncUrl) {
         const url = new URL(window.location.href);

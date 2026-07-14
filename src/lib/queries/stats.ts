@@ -36,7 +36,7 @@ export async function getHomepageFeed() {
     getAllResourceArticles(),
     getPublishedWorks(),
     getFeaturedWorks(4),
-    getRecentUpdates(6),
+    getRecentUpdates(24),
   ]);
   return { posts: posts.slice(0, 3), works, featuredWorks, recentUpdates };
 }

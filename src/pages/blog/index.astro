@@ -18,7 +18,7 @@ const [posts, categories, seriesList, tags, topics] = await Promise.all([
 const paginated = paginate(posts, 1, 6, "/blog");
 const filterGroups = [
   {
-    title: "Categories",
+    title: "分类",
     items: categories.map((category) => ({ label: category, href: `/blog/categories/${category}` })),
   },
   {
@@ -26,7 +26,7 @@ const filterGroups = [
     items: seriesList.map((series) => ({ label: series, href: `/blog/series/${series}` })),
   },
   {
-    title: "Topics",
+    title: "主题",
     items: topics.map((topic) => ({ label: topic.data.title, href: `/blog/topics/${topic.id}` })),
   },
   {
@@ -44,7 +44,7 @@ const filterGroups = [
       posts.length > 0 ? (
         paginated.items.map((post) => <ArticleCard post={post} />)
       ) : (
-        <EmptyState title="还没有公开文章" description="添加 Markdown 内容后，这里会自动生成归档列表。" />
+        <EmptyState title="还没有公开文章" description="当前暂无可阅读内容。" />
       )
     }
 

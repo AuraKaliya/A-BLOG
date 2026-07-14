@@ -21,7 +21,7 @@ const events = (await getWorldEntriesByKind("event")).sort((a, b) => (b.data.eve
                 <article class="timeline-entry">
                   <div class="timeline-date">{event.data.eventDate ?? event.data.era ?? "日期未定"}</div>
                   <div>
-                    <span class="eyebrow">Event</span>
+                    <span class="eyebrow">事件</span>
                     <h2><a href={`/world/${event.slug}`}>{event.data.title}</a></h2>
                     <p>{event.data.description}</p>
                   </div>
@@ -29,7 +29,7 @@ const events = (await getWorldEntriesByKind("event")).sort((a, b) => (b.data.eve
               ))}
             </div>
           ) : (
-            <EmptyState title="时间线上还没有事件" description="为世界事件填写 eventDate 后，它会出现在这里。" />
+            <EmptyState title="时间线上还没有公开事件" description="当前暂无事件条目。" />
           )
         }
       </div>

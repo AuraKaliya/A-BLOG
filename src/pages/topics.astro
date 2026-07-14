@@ -1,6 +1,7 @@
 ---
 import ArticleCard from "../components/ArticleCard.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
+import EmptyState from "../components/EmptyState.astro";
 import PageHero from "../components/PageHero.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import WorkCard from "../components/WorkCard.astro";
@@ -15,33 +16,34 @@ const [topics, categories, tags] = await Promise.all([getTopicSummaries(), getAl
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "主题地图", path: "/topics" },
+    { name: "主题", path: "/topics" },
   ]),
   buildTopicSummaryStructuredData(topics),
 ];
 ---
 
 <BaseLayout
-  title="主题地图"
+  title="主题"
   description="把博客、作品和实验按照长期关注方向重新组织。"
   image="/og/page/topics.svg"
   keywords={topics.flatMap((topic) => topic.keywords)}
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="主题地图" description="不按发布时间浏览，而是按长期主题重新看见文章、作品和实验之间的关系。" />
+    <PageHero title="主题" description="按照长期关注方向，重新浏览文章、随记、收藏与其他公开内容。" />
 
     <section class="archive-section section-dark">
       <div class="container archive-list">
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "主题地图" }]} />
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "主题" }]} />
 
+        {topics.length > 0 ? <>
         <div class="topic-map-link-panel">
           <div>
-            <span class="eyebrow">Constellation View</span>
-            <strong>想看见主题之外的直接引用关系？</strong>
-            <p>内容星图会把文章、作品、世界档案、短动态和站外链接之间的连接同时展开。</p>
+            <span class="eyebrow">内容关系</span>
+            <strong>查看内容之间的直接关系</strong>
+            <p>关系图会同时展示共享主题和彼此引用的内容。</p>
           </div>
-          <a class="primary-cta" href="/map">打开内容星图</a>
+          <a class="primary-cta" href="/map">打开内容关系</a>
         </div>
 
         <div class="topic-overview">
@@ -58,9 +60,9 @@ const structuredData = [
 
         <section class="topic-taxonomy-panel">
           <SectionHeading
-            eyebrow="Taxonomy"
+            eyebrow="索引"
             title="现有分类和标签"
-            description="这里展示当前内容层已经识别出的栏目与标签，后续可以继续沉淀成稳定主题。"
+            description="可以从文章分类和标签继续浏览。"
           />
           <div class="taxonomy-columns">
             <div>
@@ -80,7 +82,7 @@ const structuredData = [
               <SectionHeading
                 eyebrow={topic.title}
                 title={`${topic.title}主题`}
-                description={`${topic.description} 当前关联 ${topic.posts.length} 篇文章、${topic.works.length} 个作品、${topic.worlds.length} 份世界档案、${topic.notes.length} 条短动态、${topic.links.length} 个站外入口。`}
+                description={`${topic.description} 当前关联 ${topic.posts.length} 篇文章、${topic.works.length} 个作品、${topic.worlds.length} 份世界档案、${topic.notes.length} 条随记、${topic.links.length} 项收藏。`}
               />
               <div class="topic-keywords tag-row">{topic.keywords.map((keyword) => <span>{keyword}</span>)}</div>
               {topic.posts.length > 0 && <div class="archive-list compact-list">{topic.posts.map((post) => <ArticleCard post={post} />)}</div>}
@@ -91,6 +93,7 @@ const structuredData = [
             </section>
           ))
         }
+        </> : <EmptyState title="还没有公开主题" description="主题会随公开内容出现。" />}
       </div>
     </section>
   </main>

@@ -13,11 +13,11 @@ const kinds = Object.entries(archiveKindLabels).filter(([kind]) => entries.some(
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "全站归档", path: "/archive" },
+    { name: "归档", path: "/archive" },
   ]),
   buildCollectionPageStructuredData({
-    title: "全站归档",
-    description: "按时间统一浏览文章、作品、世界档案、短动态、推荐链接与更新记录。",
+    title: "归档",
+    description: "按时间浏览文章、作品、世界档案、随记、收藏与网站更新。",
     path: "/archive",
     itemCount: entries.length,
   }),
@@ -25,21 +25,21 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title="全站归档"
-  description="按时间统一浏览文章、作品、世界档案、短动态、推荐链接与更新记录。"
+  title="归档"
+  description="按时间浏览文章、作品、世界档案、随记、收藏与网站更新。"
   image="/og/page/archive.svg"
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="全站归档" description="当分类不是答案时，就沿时间向后走。这里汇集站内所有公开信号。" />
+    <PageHero title="归档" description="按照时间浏览公开内容。" />
 
     <section class="archive-section section-dark">
       <div class="container archive-list" data-archive-filter-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "全站归档" }]} />
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "归档" }]} />
 
         <div class="archive-command-panel">
           <div>
-            <span class="eyebrow">Master Index</span>
+            <span class="eyebrow">归档</span>
             <strong data-archive-filter-summary>正在显示全部 {entries.length} 条公开内容</strong>
           </div>
           <div class="search-filter-row" role="group" aria-label="归档内容类型筛选">

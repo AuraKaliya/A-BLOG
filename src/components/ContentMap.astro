@@ -13,8 +13,8 @@ const shortLabel = (value: string) => (value.length > 10 ? `${value.slice(0, 9)}
 <div class="content-map-shell">
   <div class="content-map-viewport" tabindex="0" aria-label="可横向滚动的内容关系图">
     <svg class="content-map" viewBox="0 0 1120 760" role="img" aria-labelledby="content-map-title content-map-description">
-      <title id="content-map-title">Aura 内容星图</title>
-      <desc id="content-map-description">主题位于中心，文章、作品、世界档案、短动态与站外链接围绕外圈，通过主题和直接引用相连。</desc>
+      <title id="content-map-title">Aura 内容关系图</title>
+      <desc id="content-map-description">主题位于中心，文章、作品、世界档案、随记与收藏围绕外圈，通过主题和直接引用相连。</desc>
       <defs>
         <radialGradient id="map-core-glow">
           <stop offset="0" stop-color="#03ffff" stop-opacity="0.11"></stop>
@@ -71,13 +71,13 @@ const shortLabel = (value: string) => (value.length > 10 ? `${value.slice(0, 9)}
     </svg>
   </div>
 
-  <div class="content-map-legend" aria-label="内容星图图例">
+  <div class="content-map-legend" aria-label="内容关系图例">
     <span><i class="legend-dot topic"></i>主题核心</span>
     <span><i class="legend-dot blog"></i>文章</span>
     <span><i class="legend-dot work"></i>作品</span>
     <span><i class="legend-dot world"></i>世界档案</span>
-    <span><i class="legend-dot note"></i>短动态</span>
-    <span><i class="legend-dot link"></i>站外链接</span>
+    <span><i class="legend-dot note"></i>随记</span>
+    <span><i class="legend-dot link"></i>收藏</span>
     <span><i class="legend-line related"></i>直接引用</span>
   </div>
 </div>

@@ -75,9 +75,9 @@ export const archiveKindLabels = {
   blog: "文章",
   work: "作品",
   world: "世界档案",
-  note: "短动态",
-  link: "推荐链接",
-  changelog: "更新记录",
+  note: "随记",
+  link: "收藏",
+  changelog: "网站更新",
 } as const;
 
 export const contentGraphKindLabels = {
@@ -85,6 +85,6 @@ export const contentGraphKindLabels = {
   blog: "文章",
   work: "作品",
   world: "世界档案",
-  note: "短动态",
-  link: "站外链接",
+  note: "随记",
+  link: "收藏",
 } as const;

@@ -13,11 +13,11 @@ const kinds = Object.entries(noteKindLabels).filter(([kind]) => notes.some((note
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "短动态", path: "/notes" },
+    { name: "随记", path: "/notes" },
   ]),
   buildCollectionPageStructuredData({
-    title: "短动态",
-    description: "比文章更轻的状态、随想、分享与碎片记录。",
+    title: "随记",
+    description: "短一些的状态与想法。",
     path: "/notes",
     itemCount: notes.length,
   }),
@@ -25,24 +25,24 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title="短动态"
-  description="比文章更轻的状态、随想、分享与碎片记录。"
+  title="随记"
+  description="短一些的状态与想法。"
   image="/og/page/notes.svg"
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="短动态" description="不必等到想法长成文章。这里保留状态、随想、链接和仍在发光的碎片。" />
+    <PageHero title="随记" description="短一些的状态与想法。" />
 
     <section class="archive-section section-dark">
       <div class="container archive-list" data-note-filter-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "短动态" }]} />
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "随记" }]} />
 
         <div class="note-command-panel">
           <div>
-            <span class="eyebrow">Signal Stream</span>
-            <strong data-note-filter-summary>正在显示全部 {notes.length} 条动态</strong>
+            <span class="eyebrow">随记</span>
+            <strong data-note-filter-summary>正在显示全部 {notes.length} 条随记</strong>
           </div>
-          <div class="search-filter-row" role="group" aria-label="短动态类型筛选">
+          <div class="search-filter-row" role="group" aria-label="随记类型筛选">
             <button class="filter-chip active" type="button" data-note-filter="all" aria-pressed="true">全部 {notes.length}</button>
             {
               kinds.map(([kind, label]) => (
@@ -54,7 +54,7 @@ const structuredData = [
           </div>
         </div>
 
-        {notes.length > 0 ? <div class="notes-grid">{notes.map((note) => <NoteCard note={note} />)}</div> : <EmptyState title="还没有公开动态" description="新增 notes 内容后，这里会形成轻量更新流。" />}
+        {notes.length > 0 ? <div class="notes-grid">{notes.map((note) => <NoteCard note={note} />)}</div> : <EmptyState title="还没有公开随记" description="当前暂无可阅读内容。" />}
       </div>
     </section>
   </main>

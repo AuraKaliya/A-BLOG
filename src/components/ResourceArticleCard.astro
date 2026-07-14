@@ -26,7 +26,7 @@ const tagList = article.tags.join(",");
     <h2><a href={`/writings/${article.slug}`}>{article.title}</a></h2>
     <p>{article.summary}</p>
     <div class="tag-row">
-      {article.tags.map((tag) => <button type="button" data-article-tag-jump={tag}>{tag}</button>)}
+      {article.tags.map((tag) => <button type="button" data-article-tag-jump={tag} title={tag}><span>{tag}</span></button>)}
     </div>
   </div>
 </article>

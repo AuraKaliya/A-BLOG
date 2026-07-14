@@ -17,8 +17,8 @@ const structuredData = [
     { name: "世界档案", path: "/world" },
   ]),
   buildCollectionPageStructuredData({
-    title: "世界档案",
-    description: "角色、地区、组织、事件、规则与术语构成的设定资料库。",
+    title: "Dreath 世界档案",
+    description: "Dreath 的人物、地点、组织、事件、规则与术语。",
     path: "/world",
     itemCount: entries.length,
   }),
@@ -26,65 +26,66 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title="世界档案"
-  description="角色、地区、组织、事件、规则与术语构成的设定资料库。"
+  title="Dreath 世界档案"
+  description="Dreath 的人物、地点、组织、事件、规则与术语。"
   image="/og/page/world.svg"
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="世界档案" description="这不是一列普通文章，而是一组可以相互关联、持续整理和逐渐公开的设定档案。" />
+    <PageHero title="Dreath 世界档案" description="Dreath 的人物、地点、组织、事件与规则。" />
 
     <section class="archive-section world-archive-section">
       <div class="container archive-list" data-world-filter-root>
         <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "世界档案" }]} />
 
-        <div class="world-command-panel">
-          <div>
-            <span class="eyebrow">Archive Index</span>
-            <strong>{entries.length} 份公开档案已接入索引</strong>
-            <p>按条目类型浏览，或沿着每份档案中的关联继续探索。</p>
-          </div>
-          <div class="world-command-actions">
-            <a class="secondary-cta" href="/map?type=world">查看关系星图</a>
-            <a class="secondary-cta" href="/world/timeline">查看事件时间线</a>
-            <button class="primary-cta random-entry-button" type="button" data-random-entry>随机进入一个条目</button>
-          </div>
-        </div>
-
-        <div class="world-filter-panel">
-          <div>
-            <span class="eyebrow">Filter</span>
-            <strong data-world-filter-summary>正在显示全部 {entries.length} 份档案</strong>
-          </div>
-          <div class="search-filter-row" role="group" aria-label="世界档案类型筛选">
-            <button class="filter-chip active" type="button" data-world-filter="all" aria-pressed="true">全部 {entries.length}</button>
-            {
-              kinds.map(([kind, label]) => (
-                <button class="filter-chip" type="button" data-world-filter={kind} aria-pressed="false">
-                  {label} {entries.filter((entry) => entry.data.kind === kind).length}
-                </button>
-              ))
-            }
-          </div>
-        </div>
-
         {
-          kinds.map(([kind, label]) => {
-            const kindEntries = entries.filter((entry) => entry.data.kind === kind);
-            return (
-              <section class="world-kind-section" id={kind} data-world-kind-section={kind}>
-                <SectionHeading
-                  eyebrow={kind}
-                  title={label}
-                  description={`当前公开 ${kindEntries.length} 份${label}档案。`}
-                />
-                <div class="world-grid">{kindEntries.map((entry) => <WorldCard entry={entry} />)}</div>
-              </section>
-            );
-          })
-        }
+          entries.length > 0 ? (
+            <>
+              <div class="world-command-panel">
+                <div>
+                  <span class="eyebrow">Dreath 档案</span>
+                  <strong>{entries.length} 份公开档案</strong>
+                  <p>按条目类型浏览，或沿着档案之间的关联继续探索。</p>
+                </div>
+                <div class="world-command-actions">
+                  <a class="secondary-cta" href="/map?type=world">查看内容关系</a>
+                  <a class="secondary-cta" href="/world/timeline">查看事件时间线</a>
+                  <button class="primary-cta random-entry-button" type="button" data-random-entry>随机进入一个条目</button>
+                </div>
+              </div>
 
-        {entries.length === 0 && <EmptyState title="世界档案仍未开放" description="添加 world 内容条目后，这里会自动形成资料库索引。" />}
+              <div class="world-filter-panel">
+                <div>
+                  <span class="eyebrow">筛选</span>
+                  <strong data-world-filter-summary>正在显示全部 {entries.length} 份档案</strong>
+                </div>
+                <div class="search-filter-row" role="group" aria-label="世界档案类型筛选">
+                  <button class="filter-chip active" type="button" data-world-filter="all" aria-pressed="true">全部 {entries.length}</button>
+                  {kinds.map(([kind, label]) => (
+                    <button class="filter-chip" type="button" data-world-filter={kind} aria-pressed="false">
+                      {label} {entries.filter((entry) => entry.data.kind === kind).length}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {kinds.map(([kind, label]) => {
+                const kindEntries = entries.filter((entry) => entry.data.kind === kind);
+                return (
+                  <section class="world-kind-section" id={kind} data-world-kind-section={kind}>
+                    <SectionHeading eyebrow={kind} title={label} description={`已公开 ${kindEntries.length} 份${label}档案。`} />
+                    <div class="world-grid">{kindEntries.map((entry) => <WorldCard entry={entry} />)}</div>
+                  </section>
+                );
+              })}
+            </>
+          ) : (
+            <EmptyState
+              title="还没有公开的 Dreath 档案"
+              description="当前暂无可阅读条目。"
+            />
+          )
+        }
       </div>
     </section>
   </main>

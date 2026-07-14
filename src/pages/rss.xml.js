@@ -13,7 +13,7 @@ export async function GET(context) {
       link: `/writings/${article.slug}/`,
     })),
     ...notes.map((note) => ({
-      title: `短动态：${note.data.title}`,
+      title: `随记：${note.data.title}`,
       description: note.data.description,
       pubDate: note.data.pubDate,
       link: `/notes/${note.slug}/`,

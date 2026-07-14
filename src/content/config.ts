@@ -59,7 +59,7 @@ const homePage = z.object({
   title: z.string(),
   description: z.string(),
   profile: z.object({
-    eyebrow: z.string().default("Profile"),
+    eyebrow: z.string().default("个人简介"),
     name: z.string(),
     role: z.string(),
     status: z.string(),
@@ -67,6 +67,7 @@ const homePage = z.object({
     bio: z.string(),
     imageIndex: z.string().optional(),
     imageAlt: z.string().optional(),
+    imagePosition: z.string().optional(),
     tags: z.array(z.string()).default([]),
     links: z.array(simpleLinkSchema).default([]),
   }),
@@ -76,16 +77,17 @@ const homePage = z.object({
     description: z.string(),
     imageIndex: z.string().optional(),
     imageAlt: z.string().optional(),
+    imagePosition: z.string().optional(),
     href: z.string().optional(),
   }),
   randomExplore: z.object({
-    eyebrow: z.string().default("Explore"),
+    eyebrow: z.string().default("随机浏览"),
     title: z.string(),
     description: z.string(),
     actionLabel: z.string(),
   }),
   intro: z.object({
-    eyebrow: z.string().default("About this site"),
+    eyebrow: z.string().default("关于这里"),
     title: z.string(),
     lead: z.string(),
     highlights: z.array(
@@ -154,6 +156,7 @@ const nowPage = z.object({
   kind: z.literal("now"),
   title: z.string(),
   description: z.string(),
+  updatedDate: z.coerce.date().optional(),
   intro: z.object({
     title: z.string(),
     description: z.string(),

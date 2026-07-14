@@ -139,6 +139,13 @@
     return `/resource/${raw}.png`;
   };
 
+  const setImagePosition = (image, value) => {
+    const position = String(value ?? "").trim();
+    if (image && /^(?:\d{1,3}(?:\.\d+)?%|left|center|right)(?:\s+(?:\d{1,3}(?:\.\d+)?%|top|center|bottom))?$/.test(position)) {
+      image.style.objectPosition = position;
+    }
+  };
+
   function setLinks(container, links = []) {
     if (!container) return;
     container.innerHTML = links
@@ -168,6 +175,8 @@
     text("[data-home-profile-role]", home.profile?.role, root);
     text("[data-home-profile-status]", home.profile?.status, root);
     text("[data-home-profile-location]", home.profile?.location, root);
+    const profileLocation = root.querySelector("[data-home-profile-location]");
+    if (profileLocation) profileLocation.hidden = !String(home.profile?.location ?? "").trim();
     text("[data-home-profile-bio]", home.profile?.bio, root);
     setTags(root.querySelector("[data-home-profile-tags]"), home.profile?.tags);
     setLinks(root.querySelector("[data-home-profile-links]"), home.profile?.links);
@@ -176,6 +185,7 @@
       profileImage.src = resourceImage(home.profile.imageIndex);
       profileImage.alt = home.profile.imageAlt || home.profile.name || "";
     }
+    setImagePosition(profileImage, home.profile?.imagePosition);
 
     text("[data-home-recent-eyebrow]", home.recentStatus?.eyebrow, root);
     text("[data-home-recent-title]", home.recentStatus?.title, root);
@@ -185,6 +195,7 @@
       recentImage.src = resourceImage(home.recentStatus.imageIndex);
       recentImage.alt = home.recentStatus.imageAlt || home.recentStatus.title || "";
     }
+    setImagePosition(recentImage, home.recentStatus?.imagePosition);
     const recentLink = root.querySelector(".recent-status-copy a");
     if (recentLink && home.recentStatus?.href) recentLink.href = safeHref(home.recentStatus.href, recentLink.href);
 
@@ -236,7 +247,7 @@
           <h2><a href="/writings/${encodeURIComponent(article.slug)}">${escapeHtml(article.title)}</a></h2>
           <p>${escapeHtml(article.summary)}</p>
           <div class="tag-row">
-            ${tags.map((tag) => `<button type="button" data-article-tag-jump="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join("")}
+            ${tags.map((tag) => `<button type="button" data-article-tag-jump="${escapeHtml(tag)}" title="${escapeHtml(tag)}"><span>${escapeHtml(tag)}</span></button>`).join("")}
           </div>
         </div>
       </article>
@@ -287,18 +298,22 @@
   async function hydrateWritingsIndex() {
     const collection = document.querySelector("[data-article-collection]");
     const controls = document.querySelector("[data-article-controls]");
+    const emptyState = document.querySelector("[data-article-empty]");
     if (!collection || !controls) return;
 
     const [articlePayload, tagPayload] = await Promise.all([api.get("/api/articles/"), api.get("/api/articles/tags/")]);
     const articles = articlePayload.items || [];
     const tags = tagPayload.items || [];
     collection.innerHTML = articles.map(articleCard).join("");
+    controls.hidden = articles.length === 0;
+    collection.hidden = articles.length === 0;
+    if (emptyState) emptyState.hidden = articles.length > 0;
 
     const filter = controls.querySelector(".article-tag-filter");
     if (filter) {
       filter.innerHTML = `
         <button type="button" data-article-tag="all" aria-pressed="true"><span>全部档案</span><small>${articles.length}</small></button>
-        ${tags.map((tag) => `<button type="button" data-article-tag="${escapeHtml(tag.name)}" aria-pressed="false"><span>${escapeHtml(tag.name)}</span><small>${Number(tag.count) || 0}</small></button>`).join("")}
+        ${tags.map((tag) => `<button type="button" data-article-tag="${escapeHtml(tag.name)}" aria-pressed="false" title="${escapeHtml(tag.name)}"><span>${escapeHtml(tag.name)}</span><small>${Number(tag.count) || 0}</small></button>`).join("")}
       `;
     }
     applyArticleFilters(collection, controls);
@@ -307,7 +322,8 @@
   function slugFromPath() {
     const parts = window.location.pathname.split("/").filter(Boolean);
     if (parts[0] !== "writings") return "";
-    if (!parts[1] || parts[1] === "live") return "";
+    if (parts[1] === "live") return new URLSearchParams(window.location.search).get("slug") || "";
+    if (!parts[1]) return "";
     return decodeURIComponent(parts[1]);
   }
 
@@ -352,7 +368,7 @@
     }
     aside.innerHTML = `
       <div class="article-toc-card">
-        <p class="article-toc-kicker">CONTENTS</p>
+        <p class="article-toc-kicker">目录</p>
         <nav class="article-toc-list" aria-label="文章目录">
           ${toc.map((item) => `<a class="article-toc-link depth-${item.depth}" href="#${escapeHtml(item.id)}" data-article-toc-link="${escapeHtml(item.id)}"><span>${escapeHtml(item.text)}</span></a>`).join("")}
         </nav>

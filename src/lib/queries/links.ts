@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { withSlug } from "../content-entry";
+import { hasCollectionSource, withSlug } from "../content-entry";
 import type { LinkEntry } from "../content-types";
 
 export function sortLinksByDate(links: LinkEntry[]) {
@@ -11,6 +11,7 @@ export function sortLinksByDate(links: LinkEntry[]) {
 }
 
 export async function getPublishedLinks() {
+  if (!hasCollectionSource("links", [".md", ".mdx"])) return [];
   const links = await getCollection("links", ({ data }) => !data.draft);
   return sortLinksByDate(links.map(withSlug));
 }

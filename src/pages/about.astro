@@ -7,6 +7,11 @@ import SocialCard from "../components/SocialCard.astro";
 
 const aboutPage = await getAboutPageData();
 const about = aboutPage.data;
+const contactFields = [
+  { label: about.contact.emailLabel, value: siteConfig.author.email },
+  { label: about.contact.githubLabel, value: siteConfig.author.github.replace("https://", "") },
+  { label: about.contact.socialLabel, value: siteConfig.author.social },
+].filter((item) => item.value.trim());
 ---
 
 <BaseLayout title={about.title} description={about.description} image="/og/page/about.svg">
@@ -16,63 +21,53 @@ const about = aboutPage.data;
       <p>{about.description}</p>
     </section>
 
-    <section class="about-section section-dark">
-      <div class="container about-grid">
+    <section class="about-section section-dark" id="identity">
+      <div class:list={["container", "about-grid", { "single-column": about.focusAreas.length === 0 }]}>
         <article class="about-story">
           <h3>{about.intro.title}</h3>
           <p>{about.intro.description}</p>
         </article>
-        <div class="stats-grid" id="focus">
-          {about.focusAreas.map((item, index) => <article><strong>{String(index + 1).padStart(2, "0")}</strong><span>{item}</span></article>)}
-        </div>
+        {about.focusAreas.length > 0 && <div class="stats-grid">{about.focusAreas.map((item, index) => <article><strong>{String(index + 1).padStart(2, "0")}</strong><span>{item}</span></article>)}</div>}
       </div>
     </section>
 
-    <section class="support-section section-mid" id="stack">
-      <div class="container support-layout">
-        <div class="support-panel">
-          {
-            about.stackCards.map((card) => (
-              <article class:list={["support-card", { primary: card.featured }]}>
-                {card.label && <span class="eyebrow">{card.label}</span>}
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
-              </article>
-            ))
-          }
+    <section class="support-section section-mid" id="focus">
+      <div class:list={["container", "support-layout", { "single-column": contactFields.length === 0 }]}>
+        <div class="archive-list">
+          <SectionHeading eyebrow="当前内容" title="我在做什么" description="Dreath 是目前的创作核心，写作和技术实践也会在形成具体内容后公开。" />
+          <div class="support-panel">
+            {
+              about.stackCards.map((card) => (
+                <article class:list={["support-card", { primary: card.featured }]}>
+                  {card.label && <span class="eyebrow">{card.label}</span>}
+                  <h3>{card.title}</h3>
+                  <p>{card.description}</p>
+                </article>
+              ))
+            }
+          </div>
         </div>
 
-        <div class="support-form static-panel" id="contact">
-          <span class="eyebrow">Contact</span>
+        {contactFields.length > 0 && <div class="support-form static-panel" id="contact">
+          <span class="eyebrow">联系</span>
           <h3>联系方式</h3>
-          <label>
-            <span>{about.contact.emailLabel}</span>
-            <input type="text" value={siteConfig.author.email} readonly />
-          </label>
-          <label>
-            <span>{about.contact.githubLabel}</span>
-            <input type="text" value={siteConfig.author.github.replace("https://", "")} readonly />
-          </label>
-          <label>
-            <span>{about.contact.socialLabel}</span>
-            <input type="text" value={siteConfig.author.social} readonly />
-          </label>
-          <a class="primary-cta submit" href={`mailto:${siteConfig.author.email}`}>{about.contact.ctaLabel}</a>
-        </div>
+          {contactFields.map((item) => <label><span>{item.label}</span><input type="text" value={item.value} readonly /></label>)}
+          {siteConfig.author.email && <a class="primary-cta submit" href={`mailto:${siteConfig.author.email}`}>{about.contact.ctaLabel}</a>}
+        </div>}
       </div>
     </section>
 
-    <section class="archive-section section-dark" id="socials">
+    {about.socialCards.length > 0 && <section class="archive-section section-dark" id="socials">
       <div class="container archive-list">
         <SectionHeading
-          eyebrow="Find Me"
-          title="在哪里可以找到我"
-          description="不同入口承载不同类型的交流：代码、订阅和较完整的联系各自有合适的位置。"
+          eyebrow="其他入口"
+          title="可以找到我的地方"
+          description="当前可用的站外入口。"
         />
         <div class="social-grid">
           {about.socialCards.map((card) => <SocialCard {...card} />)}
         </div>
       </div>
-    </section>
+    </section>}
   </main>
 </BaseLayout>

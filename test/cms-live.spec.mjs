@@ -109,11 +109,11 @@ test("writings index hydrates live articles and tags", async ({ page }) => {
 });
 
 test("article detail hydrates live body, toc, metadata, and view count", async ({ page }) => {
-  await page.route("**/api/articles/starting-a-personal-site/**", async (route) => {
+  await page.route("**/api/articles/live-article/**", async (route) => {
     if (new URL(route.request().url()).pathname.endsWith("/view/")) {
       await route.fulfill({
         contentType: "application/json",
-        json: { slug: "starting-a-personal-site", views: 12, counted: true },
+        json: { slug: "live-article", views: 12, counted: true },
       });
       return;
     }
@@ -121,7 +121,7 @@ test("article detail hydrates live body, toc, metadata, and view count", async (
     await route.fulfill({
       contentType: "application/json",
       json: {
-        slug: "starting-a-personal-site",
+        slug: "live-article",
         title: "实时详情标题",
         summary: "详情页来自 CMS API。",
         cover: "/resource/default/default_image.png",
@@ -142,7 +142,7 @@ test("article detail hydrates live body, toc, metadata, and view count", async (
       json: {
         items: [
           {
-            slug: "starting-a-personal-site",
+            slug: "live-article",
             title: "实时详情标题",
             summary: "详情页来自 CMS API。",
             cover: "/resource/default/default_image.png",
@@ -159,7 +159,7 @@ test("article detail hydrates live body, toc, metadata, and view count", async (
     });
   });
 
-  await page.goto("/writings/starting-a-personal-site");
+  await page.goto("/writings/live?slug=live-article");
 
   await expect(page.getByRole("heading", { level: 1, name: "实时详情标题" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "章节一" })).toBeVisible();

@@ -1,58 +1,55 @@
 {
   "kind": "home",
-  "title": "Aura 的个人空间",
-  "description": "一个保存文字、技术、作品、世界设定与未完成想法的个人内容站点入口。",
+  "title": "Aura Kaliye 的个人空间",
+  "description": "Aura Kaliye 的创作、写作与技术实践。",
   "profile": {
-    "eyebrow": "Profile",
+    "eyebrow": "个人简介",
     "name": "Aura Kaliye",
-    "role": "银花海 / 花海 ",
-    "status": "正在激情创作世界观中",
-    "location": "Online, mostly at night",
-    "bio": "欢迎来到Aura的个人空间！",
+    "role": "笔名：Aura、银花海、花海",
+    "status": "正在创作 Dreath",
+    "location": "",
+    "bio": "我使用 Aura Kaliye、Aura、银花海和花海作为署名。",
     "imageIndex": "default/default_image",
     "imageAlt": "Aura Kaliye 头像",
+    "imagePosition": "50% 50%",
     "tags": [],
-    "links": [
-      {
-        "label": "Twitter",
-        "href": "https://twitter.com/AuraKaliye"
-      }
-    ]
+    "links": []
   },
   "recentStatus": {
-    "eyebrow": "Recent Status",
-    "title": "近期状态",
-    "description": "正在激情创作世界观中，顺手把个人站整理成更适合长期维护的展示板。",
+    "eyebrow": "近期状态",
+    "title": "Dreath 近况",
+    "description": "最近主要在推进 Dreath，当前工作集中在人物、地点和事件之间的关系。",
     "imageIndex": "default/default_image",
-    "imageAlt": "近期状态展示图"
+    "imageAlt": "近期状态展示图",
+    "imagePosition": "42% 50%"
   },
   "randomExplore": {
-    "eyebrow": "Explore",
-    "title": "随机探索",
-    "description": "从文章、作品、世界档案、短动态和站外链接里随机打开一个入口。",
-    "actionLabel": "开始漫游"
+    "eyebrow": "随机浏览",
+    "title": "随意看看",
+    "description": "从已经公开的文字、随记、收藏和其他内容中随机打开一页。",
+    "actionLabel": "随机打开"
   },
   "intro": {
-    "eyebrow": "About this site",
-    "title": "来点正经介绍",
-    "lead": "这里会留存有我的生活记录、创作作品以及各种想法和实验。",
+    "eyebrow": "关于这里",
+    "title": "创作、写作与实践",
+    "lead": "这个空间以 Dreath 为当前创作核心，也会收录其他已经完成或正在推进的内容。",
     "highlights": [
       {
         "keyword": "文字",
-        "title": "生活随笔、技术博客",
-        "description": "梦和影子的留存之地",
-        "href": "/archive"
+        "title": "写下来的内容",
+        "description": "随笔、创作笔记与技术实践",
+        "href": "/writings"
       },
       {
         "keyword": "作品",
-        "title": "项目、工具",
-        "description": "一些想法和实践的产物归档之地",
+        "title": "完成的创作",
+        "description": "准备好公开的项目、工具与作品",
         "href": "/works"
       },
       {
         "keyword": "世界",
-        "title": "Dreath世界观",
-        "description": "欢迎来到Aura的幻想世界",
+        "title": "Dreath",
+        "description": "人物、地点、事件与规则构成的幻想世界",
         "href": "/world"
       }
     ]

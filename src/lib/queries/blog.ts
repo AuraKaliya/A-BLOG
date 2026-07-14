@@ -1,6 +1,6 @@
 import { getCollection } from "astro:content";
 import { blogCategoryKeys } from "../../config/taxonomy";
-import { withSlug } from "../content-entry";
+import { hasCollectionSource, withSlug } from "../content-entry";
 import type { BlogPost } from "../content-types";
 
 export function sortPostsByDate(posts: BlogPost[]) {
@@ -8,6 +8,7 @@ export function sortPostsByDate(posts: BlogPost[]) {
 }
 
 export async function getPublishedPosts() {
+  if (!hasCollectionSource("blog", [".md", ".mdx"])) return [];
   const posts = await getCollection("blog", ({ data }) => !data.draft);
   return sortPostsByDate(posts.map(withSlug));
 }

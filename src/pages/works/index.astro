@@ -2,6 +2,7 @@
 import ArchiveFilters from "../../components/ArchiveFilters.astro";
 import ArchivePageLayout from "../../components/ArchivePageLayout.astro";
 import ArchiveSectionGroup from "../../components/ArchiveSectionGroup.astro";
+import EmptyState from "../../components/EmptyState.astro";
 import WorkCard from "../../components/WorkCard.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllWorkCategories, getPublishedWorks, getTopicDefinitions } from "../../lib/content";
@@ -10,34 +11,37 @@ import { workCategoryLabels } from "../../config/taxonomy";
 const [works, categories, topics] = await Promise.all([getPublishedWorks(), getAllWorkCategories(), getTopicDefinitions()]);
 const filterGroups = [
   {
-    title: "Categories",
+    title: "分类",
     items: categories.map((category) => ({ label: workCategoryLabels[category], href: `/works/categories/${category}` })),
   },
   {
-    title: "Topics",
+    title: "主题",
     items: topics.map((topic) => ({ label: topic.data.title, href: `/works/topics/${topic.id}` })),
   },
 ];
 ---
 
 <BaseLayout title="作品" description="项目、写作、工具、研究和实验的展示归档。" image="/og/page/works.svg">
-  <ArchivePageLayout title="作品" description="这里不只放完成项目，也放能代表方向、方法和判断的长期产出。" sectionTone="section-mid">
-    <ArchiveFilters slot="before" groups={filterGroups} />
+  <ArchivePageLayout title="作品" description="项目、工具、写作与创作成果。" sectionTone="section-mid">
+    {works.length > 0 && <ArchiveFilters slot="before" groups={filterGroups} />}
 
     {
-      categories.map((category) => (
-        <ArchiveSectionGroup
-          eyebrow={category}
-          title={workCategoryLabels[category]}
-          description="这个分组用于承接同类型项目，后续可以继续扩展筛选、案例研究和相关博客关联。"
-        >
-          <div class="work-grid">
-            {works
-              .filter((work) => work.data.category === category)
-              .map((work) => <WorkCard work={work} />)}
-          </div>
-        </ArchiveSectionGroup>
-      ))
+      works.length > 0 ? (
+        categories.map((category) => (
+          <ArchiveSectionGroup eyebrow={category} title={workCategoryLabels[category]}>
+            <div class="work-grid">
+              {works
+                .filter((work) => work.data.category === category)
+                .map((work) => <WorkCard work={work} />)}
+            </div>
+          </ArchiveSectionGroup>
+        ))
+      ) : (
+        <EmptyState
+          title="还没有公开作品"
+          description="当前暂无可展示的作品。"
+        />
+      )
     }
   </ArchivePageLayout>
 </BaseLayout>

@@ -18,7 +18,7 @@ const topicMap = await getTopicDefinitionMap();
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "短动态", path: "/notes" },
+    { name: "随记", path: "/notes" },
     { name: note.data.title, path: `/notes/${note.slug}` },
   ]),
   buildNoteStructuredData(note),
@@ -37,9 +37,9 @@ const structuredData = [
 >
   <main class="page-main">
     <article class="article-shell container note-detail">
-      <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "短动态", href: "/notes" }, { label: note.data.title }]} />
+      <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "随记", href: "/notes" }, { label: note.data.title }]} />
       <header class="article-header note-entry-header">
-        <span class="eyebrow">Signal / {note.data.kind}</span>
+        <span class="eyebrow">随记 / {note.data.kind}</span>
         <h1>{note.data.title}</h1>
         <p>{note.data.description}</p>
         <div class="meta-grid">

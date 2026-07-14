@@ -1,6 +1,7 @@
 ---
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import ContentMap from "../components/ContentMap.astro";
+import EmptyState from "../components/EmptyState.astro";
 import PageHero from "../components/PageHero.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import { contentGraphKindLabels } from "../config/taxonomy";
@@ -9,14 +10,15 @@ import { getContentGraphData, getTopicSummaries } from "../lib/content";
 import { buildBreadcrumbStructuredData, buildCollectionPageStructuredData } from "../lib/seo";
 
 const [graph, topics] = await Promise.all([getContentGraphData(), getTopicSummaries()]);
+const hasRelations = graph.edges.length > 0;
 const graphKinds = Object.entries(contentGraphKindLabels);
 const structuredData = [
   buildBreadcrumbStructuredData([
     { name: "门户", path: "/" },
-    { name: "内容星图", path: "/map" },
+    { name: "内容关系", path: "/map" },
   ]),
   buildCollectionPageStructuredData({
-    title: "内容星图",
+    title: "内容关系",
     description: "把主题关联和跨内容引用展开成一张可以探索的关系图。",
     path: "/map",
     itemCount: graph.nodes.length,
@@ -25,25 +27,26 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title="内容星图"
+  title="内容关系"
   description="把主题关联和跨内容引用展开成一张可以探索的关系图。"
   image="/og/page/map.svg"
   structuredData={structuredData}
 >
   <main class="page-main">
-    <PageHero title="内容星图" description="有些内容靠时间相邻，有些内容则因为共享主题、彼此引用而发生连接。这里展示后一种关系。" />
+    <PageHero title="内容关系" description="文章、随记、收藏与主题之间的直接关联。" />
 
     <section class="archive-section content-map-section">
       <div class="container archive-list" data-content-map-root>
-        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "内容星图" }]} />
+        <Breadcrumbs items={[{ label: "门户", href: "/" }, { label: "内容关系" }]} />
 
+        {hasRelations ? <>
         <div class="content-map-command-panel">
           <div>
-            <span class="eyebrow">Constellation</span>
+            <span class="eyebrow">内容关系</span>
             <strong data-content-map-summary>{graph.nodes.length} 个节点 / {graph.edges.length} 条关系</strong>
             <p>悬停或聚焦一个节点可以看见它的直接连接；点击节点会进入对应内容。</p>
           </div>
-          <div class="search-filter-row" role="group" aria-label="内容星图类型筛选">
+          <div class="search-filter-row" role="group" aria-label="内容关系类型筛选">
             <button class="filter-chip active" type="button" data-graph-filter="all" aria-pressed="true">全部 {graph.nodes.length}</button>
             {
               graphKinds.map(([kind, label]) => (
@@ -58,14 +61,13 @@ const structuredData = [
         <ContentMap graph={graph} />
 
         <div class="content-map-actions">
-          <a class="secondary-cta" href="/topics">切换到主题地图</a>
-          <a class="secondary-cta" href="/links">查看站外信号</a>
-          <a class="secondary-cta" href="/graph.json">查看图数据 JSON</a>
-          <button class="primary-cta random-entry-button" type="button" data-random-entry>沿随机节点离开</button>
+          <a class="secondary-cta" href="/topics">查看主题</a>
+          <a class="secondary-cta" href="/links">查看收藏</a>
+          <button class="primary-cta random-entry-button" type="button" data-random-entry>随机浏览</button>
         </div>
 
         <section class="content-map-topic-index">
-          <SectionHeading eyebrow="Topic Cores" title="主题核心索引" description="每个主题核心连接不同类型的内容；这里提供不依赖图形的浏览入口。" />
+          <SectionHeading eyebrow="主题" title="相关主题" description="也可以不使用关系图，直接按主题浏览。" />
           <div class="topic-overview">
             {
               topics.map((topic) => (
@@ -78,6 +80,7 @@ const structuredData = [
             }
           </div>
         </section>
+        </> : <EmptyState title="还没有可展示的内容关系" description="公开内容建立关联后，关系图会显示在这里。" />}
       </div>
     </section>
   </main>
